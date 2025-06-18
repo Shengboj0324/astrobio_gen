@@ -1,0 +1,93 @@
+#########################################################
+# ===== CORE NUMERICAL & DATA-SCIENCE STACK ============ #
+#########################################################
+numpy>=1.26,<2.0
+scipy>=1.11,<2.0
+pandas>=2.2,<3.0
+xarray>=2024.2          # NetCDF climate cubes
+tqdm>=4.66
+networkx>=3.3
+sympy>=1.12             # quick analytic checks / ODE prototypes
+
+#########################################################
+# =====  DEEP-LEARNING & CLASSICAL ML  ================ #
+#########################################################
+# ---- PyTorch (choose ONE block) ----
+torch==2.2.0              # CPU build
+torch==2.2.0+cu118       # CUDA 11.8  ~~ uncomment & add extra-index below
+torchvision==0.17.0+cu118
+ -f https://download.pytorch.org/whl/torch_stable.html
+
+torchvision==0.17.0
+torchaudio==2.2.0         # in case you explore audio biosignatures
+scikit-learn>=1.4
+umap-learn>=0.5           # dimensionality reduction for spectra clusters
+lightgbm>=4.3             # fast gradient boosting baseline
+# ---- optional graph-neural-net ----
+torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
+torch_sparse>=0.6
+
+#########################################################
+# ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
+#########################################################
+cobra==0.28.0             # constraint-based modeling
+optlang>=1.7              # solver backend for COBRA
+escher>=1.7               # pathway diagrams (optional)
+rdkit-pypi==2023.9.5     # molecular ops if you start QC cheminformatics
+
+#########################################################
+# ======  ATMOSPHERIC & CLIMATE SIM  (lightweight) ==== #
+#########################################################
+atmos<=0.3.1              # simple 1-D photochem model fork
+pint>=0.23                # unit-handling for chemistry
+pyproj>=3.6               # map projections if you output 2-D climate
+netCDF4>=1.6              # read pre-run ROCKE-3D cubes
+# ---- heavy 3-D GCM wrappers — *install only in WSL/Linux* ----
+#rocke3d==1.3              # if you compile ROCKE-3D python hooks
+
+#########################################################
+# ======  ASTRONOMY / ASTROCHEMISTRY STACK ============ #
+#########################################################
+astropy>=6.0
+astroquery>=0.4.7         # NASA archive, Vizier, etc.
+specutils>=1.13           # spectrum containers / ops
+lightkurve>=2.4           # transit light-curve helpers
+pysynphot>=2.0            # synthetic spectra utilities
+pysiaf>=0.19             # JWST aperture data if you need pixel-level sims
+requests>=2.31            # PSG and other REST APIs
+h5py>=3.11                # many FITS → HDF pipelines
+petitRADTRANS>=2.7.1     # fast RT (Linux/conda only; comment on Windows)
+radis==0.15.1            # ExoMol/HITRAN parsing (needs C compiler)
+
+#########################################################
+# ======  QUANTUM / HIGH-THROUGHPUT CHEM (optional) === #
+#########################################################
+openbabel>=3.1           # molecule conversions
+ase>=3.23                # atomic simulation environment for QC workflows
+dftbplus==23.1           # semi-empirical if you venture into QM spectra
+
+#########################################################
+# ======  VISUALISATION & NOTEBOOK EXPERIENCE  ======== #
+#########################################################
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.19              # interactive spectral plots
+ipywidgets>=8.1
+ipympl>=0.9               # live Matplotlib in JupyterLab
+ipykernel>=6.29
+jupyterlab>=4.1
+
+#########################################################
+# ======  DEV / TEST / LINT (OPTIONAL)  =============== #
+#########################################################
+black>=24.3
+isort>=5.13
+ruff>=0.3                 # fast linter combo
+pytest>=8.1
+pytest-cov>=4.1
+pre-commit>=3.7           # ensure formatting before commits
+
+#########################################################
+# ======  WINDOWS-ONLY BUILD HELPERS  ================= #
+#########################################################
+# msvc-runtime           # auto-pulled if missing for compiled wheels
