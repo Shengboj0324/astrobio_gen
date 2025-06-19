@@ -1,0 +1,19 @@
+# Global defaults (override with --config my.yml)
+trainer:
+  max_epochs: 200
+  batch_size: 32
+  accelerator: auto       # cpu / mps / gpu
+model:
+  type: graph_vae          # graph_vae | fusion
+  graph_vae:
+    in_nodes: 4
+    latent: 8
+  fusion:
+    latent_dim: 128
+    depth: 4
+data:
+  synthetic_size: 1000
+  fusion_schema:
+    air_quality:  [numeric, null]
+    rock_type:    [categorical, 12]
+    surface_vec:  [vector, 64]

@@ -6,7 +6,7 @@ scipy>=1.11,<2.0
 pandas>=2.2,<3.0
 xarray>=2024.2          # NetCDF climate cubes
 tqdm>=4.66
-networkx>=3.2
+networkx==3.2.1
 sympy>=1.12             # quick analytic checks / ODE prototypes
 
 #########################################################
@@ -14,8 +14,8 @@ sympy>=1.12             # quick analytic checks / ODE prototypes
 #########################################################
 # ---- PyTorch (choose ONE block) ----
 torch==2.2.0              # CPU build
-torch==2.2.0+cu118       # CUDA 11.8  ~~ uncomment & add extra-index below
-torchvision==0.17.0+cu118
+     # CUDA 11.8  ~~ uncomment & add extra-index below
+torchvision==0.17.0
  -f https://download.pytorch.org/whl/torch_stable.html
 
 torchvision==0.17.0
@@ -33,7 +33,7 @@ torch_sparse>=0.6
 cobra==0.28.0             # constraint-based modeling
 optlang>=1.7              # solver backend for COBRA
 escher>=1.7               # pathway diagrams (optional)
-rdkit-pypi==2023.9.5     # molecular ops if you start QC cheminformatics
+rdkit-pypi==2022.9.5     # molecular ops if you start QC cheminformatics
 
 #########################################################
 # ======  ATMOSPHERIC & CLIMATE SIM  (lightweight) ==== #
