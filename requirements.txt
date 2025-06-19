@@ -6,7 +6,7 @@ scipy>=1.11,<2.0
 pandas>=2.2,<3.0
 xarray>=2024.2          # NetCDF climate cubes
 tqdm>=4.66
-networkx>=3.3
+networkx>=3.2
 sympy>=1.12             # quick analytic checks / ODE prototypes
 
 #########################################################
@@ -24,8 +24,8 @@ scikit-learn>=1.4
 umap-learn>=0.5           # dimensionality reduction for spectra clusters
 lightgbm>=4.3             # fast gradient boosting baseline
 # ---- optional graph-neural-net ----
-#torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
-#torch_sparse>=0.6
+torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
+torch_sparse>=0.6
 
 #########################################################
 # ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
