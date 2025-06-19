@@ -15,7 +15,8 @@ from typing import Dict, List, Tuple
 import pandas as pd
 import requests
 from astroquery.nasa_exoplanet_archive import NasaExoplanetArchive
-
+import duckdb, pendulum
+DB = duckdb.connect("data/astro.db")
 # ---------------------------------------------------------------------------
 # CONFIGURABLE CONSTANTS – tweak to raise / tighten planet selection criteria
 # ---------------------------------------------------------------------------
@@ -61,17 +62,25 @@ logging.basicConfig(
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
+def last_update() -> str:
+    try:
+        return DB.execute("SELECT max(rowupdate) FROM exoplanets").fetchone()[0]
+    except duckdb.CatalogException:
+        return "1900-01-01"
 
-def fetch_exocat() -> pd.DataFrame:
-    """Query the NASA Exoplanet Archive TAP service and return a DataFrame."""
-    query = f"select {', '.join(TAP_COLUMNS)} from ps"
-    logging.info("Querying NASA Exoplanet Archive …")
-    tbl = NasaExoplanetArchive.query_tap(query, cache=True, timeout=60)
+
+def fetch_delta():
+    since = last_update()
+    query = f"""
+        SELECT {', '.join(TAP_COLUMNS)}, rowupdate
+        FROM ps WHERE rowupdate > '{since}'
+    """
+    tbl = NasaExoplanetArchive.query_tap(query, cache=False)
     df = tbl.to_pandas()
-    stamped = RAW_DIR / f"exocat_{_dt.date.today()}.csv"
-    df.to_csv(stamped, index=False)
-    logging.info("Saved raw catalog ➜ %s (%d rows)", stamped.name, len(df))
-    return df
+    if not df.empty:
+        DB.execute("CREATE TABLE IF NOT EXISTS exoplanets AS SELECT * FROM df LIMIT 0")
+        DB.execute("INSERT INTO exoplanets SELECT * FROM df")
+    return DB.execute("SELECT * FROM exoplanets").fetch_df()
 
 
 def habitable_filter(df: pd.DataFrame) -> pd.DataFrame:

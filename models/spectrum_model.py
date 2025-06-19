@@ -1,9 +1,20 @@
-import torch
-import torch.nn as nn
+import torch, torch.nn as nn, pathlib, warnings
 
-class SpectalPredictor(nn.Module):
-    def__init__(self, n_gases: int=4, n_bins: int = 100):
-        if super():
-            self.linear = nn.Linear(n_gases, n_bins)
-    def forward(self, gas_vec: torch,Tensor) -> torch.Tensor:
-        return torch.relu(self.linear(gas_vec))
+class _AE(nn.Module):
+    def __init__(self, bins=100, latent=12):
+        super().__init__()
+        self.enc = nn.Sequential(nn.Linear(bins,64), nn.ReLU(), nn.Linear(64,latent))
+        self.dec = nn.Sequential(nn.Linear(latent,64), nn.ReLU(), nn.Linear(64,bins))
+    def forward(self,x):
+        return self.dec(self.enc(x))
+
+def get_autoencoder(bins=100):
+    pt = pathlib.Path("models/spectral_autoencoder.pt")
+    model = _AE(bins)
+    if pt.exists():
+        ckpt = torch.load(pt, map_location="cpu")
+        model.load_state_dict(ckpt["state_dict"])
+    else:
+        warnings.warn("Autoencoder weights not found; using random init")
+    model.eval()
+    return model
