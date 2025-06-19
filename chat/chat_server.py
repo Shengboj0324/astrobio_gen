@@ -1,12 +1,4 @@
-"""
-chat_server.py
-==============
-Minimal RAG-plus-tool chatbot that runs offline.
 
-* Loads a local GGUF model via llama-cpp.
-* Uses LangChain’s OpenAI-function-calling support to decide when
-  to call simulate_planet().
-"""
 from pathlib import Path
 import os, json
 

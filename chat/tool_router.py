@@ -1,14 +1,4 @@
-"""
-tool_router.py
-==============
-Exposes the astrobio pipeline as a callable *tool* for the chat model.
 
-`simulate_planet` accepts JSON:
-    { "planet": "Test-Earth",
-      "methanogenic_flux": 0.1 }
-
-It returns a short JSON blob that includes the final detectability score.
-"""
 import json, random
 from pathlib import Path
 from pipeline.generate_metabolism import generate_metabolism

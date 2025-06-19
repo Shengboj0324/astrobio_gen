@@ -1,7 +1,4 @@
-"""Small ResNet‑style 1‑D CNN to map 4‑gas vector → 100‑bin spectrum.
-Trains on the dummy Gaussian generator so you can pre‑train weights before
-PSG data arrives.
-"""
+
 import torch, torch.nn as nn
 
 class ResBlock(nn.Module):

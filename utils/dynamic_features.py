@@ -1,7 +1,3 @@
-"""
-Dynamic feature registry – map column types to encoders at runtime.
-Numeric → 1-layer MLP, Category → embedding, Small graph → GCN encoder.
-"""
 
 from __future__ import annotations
 import torch, torch.nn as nn
