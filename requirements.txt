@@ -24,8 +24,8 @@ scikit-learn>=1.4
 umap-learn>=0.5           # dimensionality reduction for spectra clusters
 lightgbm>=4.3             # fast gradient boosting baseline
 # ---- optional graph-neural-net ----
-torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
-torch_sparse>=0.6
+#torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
+#torch_sparse>=0.6
 
 #########################################################
 # ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
@@ -58,7 +58,8 @@ requests>=2.31            # PSG and other REST APIs
 h5py>=3.11                # many FITS → HDF pipelines
 petitRADTRANS>=2.7.1     # fast RT (Linux/conda only; comment on Windows)
 radis==0.15.1            # ExoMol/HITRAN parsing (needs C compiler)
-
+# torch_scatter>=2.1          # if you added this one
+# torch_cluster>=1.6
 #########################################################
 # ======  QUANTUM / HIGH-THROUGHPUT CHEM (optional) === #
 #########################################################
