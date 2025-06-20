@@ -1,0 +1,3 @@
+_target_: models.graph_vae.GraphVAE
+latent_dim: 16
+hidden_dim: 64
