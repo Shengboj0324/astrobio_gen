@@ -38,7 +38,7 @@ rdkit-pypi==2022.9.5     # molecular ops if you start QC cheminformatics
 #########################################################
 # ======  ATMOSPHERIC & CLIMATE SIM  (lightweight) ==== #
 #########################################################
-atmos<=0.3.1              # simple 1-D photochem model fork
+atmos==0.2.6              # simple 1-D photochem model fork
 pint>=0.23                # unit-handling for chemistry
 pyproj>=3.6               # map projections if you output 2-D climate
 netCDF4>=1.6              # read pre-run ROCKE-3D cubes
@@ -56,7 +56,7 @@ pysynphot>=2.0            # synthetic spectra utilities
 pysiaf>=0.19             # JWST aperture data if you need pixel-level sims
 requests>=2.31            # PSG and other REST APIs
 h5py>=3.11                # many FITS → HDF pipelines
-petitRADTRANS>=2.7.1     # fast RT (Linux/conda only; comment on Windows)
+#petitRADTRANS>=2.7.1     # fast RT (Linux/conda only; comment on Windows)
 radis==0.15.1            # ExoMol/HITRAN parsing (needs C compiler)
 # torch_scatter>=2.1          # if you added this one
 # torch_cluster>=1.6
@@ -66,7 +66,7 @@ radis==0.15.1            # ExoMol/HITRAN parsing (needs C compiler)
 openbabel>=3.1           # molecule conversions
 ase>=3.23                # atomic simulation environment for QC workflows
 dftbplus==23.1           # semi-empirical if you venture into QM spectra
-
+pytorch-lightning==2.2.4
 #########################################################
 # ======  VISUALISATION & NOTEBOOK EXPERIENCE  ======== #
 #########################################################
