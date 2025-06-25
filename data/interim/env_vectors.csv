@@ -1,0 +1,582 @@
+pathway,pH,temp,O2,redox
+"pathway_id,description",7.0,298,0.21,0.0
+"map01100,Metabolic pathways",7.0,298,0.21,0.0
+"map01110,Biosynthesis of secondary metabolites",7.0,298,0.21,0.0
+"map01120,Microbial metabolism in diverse environments",7.0,298,0.21,0.0
+"map01200,Carbon metabolism",7.0,298,0.21,0.0
+"map01210,2-Oxocarboxylic acid metabolism",7.0,298,0.21,0.0
+"map01212,Fatty acid metabolism",7.0,298,0.21,0.0
+"map01230,Biosynthesis of amino acids",7.0,298,0.21,0.0
+"map01232,Nucleotide metabolism",7.0,298,0.21,0.0
+"map01250,Biosynthesis of nucleotide sugars",7.0,298,0.21,0.0
+"map01240,Biosynthesis of cofactors",7.0,298,0.21,0.0
+"map01220,Degradation of aromatic compounds",7.0,298,0.21,0.0
+"map01310,Nitrogen cycle",7.0,298,0.21,0.0
+"map01320,Sulfur cycle",7.0,298,0.21,0.0
+"map00010,Glycolysis / Gluconeogenesis",7.0,298,0.21,0.0
+"map00020,Citrate cycle (TCA cycle)",7.0,298,0.21,0.0
+"map00030,Pentose phosphate pathway",7.0,298,0.21,0.0
+"map00040,Pentose and glucuronate interconversions",7.0,298,0.21,0.0
+"map00051,Fructose and mannose metabolism",7.0,298,0.21,0.0
+"map00052,Galactose metabolism",7.0,298,0.21,0.0
+"map00053,Ascorbate and aldarate metabolism",7.0,298,0.21,0.0
+"map00500,Starch and sucrose metabolism",7.0,298,0.21,0.0
+"map00620,Pyruvate metabolism",7.0,298,0.21,0.0
+"map00630,Glyoxylate and dicarboxylate metabolism",7.0,298,0.21,0.0
+"map00640,Propanoate metabolism",7.0,298,0.21,0.0
+"map00650,Butanoate metabolism",7.0,298,0.21,0.0
+"map00660,C5-Branched dibasic acid metabolism",7.0,298,0.21,0.0
+"map00562,Inositol phosphate metabolism",7.0,298,0.21,0.0
+"map00190,Oxidative phosphorylation",7.0,298,0.21,0.0
+"map00195,Photosynthesis",7.0,298,0.21,0.0
+"map00196,Photosynthesis - antenna proteins",7.0,298,0.21,0.0
+"map00710,Carbon fixation by Calvin cycle",7.0,298,0.21,0.0
+"map00720,Other carbon fixation pathways",7.0,298,0.21,0.0
+"map00680,Methane metabolism",7.0,298,0.21,0.0
+"map00910,Nitrogen metabolism",7.0,298,0.21,0.0
+"map00920,Sulfur metabolism",7.0,298,0.21,0.0
+"map00061,Fatty acid biosynthesis",7.0,298,0.21,0.0
+"map00062,Fatty acid elongation",7.0,298,0.21,0.0
+"map00071,Fatty acid degradation",7.0,298,0.21,0.0
+"map00073,""Cutin, suberine and wax biosynthesis""",7.0,298,0.21,0.0
+"map00074,Mycolic acid biosynthesis",7.0,298,0.21,0.0
+"map00100,Steroid biosynthesis",7.0,298,0.21,0.0
+"map00120,Primary bile acid biosynthesis",7.0,298,0.21,0.0
+"map00121,Secondary bile acid biosynthesis",7.0,298,0.21,0.0
+"map00140,Steroid hormone biosynthesis",7.0,298,0.21,0.0
+"map00561,Glycerolipid metabolism",7.0,298,0.21,0.0
+"map00564,Glycerophospholipid metabolism",7.0,298,0.21,0.0
+"map00565,Ether lipid metabolism",7.0,298,0.21,0.0
+"map00600,Sphingolipid metabolism",7.0,298,0.21,0.0
+"map00590,Arachidonic acid metabolism",7.0,298,0.21,0.0
+"map00591,Linoleic acid metabolism",7.0,298,0.21,0.0
+"map00592,alpha-Linolenic acid metabolism",7.0,298,0.21,0.0
+"map01040,Biosynthesis of unsaturated fatty acids",7.0,298,0.21,0.0
+"map00230,Purine metabolism",7.0,298,0.21,0.0
+"map00240,Pyrimidine metabolism",7.0,298,0.21,0.0
+"map00250,""Alanine, aspartate and glutamate metabolism""",7.0,298,0.21,0.0
+"map00260,""Glycine, serine and threonine metabolism""",7.0,298,0.21,0.0
+"map00270,Cysteine and methionine metabolism",7.0,298,0.21,0.0
+"map00280,""Valine, leucine and isoleucine degradation""",7.0,298,0.21,0.0
+"map00290,""Valine, leucine and isoleucine biosynthesis""",7.0,298,0.21,0.0
+"map00300,Lysine biosynthesis",7.0,298,0.21,0.0
+"map00310,Lysine degradation",7.0,298,0.21,0.0
+"map00220,Arginine biosynthesis",7.0,298,0.21,0.0
+"map00330,Arginine and proline metabolism",7.0,298,0.21,0.0
+"map00340,Histidine metabolism",7.0,298,0.21,0.0
+"map00350,Tyrosine metabolism",7.0,298,0.21,0.0
+"map00360,Phenylalanine metabolism",7.0,298,0.21,0.0
+"map00380,Tryptophan metabolism",7.0,298,0.21,0.0
+"map00400,""Phenylalanine, tyrosine and tryptophan biosynthesis""",7.0,298,0.21,0.0
+"map00410,beta-Alanine metabolism",7.0,298,0.21,0.0
+"map00430,Taurine and hypotaurine metabolism",7.0,298,0.21,0.0
+"map00440,Phosphonate and phosphinate metabolism",7.0,298,0.21,0.0
+"map00450,Selenocompound metabolism",7.0,298,0.21,0.0
+"map00460,Cyanoamino acid metabolism",7.0,298,0.21,0.0
+"map00470,D-Amino acid metabolism",7.0,298,0.21,0.0
+"map00480,Glutathione metabolism",7.0,298,0.21,0.0
+"map00520,Amino sugar and nucleotide sugar metabolism",7.0,298,0.21,0.0
+"map00541,Biosynthesis of various nucleotide sugars",7.0,298,0.21,0.0
+"map00510,N-Glycan biosynthesis",7.0,298,0.21,0.0
+"map00513,Various types of N-glycan biosynthesis",7.0,298,0.21,0.0
+"map00512,Mucin type O-glycan biosynthesis",7.0,298,0.21,0.0
+"map00515,Mannose type O-glycan biosynthesis",7.0,298,0.21,0.0
+"map00514,Other types of O-glycan biosynthesis",7.0,298,0.21,0.0
+"map00532,Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate",7.0,298,0.21,0.0
+"map00534,Glycosaminoglycan biosynthesis - heparan sulfate / heparin",7.0,298,0.21,0.0
+"map00533,Glycosaminoglycan biosynthesis - keratan sulfate",7.0,298,0.21,0.0
+"map00531,Glycosaminoglycan degradation",7.0,298,0.21,0.0
+"map00563,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis",7.0,298,0.21,0.0
+"map00601,Glycosphingolipid biosynthesis - lacto and neolacto series",7.0,298,0.21,0.0
+"map00603,Glycosphingolipid biosynthesis - globo and isoglobo series",7.0,298,0.21,0.0
+"map00604,Glycosphingolipid biosynthesis - ganglio series",7.0,298,0.21,0.0
+"map00511,Other glycan degradation",7.0,298,0.21,0.0
+"map00540,Lipopolysaccharide biosynthesis",7.0,298,0.21,0.0
+"map00542,O-Antigen repeat unit biosynthesis",7.0,298,0.21,0.0
+"map00550,Peptidoglycan biosynthesis",7.0,298,0.21,0.0
+"map00552,Teichoic acid biosynthesis",7.0,298,0.21,0.0
+"map00571,Lipoarabinomannan (LAM) biosynthesis",7.0,298,0.21,0.0
+"map00572,Arabinogalactan biosynthesis - Mycobacterium",7.0,298,0.21,0.0
+"map00543,Exopolysaccharide biosynthesis",7.0,298,0.21,0.0
+"map00730,Thiamine metabolism",7.0,298,0.21,0.0
+"map00740,Riboflavin metabolism",7.0,298,0.21,0.0
+"map00750,Vitamin B6 metabolism",7.0,298,0.21,0.0
+"map00760,Nicotinate and nicotinamide metabolism",7.0,298,0.21,0.0
+"map00770,Pantothenate and CoA biosynthesis",7.0,298,0.21,0.0
+"map00780,Biotin metabolism",7.0,298,0.21,0.0
+"map00785,Lipoic acid metabolism",7.0,298,0.21,0.0
+"map00790,Folate biosynthesis",7.0,298,0.21,0.0
+"map00670,One carbon pool by folate",7.0,298,0.21,0.0
+"map00830,Retinol metabolism",7.0,298,0.21,0.0
+"map00860,Porphyrin metabolism",7.0,298,0.21,0.0
+"map00130,Ubiquinone and other terpenoid-quinone biosynthesis",7.0,298,0.21,0.0
+"map00900,Terpenoid backbone biosynthesis",7.0,298,0.21,0.0
+"map00902,Monoterpenoid biosynthesis",7.0,298,0.21,0.0
+"map00909,Sesquiterpenoid and triterpenoid biosynthesis",7.0,298,0.21,0.0
+"map00904,Diterpenoid biosynthesis",7.0,298,0.21,0.0
+"map00906,Carotenoid biosynthesis",7.0,298,0.21,0.0
+"map00905,Brassinosteroid biosynthesis",7.0,298,0.21,0.0
+"map00981,Insect hormone biosynthesis",7.0,298,0.21,0.0
+"map00908,Zeatin biosynthesis",7.0,298,0.21,0.0
+"map00903,Limonene degradation",7.0,298,0.21,0.0
+"map00907,""Pinene, camphor and geraniol degradation""",7.0,298,0.21,0.0
+"map01052,Type I polyketide structures",7.0,298,0.21,0.0
+"map00522,""Biosynthesis of 12-, 14- and 16-membered macrolides""",7.0,298,0.21,0.0
+"map01051,Biosynthesis of ansamycins",7.0,298,0.21,0.0
+"map01059,Biosynthesis of enediyne antibiotics",7.0,298,0.21,0.0
+"map01056,Biosynthesis of type II polyketide backbone",7.0,298,0.21,0.0
+"map01057,Biosynthesis of type II polyketide products",7.0,298,0.21,0.0
+"map00253,Tetracycline biosynthesis",7.0,298,0.21,0.0
+"map00523,Polyketide sugar unit biosynthesis",7.0,298,0.21,0.0
+"map01054,Nonribosomal peptide structures",7.0,298,0.21,0.0
+"map01053,Biosynthesis of siderophore group nonribosomal peptides",7.0,298,0.21,0.0
+"map01055,Biosynthesis of vancomycin group antibiotics",7.0,298,0.21,0.0
+"map00940,Phenylpropanoid biosynthesis",7.0,298,0.21,0.0
+"map00945,""Stilbenoid, diarylheptanoid and gingerol biosynthesis""",7.0,298,0.21,0.0
+"map00941,Flavonoid biosynthesis",7.0,298,0.21,0.0
+"map00944,Flavone and flavonol biosynthesis",7.0,298,0.21,0.0
+"map00942,Anthocyanin biosynthesis",7.0,298,0.21,0.0
+"map00943,Isoflavonoid biosynthesis",7.0,298,0.21,0.0
+"map00946,Degradation of flavonoids",7.0,298,0.21,0.0
+"map00901,Indole alkaloid biosynthesis",7.0,298,0.21,0.0
+"map00403,Indole diterpene alkaloid biosynthesis",7.0,298,0.21,0.0
+"map00950,Isoquinoline alkaloid biosynthesis",7.0,298,0.21,0.0
+"map00960,""Tropane, piperidine and pyridine alkaloid biosynthesis""",7.0,298,0.21,0.0
+"map00996,Biosynthesis of various alkaloids",7.0,298,0.21,0.0
+"map00232,Caffeine metabolism",7.0,298,0.21,0.0
+"map00965,Betalain biosynthesis",7.0,298,0.21,0.0
+"map00966,Glucosinolate biosynthesis",7.0,298,0.21,0.0
+"map00402,Benzoxazinoid biosynthesis",7.0,298,0.21,0.0
+"map00311,Penicillin and cephalosporin biosynthesis",7.0,298,0.21,0.0
+"map00332,Carbapenem biosynthesis",7.0,298,0.21,0.0
+"map00261,Monobactam biosynthesis",7.0,298,0.21,0.0
+"map00331,Clavulanic acid biosynthesis",7.0,298,0.21,0.0
+"map00521,Streptomycin biosynthesis",7.0,298,0.21,0.0
+"map00524,""Neomycin, kanamycin and gentamicin biosynthesis""",7.0,298,0.21,0.0
+"map00525,Acarbose and validamycin biosynthesis",7.0,298,0.21,0.0
+"map00401,Novobiocin biosynthesis",7.0,298,0.21,0.0
+"map00404,Staurosporine biosynthesis",7.0,298,0.21,0.0
+"map00405,Phenazine biosynthesis",7.0,298,0.21,0.0
+"map00333,Prodigiosin biosynthesis",7.0,298,0.21,0.0
+"map00254,Aflatoxin biosynthesis",7.0,298,0.21,0.0
+"map00998,Biosynthesis of various antibiotics",7.0,298,0.21,0.0
+"map00999,Biosynthesis of various plant secondary metabolites",7.0,298,0.21,0.0
+"map00997,Biosynthesis of various other secondary metabolites",7.0,298,0.21,0.0
+"map00362,Benzoate degradation",7.0,298,0.21,0.0
+"map00627,Aminobenzoate degradation",7.0,298,0.21,0.0
+"map00364,Fluorobenzoate degradation",7.0,298,0.21,0.0
+"map00625,Chloroalkane and chloroalkene degradation",7.0,298,0.21,0.0
+"map00361,Chlorocyclohexane and chlorobenzene degradation",7.0,298,0.21,0.0
+"map00623,Toluene degradation",7.0,298,0.21,0.0
+"map00622,Xylene degradation",7.0,298,0.21,0.0
+"map00633,Nitrotoluene degradation",7.0,298,0.21,0.0
+"map00642,Ethylbenzene degradation",7.0,298,0.21,0.0
+"map00643,Styrene degradation",7.0,298,0.21,0.0
+"map00791,Atrazine degradation",7.0,298,0.21,0.0
+"map00930,Caprolactam degradation",7.0,298,0.21,0.0
+"map00363,Bisphenol degradation",7.0,298,0.21,0.0
+"map00621,Dioxin degradation",7.0,298,0.21,0.0
+"map00626,Naphthalene degradation",7.0,298,0.21,0.0
+"map00624,Polycyclic aromatic hydrocarbon degradation",7.0,298,0.21,0.0
+"map00365,Furfural degradation",7.0,298,0.21,0.0
+"map00984,Steroid degradation",7.0,298,0.21,0.0
+"map00980,Metabolism of xenobiotics by cytochrome P450",7.0,298,0.21,0.0
+"map00982,Drug metabolism - cytochrome P450",7.0,298,0.21,0.0
+"map00983,Drug metabolism - other enzymes",7.0,298,0.21,0.0
+"map01010,Overview of biosynthetic pathways",7.0,298,0.21,0.0
+"map01060,Biosynthesis of plant secondary metabolites",7.0,298,0.21,0.0
+"map01061,Biosynthesis of phenylpropanoids",7.0,298,0.21,0.0
+"map01062,Biosynthesis of terpenoids and steroids",7.0,298,0.21,0.0
+"map01063,Biosynthesis of alkaloids derived from shikimate pathway",7.0,298,0.21,0.0
+"map01064,""Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid""",7.0,298,0.21,0.0
+"map01065,Biosynthesis of alkaloids derived from histidine and purine",7.0,298,0.21,0.0
+"map01066,Biosynthesis of alkaloids derived from terpenoid and polyketide",7.0,298,0.21,0.0
+"map01070,Biosynthesis of plant hormones",7.0,298,0.21,0.0
+"map03020,RNA polymerase",7.0,298,0.21,0.0
+"map03022,Basal transcription factors",7.0,298,0.21,0.0
+"map03040,Spliceosome",7.0,298,0.21,0.0
+"map03010,Ribosome",7.0,298,0.21,0.0
+"map00970,Aminoacyl-tRNA biosynthesis",7.0,298,0.21,0.0
+"map03013,Nucleocytoplasmic transport",7.0,298,0.21,0.0
+"map03015,mRNA surveillance pathway",7.0,298,0.21,0.0
+"map03008,Ribosome biogenesis in eukaryotes",7.0,298,0.21,0.0
+"map03060,Protein export",7.0,298,0.21,0.0
+"map04141,Protein processing in endoplasmic reticulum",7.0,298,0.21,0.0
+"map04130,SNARE interactions in vesicular transport",7.0,298,0.21,0.0
+"map04120,Ubiquitin mediated proteolysis",7.0,298,0.21,0.0
+"map04122,Sulfur relay system",7.0,298,0.21,0.0
+"map03050,Proteasome",7.0,298,0.21,0.0
+"map03018,RNA degradation",7.0,298,0.21,0.0
+"map03030,DNA replication",7.0,298,0.21,0.0
+"map03410,Base excision repair",7.0,298,0.21,0.0
+"map03420,Nucleotide excision repair",7.0,298,0.21,0.0
+"map03430,Mismatch repair",7.0,298,0.21,0.0
+"map03440,Homologous recombination",7.0,298,0.21,0.0
+"map03450,Non-homologous end-joining",7.0,298,0.21,0.0
+"map03460,Fanconi anemia pathway",7.0,298,0.21,0.0
+"map03082,ATP-dependent chromatin remodeling",7.0,298,0.21,0.0
+"map03083,Polycomb repressive complex",7.0,298,0.21,0.0
+"map03230,Viral genome structure",7.0,298,0.21,0.0
+"map03240,Viral replication",7.0,298,0.21,0.0
+"map03250,Viral life cycle - HIV-1",7.0,298,0.21,0.0
+"map03260,Virion - Human immunodeficiency virus",7.0,298,0.21,0.0
+"map03271,Virion - Rotavirus",7.0,298,0.21,0.0
+"map03262,Virion - Coronavirus",7.0,298,0.21,0.0
+"map03261,Virion - Influenza virus",7.0,298,0.21,0.0
+"map03263,Virion - Enterovirus",7.0,298,0.21,0.0
+"map03264,Virion - Flavivirus and Alphavirus",7.0,298,0.21,0.0
+"map03265,""Virion - Ebolavirus, Lyssavirus and Morbillivirus""",7.0,298,0.21,0.0
+"map03273,Virion - Lassa virus and SFTS virus",7.0,298,0.21,0.0
+"map03272,Virion - Hepatitis viruses",7.0,298,0.21,0.0
+"map03266,Virion - Herpesvirus",7.0,298,0.21,0.0
+"map03268,Virion - Orthopoxvirus",7.0,298,0.21,0.0
+"map03267,Virion - Adenovirus",7.0,298,0.21,0.0
+"map03259,Virion - Bacteriophages T4 and T7",7.0,298,0.21,0.0
+"map03258,Virion - Bacteriophage lambda",7.0,298,0.21,0.0
+"map02010,ABC transporters",7.0,298,0.21,0.0
+"map02060,Phosphotransferase system (PTS)",7.0,298,0.21,0.0
+"map03070,Bacterial secretion system",7.0,298,0.21,0.0
+"map02020,Two-component system",7.0,298,0.21,0.0
+"map04010,MAPK signaling pathway",7.0,298,0.21,0.0
+"map04013,MAPK signaling pathway - fly",7.0,298,0.21,0.0
+"map04016,MAPK signaling pathway - plant",7.0,298,0.21,0.0
+"map04011,MAPK signaling pathway - yeast",7.0,298,0.21,0.0
+"map04012,ErbB signaling pathway",7.0,298,0.21,0.0
+"map04014,Ras signaling pathway",7.0,298,0.21,0.0
+"map04015,Rap1 signaling pathway",7.0,298,0.21,0.0
+"map04310,Wnt signaling pathway",7.0,298,0.21,0.0
+"map04330,Notch signaling pathway",7.0,298,0.21,0.0
+"map04340,Hedgehog signaling pathway",7.0,298,0.21,0.0
+"map04341,Hedgehog signaling pathway - fly",7.0,298,0.21,0.0
+"map04350,TGF-beta signaling pathway",7.0,298,0.21,0.0
+"map04390,Hippo signaling pathway",7.0,298,0.21,0.0
+"map04391,Hippo signaling pathway - fly",7.0,298,0.21,0.0
+"map04392,Hippo signaling pathway - multiple species",7.0,298,0.21,0.0
+"map04370,VEGF signaling pathway",7.0,298,0.21,0.0
+"map04371,Apelin signaling pathway",7.0,298,0.21,0.0
+"map04630,JAK-STAT signaling pathway",7.0,298,0.21,0.0
+"map04064,NF-kappa B signaling pathway",7.0,298,0.21,0.0
+"map04668,TNF signaling pathway",7.0,298,0.21,0.0
+"map04066,HIF-1 signaling pathway",7.0,298,0.21,0.0
+"map04068,FoxO signaling pathway",7.0,298,0.21,0.0
+"map04020,Calcium signaling pathway",7.0,298,0.21,0.0
+"map04070,Phosphatidylinositol signaling system",7.0,298,0.21,0.0
+"map04072,Phospholipase D signaling pathway",7.0,298,0.21,0.0
+"map04071,Sphingolipid signaling pathway",7.0,298,0.21,0.0
+"map04024,cAMP signaling pathway",7.0,298,0.21,0.0
+"map04022,cGMP-PKG signaling pathway",7.0,298,0.21,0.0
+"map04151,PI3K-Akt signaling pathway",7.0,298,0.21,0.0
+"map04152,AMPK signaling pathway",7.0,298,0.21,0.0
+"map04150,mTOR signaling pathway",7.0,298,0.21,0.0
+"map04075,Plant hormone signal transduction",7.0,298,0.21,0.0
+"map04080,Neuroactive ligand-receptor interaction",7.0,298,0.21,0.0
+"map04082,Neuroactive ligand signaling",7.0,298,0.21,0.0
+"map04081,Hormone signaling",7.0,298,0.21,0.0
+"map04060,Cytokine-cytokine receptor interaction",7.0,298,0.21,0.0
+"map04061,Viral protein interaction with cytokine and cytokine receptor",7.0,298,0.21,0.0
+"map04512,ECM-receptor interaction",7.0,298,0.21,0.0
+"map04514,Cell adhesion molecules",7.0,298,0.21,0.0
+"map04144,Endocytosis",7.0,298,0.21,0.0
+"map04145,Phagosome",7.0,298,0.21,0.0
+"map04142,Lysosome",7.0,298,0.21,0.0
+"map04146,Peroxisome",7.0,298,0.21,0.0
+"map04140,Autophagy - animal",7.0,298,0.21,0.0
+"map04138,Autophagy - yeast",7.0,298,0.21,0.0
+"map04136,Autophagy - other",7.0,298,0.21,0.0
+"map04137,Mitophagy - animal",7.0,298,0.21,0.0
+"map04139,Mitophagy - yeast",7.0,298,0.21,0.0
+"map04148,Efferocytosis",7.0,298,0.21,0.0
+"map04110,Cell cycle",7.0,298,0.21,0.0
+"map04111,Cell cycle - yeast",7.0,298,0.21,0.0
+"map04112,Cell cycle - Caulobacter",7.0,298,0.21,0.0
+"map04113,Meiosis - yeast",7.0,298,0.21,0.0
+"map04114,Oocyte meiosis",7.0,298,0.21,0.0
+"map04210,Apoptosis",7.0,298,0.21,0.0
+"map04214,Apoptosis - fly",7.0,298,0.21,0.0
+"map04215,Apoptosis - multiple species",7.0,298,0.21,0.0
+"map04216,Ferroptosis",7.0,298,0.21,0.0
+"map04217,Necroptosis",7.0,298,0.21,0.0
+"map04115,p53 signaling pathway",7.0,298,0.21,0.0
+"map04218,Cellular senescence",7.0,298,0.21,0.0
+"map04510,Focal adhesion",7.0,298,0.21,0.0
+"map04520,Adherens junction",7.0,298,0.21,0.0
+"map04530,Tight junction",7.0,298,0.21,0.0
+"map04540,Gap junction",7.0,298,0.21,0.0
+"map04550,Signaling pathways regulating pluripotency of stem cells",7.0,298,0.21,0.0
+"map02024,Quorum sensing",7.0,298,0.21,0.0
+"map05111,Biofilm formation - Vibrio cholerae",7.0,298,0.21,0.0
+"map02025,Biofilm formation - Pseudomonas aeruginosa",7.0,298,0.21,0.0
+"map02026,Biofilm formation - Escherichia coli",7.0,298,0.21,0.0
+"map02030,Bacterial chemotaxis",7.0,298,0.21,0.0
+"map02040,Flagellar assembly",7.0,298,0.21,0.0
+"map04814,Motor proteins",7.0,298,0.21,0.0
+"map04820,Cytoskeleton in muscle cells",7.0,298,0.21,0.0
+"map04810,Regulation of actin cytoskeleton",7.0,298,0.21,0.0
+"map04640,Hematopoietic cell lineage",7.0,298,0.21,0.0
+"map04610,Complement and coagulation cascades",7.0,298,0.21,0.0
+"map04611,Platelet activation",7.0,298,0.21,0.0
+"map04613,Neutrophil extracellular trap formation",7.0,298,0.21,0.0
+"map04620,Toll-like receptor signaling pathway",7.0,298,0.21,0.0
+"map04624,Toll and Imd signaling pathway",7.0,298,0.21,0.0
+"map04621,NOD-like receptor signaling pathway",7.0,298,0.21,0.0
+"map04622,RIG-I-like receptor signaling pathway",7.0,298,0.21,0.0
+"map04623,Cytosolic DNA-sensing pathway",7.0,298,0.21,0.0
+"map04625,C-type lectin receptor signaling pathway",7.0,298,0.21,0.0
+"map04650,Natural killer cell mediated cytotoxicity",7.0,298,0.21,0.0
+"map04612,Antigen processing and presentation",7.0,298,0.21,0.0
+"map04660,T cell receptor signaling pathway",7.0,298,0.21,0.0
+"map04658,Th1 and Th2 cell differentiation",7.0,298,0.21,0.0
+"map04659,Th17 cell differentiation",7.0,298,0.21,0.0
+"map04657,IL-17 signaling pathway",7.0,298,0.21,0.0
+"map04662,B cell receptor signaling pathway",7.0,298,0.21,0.0
+"map04664,Fc epsilon RI signaling pathway",7.0,298,0.21,0.0
+"map04666,Fc gamma R-mediated phagocytosis",7.0,298,0.21,0.0
+"map04670,Leukocyte transendothelial migration",7.0,298,0.21,0.0
+"map04672,Intestinal immune network for IgA production",7.0,298,0.21,0.0
+"map04062,Chemokine signaling pathway",7.0,298,0.21,0.0
+"map04911,Insulin secretion",7.0,298,0.21,0.0
+"map04910,Insulin signaling pathway",7.0,298,0.21,0.0
+"map04922,Glucagon signaling pathway",7.0,298,0.21,0.0
+"map04923,Regulation of lipolysis in adipocytes",7.0,298,0.21,0.0
+"map04920,Adipocytokine signaling pathway",7.0,298,0.21,0.0
+"map03320,PPAR signaling pathway",7.0,298,0.21,0.0
+"map04929,GnRH secretion",7.0,298,0.21,0.0
+"map04912,GnRH signaling pathway",7.0,298,0.21,0.0
+"map04913,Ovarian steroidogenesis",7.0,298,0.21,0.0
+"map04915,Estrogen signaling pathway",7.0,298,0.21,0.0
+"map04914,Progesterone-mediated oocyte maturation",7.0,298,0.21,0.0
+"map04917,Prolactin signaling pathway",7.0,298,0.21,0.0
+"map04921,Oxytocin signaling pathway",7.0,298,0.21,0.0
+"map04926,Relaxin signaling pathway",7.0,298,0.21,0.0
+"map04935,""Growth hormone synthesis, secretion and action""",7.0,298,0.21,0.0
+"map04918,Thyroid hormone synthesis",7.0,298,0.21,0.0
+"map04919,Thyroid hormone signaling pathway",7.0,298,0.21,0.0
+"map04928,""Parathyroid hormone synthesis, secretion and action""",7.0,298,0.21,0.0
+"map04916,Melanogenesis",7.0,298,0.21,0.0
+"map04924,Renin secretion",7.0,298,0.21,0.0
+"map04614,Renin-angiotensin system",7.0,298,0.21,0.0
+"map04925,Aldosterone synthesis and secretion",7.0,298,0.21,0.0
+"map04927,Cortisol synthesis and secretion",7.0,298,0.21,0.0
+"map04260,Cardiac muscle contraction",7.0,298,0.21,0.0
+"map04261,Adrenergic signaling in cardiomyocytes",7.0,298,0.21,0.0
+"map04270,Vascular smooth muscle contraction",7.0,298,0.21,0.0
+"map04970,Salivary secretion",7.0,298,0.21,0.0
+"map04971,Gastric acid secretion",7.0,298,0.21,0.0
+"map04972,Pancreatic secretion",7.0,298,0.21,0.0
+"map04976,Bile secretion",7.0,298,0.21,0.0
+"map04973,Carbohydrate digestion and absorption",7.0,298,0.21,0.0
+"map04974,Protein digestion and absorption",7.0,298,0.21,0.0
+"map04975,Fat digestion and absorption",7.0,298,0.21,0.0
+"map04979,Cholesterol metabolism",7.0,298,0.21,0.0
+"map04977,Vitamin digestion and absorption",7.0,298,0.21,0.0
+"map04981,Folate transport and metabolism",7.0,298,0.21,0.0
+"map04980,Cobalamin transport and metabolism",7.0,298,0.21,0.0
+"map04978,Mineral absorption",7.0,298,0.21,0.0
+"map04962,Vasopressin-regulated water reabsorption",7.0,298,0.21,0.0
+"map04960,Aldosterone-regulated sodium reabsorption",7.0,298,0.21,0.0
+"map04961,Endocrine and other factor-regulated calcium reabsorption",7.0,298,0.21,0.0
+"map04964,Proximal tubule bicarbonate reclamation",7.0,298,0.21,0.0
+"map04966,Collecting duct acid secretion",7.0,298,0.21,0.0
+"map04724,Glutamatergic synapse",7.0,298,0.21,0.0
+"map04727,GABAergic synapse",7.0,298,0.21,0.0
+"map04725,Cholinergic synapse",7.0,298,0.21,0.0
+"map04728,Dopaminergic synapse",7.0,298,0.21,0.0
+"map04726,Serotonergic synapse",7.0,298,0.21,0.0
+"map04720,Long-term potentiation",7.0,298,0.21,0.0
+"map04730,Long-term depression",7.0,298,0.21,0.0
+"map04723,Retrograde endocannabinoid signaling",7.0,298,0.21,0.0
+"map04721,Synaptic vesicle cycle",7.0,298,0.21,0.0
+"map04722,Neurotrophin signaling pathway",7.0,298,0.21,0.0
+"map04744,Phototransduction",7.0,298,0.21,0.0
+"map04745,Phototransduction - fly",7.0,298,0.21,0.0
+"map04740,Olfactory transduction",7.0,298,0.21,0.0
+"map04742,Taste transduction",7.0,298,0.21,0.0
+"map04750,Inflammatory mediator regulation of TRP channels",7.0,298,0.21,0.0
+"map04320,Dorso-ventral axis formation",7.0,298,0.21,0.0
+"map04360,Axon guidance",7.0,298,0.21,0.0
+"map04361,Axon regeneration",7.0,298,0.21,0.0
+"map04380,Osteoclast differentiation",7.0,298,0.21,0.0
+"map04382,Cornified envelope formation",7.0,298,0.21,0.0
+"map04211,Longevity regulating pathway",7.0,298,0.21,0.0
+"map04212,Longevity regulating pathway - worm",7.0,298,0.21,0.0
+"map04213,Longevity regulating pathway - multiple species",7.0,298,0.21,0.0
+"map04710,Circadian rhythm",7.0,298,0.21,0.0
+"map04713,Circadian entrainment",7.0,298,0.21,0.0
+"map04711,Circadian rhythm - fly",7.0,298,0.21,0.0
+"map04712,Circadian rhythm - plant",7.0,298,0.21,0.0
+"map04714,Thermogenesis",7.0,298,0.21,0.0
+"map04626,Plant-pathogen interaction",7.0,298,0.21,0.0
+"map05200,Pathways in cancer",7.0,298,0.21,0.0
+"map05202,Transcriptional misregulation in cancer",7.0,298,0.21,0.0
+"map05206,MicroRNAs in cancer",7.0,298,0.21,0.0
+"map05205,Proteoglycans in cancer",7.0,298,0.21,0.0
+"map05204,Chemical carcinogenesis - DNA adducts",7.0,298,0.21,0.0
+"map05207,Chemical carcinogenesis - receptor activation",7.0,298,0.21,0.0
+"map05208,Chemical carcinogenesis - reactive oxygen species",7.0,298,0.21,0.0
+"map05203,Viral carcinogenesis",7.0,298,0.21,0.0
+"map05230,Central carbon metabolism in cancer",7.0,298,0.21,0.0
+"map05231,Choline metabolism in cancer",7.0,298,0.21,0.0
+"map05235,PD-L1 expression and PD-1 checkpoint pathway in cancer",7.0,298,0.21,0.0
+"map05210,Colorectal cancer",7.0,298,0.21,0.0
+"map05212,Pancreatic cancer",7.0,298,0.21,0.0
+"map05225,Hepatocellular carcinoma",7.0,298,0.21,0.0
+"map05226,Gastric cancer",7.0,298,0.21,0.0
+"map05214,Glioma",7.0,298,0.21,0.0
+"map05216,Thyroid cancer",7.0,298,0.21,0.0
+"map05221,Acute myeloid leukemia",7.0,298,0.21,0.0
+"map05220,Chronic myeloid leukemia",7.0,298,0.21,0.0
+"map05217,Basal cell carcinoma",7.0,298,0.21,0.0
+"map05218,Melanoma",7.0,298,0.21,0.0
+"map05211,Renal cell carcinoma",7.0,298,0.21,0.0
+"map05219,Bladder cancer",7.0,298,0.21,0.0
+"map05215,Prostate cancer",7.0,298,0.21,0.0
+"map05213,Endometrial cancer",7.0,298,0.21,0.0
+"map05224,Breast cancer",7.0,298,0.21,0.0
+"map05222,Small cell lung cancer",7.0,298,0.21,0.0
+"map05223,Non-small cell lung cancer",7.0,298,0.21,0.0
+"map05166,Human T-cell leukemia virus 1 infection",7.0,298,0.21,0.0
+"map05170,Human immunodeficiency virus 1 infection",7.0,298,0.21,0.0
+"map05161,Hepatitis B",7.0,298,0.21,0.0
+"map05160,Hepatitis C",7.0,298,0.21,0.0
+"map05171,Coronavirus disease - COVID-19",7.0,298,0.21,0.0
+"map05164,Influenza A",7.0,298,0.21,0.0
+"map05162,Measles",7.0,298,0.21,0.0
+"map05168,Herpes simplex virus 1 infection",7.0,298,0.21,0.0
+"map05163,Human cytomegalovirus infection",7.0,298,0.21,0.0
+"map05167,Kaposi sarcoma-associated herpesvirus infection",7.0,298,0.21,0.0
+"map05169,Epstein-Barr virus infection",7.0,298,0.21,0.0
+"map05165,Human papillomavirus infection",7.0,298,0.21,0.0
+"map05110,Vibrio cholerae infection",7.0,298,0.21,0.0
+"map05120,Epithelial cell signaling in Helicobacter pylori infection",7.0,298,0.21,0.0
+"map05130,Pathogenic Escherichia coli infection",7.0,298,0.21,0.0
+"map05132,Salmonella infection",7.0,298,0.21,0.0
+"map05131,Shigellosis",7.0,298,0.21,0.0
+"map05135,Yersinia infection",7.0,298,0.21,0.0
+"map05133,Pertussis",7.0,298,0.21,0.0
+"map05134,Legionellosis",7.0,298,0.21,0.0
+"map05150,Staphylococcus aureus infection",7.0,298,0.21,0.0
+"map05152,Tuberculosis",7.0,298,0.21,0.0
+"map05100,Bacterial invasion of epithelial cells",7.0,298,0.21,0.0
+"map05146,Amoebiasis",7.0,298,0.21,0.0
+"map05144,Malaria",7.0,298,0.21,0.0
+"map05145,Toxoplasmosis",7.0,298,0.21,0.0
+"map05140,Leishmaniasis",7.0,298,0.21,0.0
+"map05142,Chagas disease",7.0,298,0.21,0.0
+"map05143,African trypanosomiasis",7.0,298,0.21,0.0
+"map05310,Asthma",7.0,298,0.21,0.0
+"map05322,Systemic lupus erythematosus",7.0,298,0.21,0.0
+"map05323,Rheumatoid arthritis",7.0,298,0.21,0.0
+"map05320,Autoimmune thyroid disease",7.0,298,0.21,0.0
+"map05321,Inflammatory bowel disease",7.0,298,0.21,0.0
+"map05330,Allograft rejection",7.0,298,0.21,0.0
+"map05332,Graft-versus-host disease",7.0,298,0.21,0.0
+"map05340,Primary immunodeficiency",7.0,298,0.21,0.0
+"map05010,Alzheimer disease",7.0,298,0.21,0.0
+"map05012,Parkinson disease",7.0,298,0.21,0.0
+"map05014,Amyotrophic lateral sclerosis",7.0,298,0.21,0.0
+"map05016,Huntington disease",7.0,298,0.21,0.0
+"map05017,Spinocerebellar ataxia",7.0,298,0.21,0.0
+"map05020,Prion disease",7.0,298,0.21,0.0
+"map05022,Pathways of neurodegeneration - multiple diseases",7.0,298,0.21,0.0
+"map05030,Cocaine addiction",7.0,298,0.21,0.0
+"map05031,Amphetamine addiction",7.0,298,0.21,0.0
+"map05032,Morphine addiction",7.0,298,0.21,0.0
+"map05033,Nicotine addiction",7.0,298,0.21,0.0
+"map05034,Alcoholism",7.0,298,0.21,0.0
+"map05417,Lipid and atherosclerosis",7.0,298,0.21,0.0
+"map05418,Fluid shear stress and atherosclerosis",7.0,298,0.21,0.0
+"map05410,Hypertrophic cardiomyopathy",7.0,298,0.21,0.0
+"map05412,Arrhythmogenic right ventricular cardiomyopathy",7.0,298,0.21,0.0
+"map05414,Dilated cardiomyopathy",7.0,298,0.21,0.0
+"map05415,Diabetic cardiomyopathy",7.0,298,0.21,0.0
+"map05416,Viral myocarditis",7.0,298,0.21,0.0
+"map04930,Type II diabetes mellitus",7.0,298,0.21,0.0
+"map04940,Type I diabetes mellitus",7.0,298,0.21,0.0
+"map04950,Maturity onset diabetes of the young",7.0,298,0.21,0.0
+"map04936,Alcoholic liver disease",7.0,298,0.21,0.0
+"map04932,Non-alcoholic fatty liver disease",7.0,298,0.21,0.0
+"map04931,Insulin resistance",7.0,298,0.21,0.0
+"map04933,AGE-RAGE signaling pathway in diabetic complications",7.0,298,0.21,0.0
+"map04934,Cushing syndrome",7.0,298,0.21,0.0
+"map01501,beta-Lactam resistance",7.0,298,0.21,0.0
+"map01502,Vancomycin resistance",7.0,298,0.21,0.0
+"map01503,Cationic antimicrobial peptide (CAMP) resistance",7.0,298,0.21,0.0
+"map01521,EGFR tyrosine kinase inhibitor resistance",7.0,298,0.21,0.0
+"map01524,Platinum drug resistance",7.0,298,0.21,0.0
+"map01523,Antifolate resistance",7.0,298,0.21,0.0
+"map01522,Endocrine resistance",7.0,298,0.21,0.0
+"map07011,Penicillins",7.0,298,0.21,0.0
+"map07012,Cephalosporins - parenteral agents",7.0,298,0.21,0.0
+"map07013,Cephalosporins - oral agents",7.0,298,0.21,0.0
+"map07021,Aminoglycosides",7.0,298,0.21,0.0
+"map07019,Tetracyclines",7.0,298,0.21,0.0
+"map07020,Macrolides and ketolides",7.0,298,0.21,0.0
+"map07014,Quinolones",7.0,298,0.21,0.0
+"map07023,Rifamycins",7.0,298,0.21,0.0
+"map07026,Antifungal agents",7.0,298,0.21,0.0
+"map07044,Antiviral agents",7.0,298,0.21,0.0
+"map07053,Anti-HIV agents",7.0,298,0.21,0.0
+"map07040,Antineoplastics - alkylating agents",7.0,298,0.21,0.0
+"map07041,Antineoplastics - antimetabolic agents",7.0,298,0.21,0.0
+"map07042,Antineoplastics - agents from natural products",7.0,298,0.21,0.0
+"map07043,Antineoplastics - hormones",7.0,298,0.21,0.0
+"map07045,Antineoplastics - protein kinase inhibitors",7.0,298,0.21,0.0
+"map07032,Hypnotics",7.0,298,0.21,0.0
+"map07030,Anxiolytics",7.0,298,0.21,0.0
+"map07033,Anticonvulsants",7.0,298,0.21,0.0
+"map07015,Local analgesics",7.0,298,0.21,0.0
+"map07039,Opioid analgesics",7.0,298,0.21,0.0
+"map07028,Antipsychotics",7.0,298,0.21,0.0
+"map07029,Antipsychotics - phenothiazines",7.0,298,0.21,0.0
+"map07031,Antipsychotics - butyrophenones",7.0,298,0.21,0.0
+"map07027,Antidepressants",7.0,298,0.21,0.0
+"map07056,Agents for Alzheimer-type dementia",7.0,298,0.21,0.0
+"map07057,Antiparkinsonian agents",7.0,298,0.21,0.0
+"map07055,Sulfonamide derivatives - overview",7.0,298,0.21,0.0
+"map07016,Sulfonamide derivatives - sulfa drugs",7.0,298,0.21,0.0
+"map07017,Sulfonamide derivatives - diuretics",7.0,298,0.21,0.0
+"map07018,Sulfonamide derivatives - hypoglycemic agents",7.0,298,0.21,0.0
+"map07037,Antiarrhythmic drugs",7.0,298,0.21,0.0
+"map07038,Antiulcer drugs",7.0,298,0.21,0.0
+"map07046,Immunosuppressive agents",7.0,298,0.21,0.0
+"map07047,Osteoporosis drugs",7.0,298,0.21,0.0
+"map07048,Antimigraines",7.0,298,0.21,0.0
+"map07049,Antithrombosis agents",7.0,298,0.21,0.0
+"map07050,Antirheumatics - DMARDs and biological agents",7.0,298,0.21,0.0
+"map07051,Antidiabetics",7.0,298,0.21,0.0
+"map07052,Antidyslipidemic agents",7.0,298,0.21,0.0
+"map07054,Antiglaucoma agents",7.0,298,0.21,0.0
+"map07220,Cholinergic and anticholinergic drugs",7.0,298,0.21,0.0
+"map07215,alpha-Adrenergic receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07214,beta-Adrenergic receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07213,Dopamine receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07212,Histamine H1 receptor antagonists",7.0,298,0.21,0.0
+"map07227,Histamine H2/H3 receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07211,Serotonin receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07228,Eicosanoid receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07224,Opioid receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07229,Angiotensin receptor and endothelin receptor antagonists",7.0,298,0.21,0.0
+"map07225,Glucocorticoid and mineralocorticoid receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07226,""Progesterone, androgen and estrogen receptor agonists/antagonists""",7.0,298,0.21,0.0
+"map07223,Retinoic acid receptor (RAR) and retinoid X receptor (RXR) agonists/antagonists",7.0,298,0.21,0.0
+"map07222,Peroxisome proliferator-activated receptor (PPAR) agonists",7.0,298,0.21,0.0
+"map07221,Nicotinic cholinergic receptor antagonists",7.0,298,0.21,0.0
+"map07230,GABA-A receptor agonists/antagonists",7.0,298,0.21,0.0
+"map07036,Calcium channel blocking drugs",7.0,298,0.21,0.0
+"map07231,Sodium channel blocking drugs",7.0,298,0.21,0.0
+"map07232,Potassium channel blocking and opening drugs",7.0,298,0.21,0.0
+"map07235,N-Methyl-D-aspartic acid (NMDA) receptor antagonists",7.0,298,0.21,0.0
+"map07233,Ion transporter inhibitors",7.0,298,0.21,0.0
+"map07234,Neurotransmitter transporter inhibitors",7.0,298,0.21,0.0
+"map07216,Catecholamine transferase inhibitors",7.0,298,0.21,0.0
+"map07219,Cyclooxygenase inhibitors",7.0,298,0.21,0.0
+"map07024,HMG-CoA reductase inhibitors",7.0,298,0.21,0.0
+"map07217,Renin-angiotensin system inhibitors",7.0,298,0.21,0.0
+"map07218,HIV protease inhibitors",7.0,298,0.21,0.0
+"map07025,Quinolines",7.0,298,0.21,0.0
+"map07034,Eicosanoids",7.0,298,0.21,0.0
+"map07035,Prostaglandins",7.0,298,0.21,0.0
+"map07110,Benzoic acid family",7.0,298,0.21,0.0
+"map07112,""1,2-Diphenyl substitution family""",7.0,298,0.21,0.0
+"map07114,Naphthalene family",7.0,298,0.21,0.0
+"map07117,Benzodiazepine family",7.0,298,0.21,0.0
