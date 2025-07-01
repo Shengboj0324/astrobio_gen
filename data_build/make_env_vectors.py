@@ -22,7 +22,8 @@ hsa = pd.read_csv(
 ).dropna(subset=["description"])
 
 hsa["pathway"] = hsa["description"].str.extract(r"(map\d{5})")
-human_set = set(hsa["pathway"].dropna())
+human_path_df = pd.read_csv(RAW / "kegg_hsa_pathways.csv", sep=",")
+human_set = set(human_path_df["pathway"])
 
 # ---------- default env values ----------
 def default_row(pid):

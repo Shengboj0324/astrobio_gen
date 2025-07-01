@@ -34,7 +34,7 @@ cobra==0.28.0             # constraint-based modeling
 optlang>=1.7              # solver backend for COBRA
 escher>=1.7               # pathway diagrams (optional)
 rdkit-pypi==2022.9.5     # molecular ops if you start QC cheminformatics
-
+pytorch-lightning==2.2.4
 #########################################################
 # ======  ATMOSPHERIC & CLIMATE SIM  (lightweight) ==== #
 #########################################################
