@@ -72,4 +72,9 @@ def main():
     trainer.fit(module, dl)
 
 if __name__ == "__main__":
-    main()
+    pl.seed_everything(0)
+    LightningCLI(
+        model_class      = MetabolismGenerator,
+        datamodule_class = KeggDM,
+        save_config_callback = None,
+        run = True)

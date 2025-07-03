@@ -1,32 +1,29 @@
+import torch, numpy as np
 from pathlib import Path
-import numpy as np, torch
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import TensorDataset, DataLoader
 import pytorch_lightning as pl
 
 class KeggDM(pl.LightningDataModule):
-    def __init__(self, root="data/kegg_graphs", batch_size=64, num_workers=4):
+    def __init__(self, root="data/kegg_graphs", batch_size=64):
         super().__init__()
-        self.root, self.bs, self.nw = Path(root), batch_size, num_workers
+        self.root = Path(root)
+        self.bs   = batch_size
 
     def setup(self, stage=None):
         files = list(self.root.glob("*.npz"))
-        split = int(0.8 * len(files))
-        train_npz, val_npz = files[:split], files[split:]
-        self.train, self.val = self._make_ds(train_npz), self._make_ds(val_npz)
+        split = int(0.8*len(files))
+        tr, va = files[:split], files[split:]
+        self.train_ds = self._load(tr)
+        self.val_ds   = self._load(va)
 
-    @staticmethod
-    def _make_ds(file_list):
+    def _load(self, paths):
         env, adj = [], []
-        for f in file_list:
-            dat = np.load(f)
-            env.append(dat["env"])
-            adj.append(dat["adj"])
-        env_t = torch.tensor(np.stack(env), dtype=torch.float32)
-        adj_t = torch.tensor(np.stack(adj), dtype=torch.float32)
-        return TensorDataset(env_t, adj_t)
+        for f in paths:
+            npz = np.load(f)
+            env.append(npz["env"]);  adj.append(npz["adj"])
+        env = torch.tensor(np.stack(env), dtype=torch.float32)
+        adj = torch.tensor(np.stack(adj), dtype=torch.float32)
+        return TensorDataset(env, adj)
 
-    def train_dataloader(self):
-        return DataLoader(self.train, self.bs, True, num_workers=self.nw)
-
-    def val_dataloader(self):
-        return DataLoader(self.val, self.bs, False, num_workers=self.nw)
+    def train_dataloader(self): return DataLoader(self.train_ds, self.bs, True)
+    def val_dataloader(self):   return DataLoader(self.val_ds,   self.bs)
