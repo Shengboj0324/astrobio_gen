@@ -175,7 +175,7 @@ def main() -> None:
     MIN_INSOL_SEFF, MAX_INSOL_SEFF = args.min_insol, args.max_insol
     THREADS = args.threads
 
-    df_raw = fetch_exocat()
+    df_raw = fetch_delta()
     df_select = habitable_filter(df_raw)
     sed_map = fetch_seds(df_select)
     build_manifest(df_select)

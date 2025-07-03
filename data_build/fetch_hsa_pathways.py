@@ -1,4 +1,4 @@
-from pathlib import Path, read_text
+from pathlib import Path
 import requests, csv
 
 RAW = Path("data/raw"); RAW.mkdir(exist_ok=True, parents=True)

@@ -7,6 +7,7 @@ from scripts.train_gvae_dummy import random_graph
 from scripts.train_fusion_dummy import schema as FUSION_SCHEMA, to_tensor
 import pandas as pd, numpy as np
 from torch.utils.data import DataLoader, TensorDataset
+from torch_geometric.loader import DataLoader as GeometricDataLoader
 import os
 
 class LitGraphVAE(pl.LightningModule):
@@ -43,7 +44,7 @@ def main():
 
     if cfg["model"]["type"] == "graph_vae":
         ds = [random_graph() for _ in range(cfg["data"]["synthetic_size"])]
-        dl = DataLoader(ds, batch_size=cfg["trainer"]["batch_size"], shuffle=True)
+        dl = GeometricDataLoader(ds, batch_size=cfg["trainer"]["batch_size"], shuffle=True)
         module = LitGraphVAE(cfg)
     else:
         # fusion synthetic tabular
@@ -72,9 +73,4 @@ def main():
     trainer.fit(module, dl)
 
 if __name__ == "__main__":
-    pl.seed_everything(0)
-    LightningCLI(
-        model_class      = MetabolismGenerator,
-        datamodule_class = KeggDM,
-        save_config_callback = None,
-        run = True)
+    main()

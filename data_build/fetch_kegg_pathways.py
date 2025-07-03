@@ -1,5 +1,5 @@
 """
-Download N pathway KGML files listed in data/raw/kegg_pathways.tsv
+Download N pathway KGML files listed in data/raw/kegg_pathways.csv
 → store in data/raw/kegg_xml/.
 """
 from pathlib import Path
@@ -8,11 +8,14 @@ import requests, csv, time
 RAW = Path("data/raw"); RAW.mkdir(parents=True, exist_ok=True)
 XML_DIR = RAW / "kegg_xml"; XML_DIR.mkdir(exist_ok=True)
 
-with open(RAW/"kegg_pathways.tsv") as fh:
-    rows = [r.strip().split("\t") for r in fh]
+import csv
+with open(RAW/"kegg_pathways.csv") as fh:
+    reader = csv.reader(fh)
+    next(reader)  # skip header
+    rows = list(reader)
 
 # keep only metabolic pathways (mapXXXXX)
-meta_rows = [r for r in rows if r[0].startswith("path:map")]
+meta_rows = [r for r in rows if len(r) >= 2 and r[0].startswith("map")]
 
 MAX = 200              # pull first 200 maps (enough to train)
 for pid, name in meta_rows[:MAX]:

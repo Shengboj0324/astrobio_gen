@@ -1,26 +1,24 @@
-"""
-Convert edges CSV + env_vectors.csv → .npz graphs
-(each npz stores adj matrix, env_vec, pathway_id)
-"""
-import csv, numpy as np, networkx as nx, pathlib, json
+import csv, json, numpy as np, networkx as nx
+from pathlib import Path
 
-EDGE_CSV = pathlib.Path("data/interim/kegg_edges.csv")
-ENV_CSV  = pathlib.Path("data/interim/env_vectors.csv")
-OUT_DIR  = pathlib.Path("data/kegg_graphs"); OUT_DIR.mkdir(exist_ok=True)
+EDGES = Path("data/interim/kegg_edges.csv")
+ENV   = Path("data/interim/env_vectors.csv")
+OUT   = Path("data/kegg_graphs"); OUT.mkdir(exist_ok=True)
 
-# load env vectors
-env = {row["pathway"]: [float(row["pH"]), float(row["temp"]), float(row["O2"]), float(row["redox"])]
-       for row in csv.DictReader(ENV_CSV.open())}
+env_map = {r["pathway"]: [float(r["pH"]),float(r["temp"]),
+                          float(r["O2"]),float(r["redox"])]
+           for r in csv.DictReader(ENV.open())}
 
-edges_by_path = {}
-for row in csv.DictReader(EDGE_CSV.open()):
-    edges_by_path.setdefault(row["reaction"], []).append((row["substrate"], row["product"]))
+edges = {}
+for r in csv.DictReader(EDGES.open()):
+    edges.setdefault(r["reaction"], []).append((r["substrate"], r["product"]))
 
-for pid, edges in edges_by_path.items():
-    G = nx.DiGraph(); G.add_edges_from(edges)
-    nodes = list(G.nodes()); idx = {n:i for i,n in enumerate(nodes)}
-    A = np.zeros((len(nodes), len(nodes)), dtype=int)
-    for u,v in edges: A[idx[u], idx[v]] = 1
-    f = OUT_DIR / f"{pid}.npz"
-    np.savez(f, adj=A, env=np.array(env.get(pid, [7,298,0.2,0])), meta=json.dumps({"nodes":nodes}))
-print("NPZ graphs saved to", OUT_DIR)
+for pid, e in edges.items():
+    G = nx.DiGraph(); G.add_edges_from(e)
+    nodes = list(G)
+    idx = {n:i for i,n in enumerate(nodes)}
+    A = np.zeros((len(nodes),len(nodes)), dtype=np.int8)
+    for u,v in e: A[idx[u],idx[v]] = 1
+    np.savez(OUT/f"{pid}.npz", adj=A, env=np.array(env_map.get(pid,[7,298,0.21,0])),
+             meta=json.dumps({"nodes":nodes}))
+print("NPZ graphs written →", OUT)

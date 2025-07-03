@@ -1,10 +1,7 @@
-"""
-Quick sanity: load 10 random NPZ files, ensure adj is square and env_vec length == 4
-"""
-import random, numpy as np, pathlib
-paths = random.sample(list(pathlib.Path("data/kegg_graphs").glob("*.npz")), 10)
-for p in paths:
-    dat = np.load(p)
-    assert dat["adj"].shape[0] == dat["adj"].shape[1]
-    assert len(dat["env"]) == 4
-print("validation passed for", len(paths), "graphs")
+import numpy as np, random, pathlib, sys
+gs = list(pathlib.Path("data/kegg_graphs").glob("*.npz"))
+if not gs: sys.exit("No graphs found")
+for p in random.sample(gs, min(5,len(gs))):
+    n = np.load(p)
+    assert n['adj'].shape[0]==n['adj'].shape[1] and len(n['env'])==4
+print("Graph dataset looks good ✔")

@@ -29,13 +29,14 @@ opt = torch.optim.Adam(model.parameters(), lr=1e-3)
 for epoch in range(1, EPOCHS + 1):
     model.train(); total = 0
     for batch in loader:
-        batch = batch.to(model.gc1.weight.device)
+        batch = batch.to(next(model.parameters()).device)
         adj_hat, mu, logvar = model(batch)
         # Binary cross‑entropy reconstruction (against batch adj matrix)
         # Use original edge_index → ground‑truth adj
         gt_adj = torch.zeros_like(adj_hat)
         for i,(u,v) in enumerate(batch.edge_index.t()):
-            gt_adj[0,u,v] = 1
+            if u < gt_adj.shape[1] and v < gt_adj.shape[2]:
+                gt_adj[0,u,v] = 1
         recon = F.binary_cross_entropy(adj_hat, gt_adj)
         kld = -0.5 * torch.mean(1 + logvar - mu**2 - logvar.exp())
         loss = recon + 0.1 * kld

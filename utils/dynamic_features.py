@@ -10,13 +10,16 @@ class CategoricalEncoder(nn.Module):
     def __init__(self, n_cat: int): super().__init__(); self.emb = nn.Embedding(n_cat, 16)
     def forward(self, x): return self.emb(x.long())
 
-class Identity(nn.Module):
-    def forward(self, x): return x          # already vector
+class VectorEncoder(nn.Module):
+    def __init__(self, input_dim: int): 
+        super().__init__()
+        self.fc = nn.Linear(input_dim, 16)
+    def forward(self, x): return torch.relu(self.fc(x))
 
 REGISTRY = {
     "numeric": lambda _: NumericEncoder(),
     "categorical": lambda n: CategoricalEncoder(n),
-    "vector": lambda _: Identity(),
+    "vector": lambda dim: VectorEncoder(dim),
 }
 
 def build_encoders(schema: dict):
