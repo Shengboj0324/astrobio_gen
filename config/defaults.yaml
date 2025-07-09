@@ -1,19 +1,159 @@
-# Global defaults (override with --config my.yml)
-trainer:
-  max_epochs: 200
-  batch_size: 32
-  accelerator: auto       # cpu / mps / gpu
+# Global defaults for NASA-ready astrobiology surrogate engine
+defaults:
+  - model: surrogate_transformer  # Default to advanced surrogate
+  - trainer: gpu_production
+  - data: gold_pipeline
+  - _self_
+
+# Model selection
 model:
-  type: graph_vae          # graph_vae | fusion
+  type: surrogate  # Options: graph_vae, fusion, surrogate
+  
+  # Graph VAE config (legacy)
   graph_vae:
     in_nodes: 4
     latent: 8
+    
+  # Fusion transformer config
   fusion:
     latent_dim: 128
     depth: 4
+    
+  # Advanced surrogate transformer config
+  surrogate:
+    dim: 256
+    depth: 8
+    heads: 8
+    n_inputs: 8
+    mode: "scalar"  # scalar, datacube, joint, spectral
+    dropout: 0.1
+
+# Training configuration
+trainer:
+  max_epochs: 200
+  batch_size: 64
+  accelerator: auto       # cpu / mps / gpu / auto
+  devices: auto
+  precision: "16-mixed"   # Mixed precision for efficiency
+  accumulate_grad_batches: 1
+  gradient_clip_val: 1.0
+
+# Training parameters
+training:
+  learning_rate: 3e-4
+  weight_decay: 1e-4
+  warmup_steps: 1000
+
+# Data configuration
 data:
-  synthetic_size: 1000
+  # Synthetic data (for testing)
+  synthetic_size: 10000
+  
+  # Gold-level data sources
+  sources:
+    nasa_archive: true
+    rocke3d_ensemble: true
+    jwst_spectra: true
+    kegg_pathways: true
+  
+  # Data quality thresholds
+  quality:
+    min_snr: 10.0
+    max_uncertainty: 0.1
+    completeness_threshold: 0.95
+  
+  # Fusion schema (legacy)
   fusion_schema:
     air_quality:  [numeric, null]
     rock_type:    [categorical, 12]
     surface_vec:  [vector, 64]
+
+# Validation configuration
+validation:
+  # Hold-out validation set
+  holdout_fraction: 0.2
+  
+  # Cross-validation
+  n_folds: 5
+  
+  # Benchmark validation
+  benchmark_planets:
+    - "Earth"
+    - "TRAPPIST-1e"
+    - "Proxima Centauri b"
+    - "TOI-715b"
+  
+  # Performance targets
+  targets:
+    r2_threshold: 0.95
+    mae_threshold: 3.0  # Kelvin for temperature
+    inference_time: 0.4  # seconds
+    memory_usage: 8  # GB
+
+# Logging and monitoring
+logging:
+  use_wandb: false  # Set to true for experiment tracking
+  project_name: "astrobio-surrogate"
+  log_frequency: 10
+  
+  # What to log
+  metrics:
+    - "loss"
+    - "r2_score"
+    - "mae"
+    - "physics_constraints"
+    - "uncertainty"
+
+# Deployment configuration
+deployment:
+  # API configuration
+  api:
+    host: "0.0.0.0"
+    port: 8000
+    workers: 4
+    
+  # Model serving
+  serving:
+    batch_size: 1
+    max_latency: 0.5  # seconds
+    memory_limit: 4  # GB
+    
+  # Feature flags for different modes
+  features:
+    enable_uncertainty: true
+    enable_explanation: false  # Requires LLM fine-tuning
+    enable_datacube: false     # Requires additional training
+    enable_jwst_denoise: false # Requires JWST-specific training
+
+# Physics constraints
+physics:
+  enable_constraints: true
+  constraint_types:
+    - "radiative_equilibrium"
+    - "mass_conservation"
+    - "energy_balance"
+  
+  # Physical constants
+  constants:
+    stefan_boltzmann: 5.670374419e-8  # W m^-2 K^-4
+    solar_luminosity: 3.828e26        # W
+    earth_radius: 6.371e6             # m
+
+# NASA integration
+nasa:
+  # Data sources
+  exoplanet_archive:
+    api_url: "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
+    update_frequency: "daily"
+  
+  # ROCKE-3D integration
+  rocke3d:
+    queue_priority: "normal"
+    max_concurrent_jobs: 10
+    output_format: "netcdf"
+  
+  # Partnership configuration
+  partnership:
+    data_sharing: true
+    validation_protocol: "nasa_standards"
+    documentation_level: "publication_ready"

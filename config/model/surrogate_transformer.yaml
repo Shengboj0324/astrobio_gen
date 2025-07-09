@@ -1,0 +1,82 @@
+# Advanced SurrogateTransformer Configuration
+# NASA-ready physics-informed climate modeling
+
+_target_: models.surrogate_transformer.SurrogateTransformer
+
+# Model architecture
+dim: 256
+depth: 8
+heads: 8
+n_inputs: 8
+dropout: 0.1
+
+# Operational mode
+mode: "scalar"  # Options: scalar, datacube, joint, spectral
+
+# Mode-specific configurations
+modes:
+  scalar:
+    # Fast habitability scoring
+    targets: ["habitability", "surface_temp", "atmospheric_pressure"]
+    inference_time_target: 0.4  # seconds
+    
+  datacube:
+    # Full 3D climate fields
+    spatial_resolution: [64, 32, 20]  # lat×lon×pressure
+    variables: ["temperature_field", "humidity_field"]
+    memory_requirement: "8GB"
+    
+  joint:
+    # Multi-planet-type modeling
+    planet_types: ["rocky", "gas_giant", "brown_dwarf"]
+    spectral_features: 512
+    
+  spectral:
+    # High-resolution spectrum synthesis
+    wavelength_bins: 10000
+    spectral_range: [0.3, 30.0]  # µm
+    resolution_target: 1000
+
+# Physics constraints
+physics:
+  enable_constraints: true
+  constraint_types:
+    - "radiative_equilibrium"
+    - "mass_conservation"
+    - "energy_balance"
+  
+  # Loss weighting (learnable parameters)
+  initial_weights:
+    radiative: 1.0
+    mass_balance: 1.0
+    positivity: 0.1
+
+# Training configuration
+training:
+  learning_rate: 3e-4
+  weight_decay: 1e-4
+  warmup_steps: 1000
+  
+  # Physics-informed learning schedule
+  physics_loss_schedule:
+    start_epoch: 0
+    ramp_epochs: 50
+    max_weight: 1.0
+
+# Validation targets (NASA standards)
+validation:
+  r2_threshold: 0.95  # Minimum R² for climate fields
+  mae_threshold: 3.0  # Maximum MAE for temperature (K)
+  uncertainty_coverage: 0.93  # 95% intervals should cover 93% of errors
+  
+  benchmark_planets:
+    - "Earth"
+    - "TRAPPIST-1e" 
+    - "Proxima Centauri b"
+    - "TOI-715b"
+
+# Uncertainty quantification
+uncertainty:
+  method: "mc_dropout"
+  n_samples: 100
+  confidence_levels: [0.68, 0.95, 0.99] 
