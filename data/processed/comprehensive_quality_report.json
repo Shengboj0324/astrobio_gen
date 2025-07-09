@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-07-09T13:53:32.624637",
+  "datasets_processed": 3,
+  "overall_quality_score": 0.9610671256454388,
+  "nasa_readiness": true,
+  "recommendations": [
+    "Fix errors in genomic_data: Object of type int64 is not JSON serializable",
+    "Data is ready for machine learning training"
+  ],
+  "data_ready_for_ml": true,
+  "kegg_edges_quality_score": 1.0,
+  "environmental_vectors_quality_score": 0.9221342512908778,
+  "genomic_data_quality_score": 0.0
+}

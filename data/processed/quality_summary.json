@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-07-09T13:50:54.838218",
+  "datasets_processed": 3,
+  "overall_quality_score": 0.0,
+  "recommendations": [
+    "Quality score below NASA standards (0.90). Review data collection and filtering processes.",
+    "Significant quality issues detected. Consider additional data sources or stricter validation."
+  ],
+  "nasa_readiness": false,
+  "environmental_vectors_quality_score": 0.0,
+  "environmental_vectors_retention_rate": 0.0017211703958691911
+}

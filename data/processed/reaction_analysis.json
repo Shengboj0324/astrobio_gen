@@ -1,0 +1,285 @@
+{
+  "total_reactions": 34,
+  "valid_reactions": 34,
+  "reaction_statistics": {
+    "42": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "44": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "49": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "50": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "52": {
+      "valid": true,
+      "n_nodes": 3,
+      "n_edges": 2,
+      "n_reactions": 2,
+      "density": 0.3333333333333333,
+      "issues": []
+    },
+    "53": {
+      "valid": true,
+      "n_nodes": 4,
+      "n_edges": 4,
+      "n_reactions": 4,
+      "density": 0.3333333333333333,
+      "issues": []
+    },
+    "54": {
+      "valid": true,
+      "n_nodes": 3,
+      "n_edges": 2,
+      "n_reactions": 2,
+      "density": 0.3333333333333333,
+      "issues": []
+    },
+    "55": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "57": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "59": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "60": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "61": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "62": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "18": {
+      "valid": true,
+      "n_nodes": 3,
+      "n_edges": 2,
+      "n_reactions": 2,
+      "density": 0.3333333333333333,
+      "issues": []
+    },
+    "63": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "64": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "66": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "67": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "69": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "70": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "71": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "73": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "74": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "75": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "76": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "79": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "80": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "117": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "137": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "138": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "140": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "143": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "144": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    },
+    "150": {
+      "valid": true,
+      "n_nodes": 2,
+      "n_edges": 1,
+      "n_reactions": 1,
+      "density": 0.5,
+      "issues": []
+    }
+  },
+  "quality_thresholds": {
+    "min_completeness": 0.8,
+    "max_outlier_rate": 0.1,
+    "min_network_size": 2,
+    "max_network_size": 2000,
+    "min_pathway_coverage": 0.5
+  }
+}
