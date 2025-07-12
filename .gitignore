@@ -1,7 +1,149 @@
-# local raw genome files (BAM/CRAM) – KEEP OUT OF GIT
+# ============================================================================
+# ASTROBIOLOGY GENOMICS PROJECT - SECURE DATA HANDLING
+# ============================================================================
+
+# ===== RAW DATA EXCLUSIONS (SECURITY CRITICAL) =====
+# Never commit raw data to version control
+data/raw/**
+!data/raw/.gitkeep
+!data/raw/README.md
+
+# Large processed datasets
+data/processed/**/*.gz
+data/processed/**/*.csv
+data/processed/**/*.json
+data/processed/**/*.h5
+data/processed/**/*.hdf5
+data/processed/**/*.npz
+data/processed/**/*.pkl
+
+# Keep small config and schema files
+!data/processed/**/schema.json
+!data/processed/**/config.yml
+!data/processed/**/README.md
+
+# Genomic data files (can be very large)
+*.bam
+*.sam
+*.cram
+*.fastq
+*.fastq.gz
+*.fasta
+*.fasta.gz
+*.fa
+*.fa.gz
+*.fna
+*.fna.gz
+*.vcf
+*.vcf.gz
+*.gff
+*.gff3
+*.gtf
+*.bed
+
+# KEGG and pathway data caches
+data/kegg_graphs/**/*.npz
+data/interim/**/*.csv
+
+# Temporary downloads and caches
+data/**/cache/**
+data/**/temp/**
+data/**/tmp/**
+*.tmp
+*.temp
+
+# Database files (contain processed data)
+*.db
+*.sqlite
+*.sqlite3
+
+# Model files and checkpoints
+models/*.pt
+models/*.pth
+models/*.ckpt
+models/*.pkl
+models/*.h5
+lightning_logs/**
+
+# Backup and versioning
+data/backups/**
+data/versions/**
+data/snapshots/**
+
+# Quality reports (can regenerate)
+data/quality_reports/**
+data/reports/**
+
+# Local raw genome files (KEEP OUT OF GIT)
 /Users/*/Desktop/DataSources(ISEF)/**
-# Python cache
+
+# ===== PYTHON CACHE AND COMPILED FILES =====
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# ===== JUPYTER AND IPYTHON =====
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# ===== IDE AND EDITOR FILES =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== ENVIRONMENT AND CONFIG =====
+.env
+.env.local
+.env.production
+config/secrets.yml
+config/credentials.json
+*.key
+*.pem
+
+# ===== LOGS =====
+*.log
+logs/
+data/logs/**
+
+# ===== OPERATING SYSTEM =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== BACKUP FILES =====
+*.bak
+*.backup
+*~
+
+# ===== KEEP IMPORTANT STRUCTURE FILES =====
+# These should be committed to maintain project structure
+!data/
+!data/README.md
+!data/raw/
+!data/raw/.gitkeep
+!data/interim/
+!data/interim/.gitkeep
+!data/processed/
+!data/processed/.gitkeep
+!requirements*.txt
+!README*.md
+!LICENSE*
+!*.md
+!*.yml
+!*.yaml
+!*.json
+!*.py

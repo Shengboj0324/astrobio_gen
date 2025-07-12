@@ -84,19 +84,64 @@ class AGORA2Model:
 
 @dataclass
 class NCBIGenome:
-    """NCBI genome data structure"""
+    """Enhanced NCBI genome data structure with comprehensive file support from web crawl"""
     assembly_accession: str
     organism_name: str
     strain: str
     taxid: int
     assembly_level: str
+    # Basic genome statistics
     genome_size: int = 0
     contig_count: int = 0
     scaffold_count: int = 0
+    n50: int = 0
+    l50: int = 0
+    # Annotation information
     annotation_provider: str = ""
     annotation_date: str = ""
+    annotation_method: str = ""
+    annotation_pipeline: str = ""
+    # File paths for comprehensive data discovered in web crawl
     ftp_path: str = ""
     checksum: str = ""
+    # Quality control files (discovered in NCBI FTP crawl)
+    fcs_report_file: str = ""  # Foreign Contamination Screen
+    ani_report_file: str = ""  # Average Nucleotide Identity
+    ani_contam_ranges_file: str = ""  # ANI contamination ranges
+    # Assembly information files
+    assembly_report_file: str = ""
+    assembly_stats_file: str = ""
+    assembly_regions_file: str = ""
+    # Sequence and annotation files
+    genomic_fna_file: str = ""  # Genomic FASTA
+    genomic_gbff_file: str = ""  # GenBank flat file
+    genomic_gff_file: str = ""  # GFF3 annotation
+    genomic_gtf_file: str = ""  # GTF annotation
+    protein_faa_file: str = ""  # Protein FASTA
+    protein_gpff_file: str = ""  # GenPept flat file
+    cds_from_genomic_file: str = ""  # CDS sequences
+    rna_from_genomic_file: str = ""  # RNA sequences
+    # Feature and expression files (discovered in NCBI FTP)
+    feature_table_file: str = ""
+    feature_count_file: str = ""
+    gene_expression_counts_file: str = ""  # RNA-seq counts
+    normalized_expression_file: str = ""  # TPM normalized counts
+    gene_ontology_file: str = ""  # GO annotations
+    rnaseq_alignment_summary_file: str = ""
+    rnaseq_runs_file: str = ""
+    # RepeatMasker output (for eukaryotes)
+    repeatmasker_out_file: str = ""
+    repeatmasker_run_file: str = ""
+    # Additional quality metrics
+    busco_score: float = 0.0
+    checkm_completeness: float = 0.0
+    checkm_contamination: float = 0.0
+    # Comprehensive metadata
+    organism_category: str = ""  # bacteria, archaea, fungi, vertebrate_mammalian, etc.
+    refseq_category: str = ""  # reference, representative, etc.
+    submission_date: str = ""
+    genbank_accession: str = ""
+    wgs_master: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)
     last_updated: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -338,7 +383,7 @@ class AGORA2Downloader:
             await self.session.close()
 
 class NCBIGenomeDownloader:
-    """Advanced NCBI genome data downloader"""
+    """Enhanced NCBI genome data downloader with comprehensive organism category support"""
     
     def __init__(self, ftp_host: str = "ftp.ncbi.nlm.nih.gov"):
         self.ftp_host = ftp_host
@@ -346,6 +391,50 @@ class NCBIGenomeDownloader:
         self.cache_path.mkdir(parents=True, exist_ok=True)
         self.session = None
         self.assembly_summary_cache = {}
+        
+        # Comprehensive organism categories discovered in NCBI FTP crawl
+        self.organism_categories = [
+            'archaea', 'bacteria', 'fungi', 'invertebrate', 'metagenomes',
+            'mitochondrion', 'plant', 'plasmid', 'plastid', 'protozoa',
+            'unknown', 'vertebrate_mammalian', 'vertebrate_other', 'viral'
+        ]
+        
+        # Comprehensive file types available for each genome (from web crawl)
+        self.available_files = {
+            # Quality control files
+            'fcs_report': '_fcs_report.txt',
+            'ani_report': '_ani_report.txt', 
+            'ani_contam_ranges': '_ani_contam_ranges.tsv',
+            # Assembly files
+            'assembly_report': '_assembly_report.txt',
+            'assembly_stats': '_assembly_stats.txt',
+            'assembly_regions': '_assembly_regions.txt',
+            # Sequence files
+            'genomic_fna': '_genomic.fna.gz',
+            'genomic_gbff': '_genomic.gbff.gz',
+            'genomic_gff': '_genomic.gff.gz',
+            'genomic_gtf': '_genomic.gtf.gz',
+            'protein_faa': '_protein.faa.gz',
+            'protein_gpff': '_protein.gpff.gz',
+            'cds_from_genomic': '_cds_from_genomic.fna.gz',
+            'rna_from_genomic': '_rna_from_genomic.fna.gz',
+            # Feature files
+            'feature_table': '_feature_table.txt.gz',
+            'feature_count': '_feature_count.txt.gz',
+            # Expression files (for some genomes)
+            'gene_expression_counts': '_gene_expression_counts.txt.gz',
+            'normalized_expression': '_normalized_gene_expression_counts.txt.gz',
+            'gene_ontology': '_gene_ontology.gaf.gz',
+            'rnaseq_alignment_summary': '_rnaseq_alignment_summary.txt',
+            'rnaseq_runs': '_rnaseq_runs.txt',
+            # RepeatMasker files (for eukaryotes)
+            'repeatmasker_out': '_rm.out.gz',
+            'repeatmasker_run': '_rm.run',
+            # Additional files
+            'wgsmaster': '_wgsmaster.gbff.gz',
+            'translated_cds': '_translated_cds.faa.gz',
+            'genomic_gaps': '_genomic_gaps.txt.gz'
+        }
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""
@@ -493,6 +582,370 @@ class NCBIGenomeDownloader:
             logger.error(f"Error downloading sequence {assembly_accession}: {e}")
             return None
     
+    async def download_all_genome_files(self, ftp_path: str, assembly_accession: str, 
+                                      file_types: Optional[List[str]] = None) -> Dict[str, str]:
+        """Download comprehensive set of genome files discovered in NCBI FTP crawl"""
+        if file_types is None:
+            file_types = list(self.available_files.keys())
+        
+        downloaded_files = {}
+        session = await self._get_session()
+        
+        # Construct base FTP URL
+        if ftp_path.startswith('ftp://'):
+            base_url = ftp_path.replace('ftp://', 'https://')
+        else:
+            base_url = ftp_path
+        
+        for file_type in file_types:
+            if file_type not in self.available_files:
+                continue
+                
+            file_suffix = self.available_files[file_type]
+            filename = f"{assembly_accession}{file_suffix}"
+            cache_file = self._get_cache_path(filename)
+            
+            # Skip if already downloaded
+            if cache_file.exists():
+                downloaded_files[file_type] = str(cache_file)
+                continue
+            
+            try:
+                file_url = f"{base_url}/{filename}"
+                
+                async with session.get(file_url) as response:
+                    if response.status == 200:
+                        content = await response.read()
+                        
+                        # Save file
+                        with open(cache_file, 'wb') as f:
+                            f.write(content)
+                        
+                        downloaded_files[file_type] = str(cache_file)
+                        logger.debug(f"Downloaded {file_type}: {filename}")
+                    else:
+                        logger.debug(f"File not available {file_type} for {assembly_accession}: HTTP {response.status}")
+                        
+            except Exception as e:
+                logger.debug(f"Error downloading {file_type} for {assembly_accession}: {e}")
+        
+        return downloaded_files
+    
+    async def fetch_comprehensive_assembly_summary(self, domains: Optional[List[str]] = None) -> Dict[str, List[Dict[str, Any]]]:
+        """Fetch assembly summaries for all organism categories discovered in web crawl"""
+        if domains is None:
+            domains = self.organism_categories
+        
+        all_assemblies = {}
+        
+        for domain in domains:
+            logger.info(f"Fetching assembly summary for {domain}")
+            assemblies = await self.fetch_assembly_summary(domain)
+            if assemblies:
+                all_assemblies[domain] = assemblies
+                logger.info(f"Fetched {len(assemblies)} assemblies for {domain}")
+        
+        return all_assemblies
+    
+    async def parse_assembly_report(self, file_path: str) -> Dict[str, Any]:
+        """Parse assembly report file for detailed genome statistics"""
+        try:
+            assembly_info = {}
+            
+            with gzip.open(file_path, 'rt') if file_path.endswith('.gz') else open(file_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('#'):
+                        # Parse metadata from header
+                        if 'Assembly name:' in line:
+                            assembly_info['assembly_name'] = line.split(':', 1)[1].strip()
+                        elif 'Organism name:' in line:
+                            assembly_info['organism_name'] = line.split(':', 1)[1].strip()
+                        elif 'Taxid:' in line:
+                            assembly_info['taxid'] = line.split(':', 1)[1].strip()
+                        elif 'Submitter:' in line:
+                            assembly_info['submitter'] = line.split(':', 1)[1].strip()
+                        elif 'Date:' in line:
+                            assembly_info['submission_date'] = line.split(':', 1)[1].strip()
+                    else:
+                        # Parse sequence statistics
+                        parts = line.split('\t')
+                        if len(parts) >= 7:
+                            seq_name = parts[0]
+                            seq_role = parts[1]
+                            assigned_molecule = parts[2]
+                            if seq_role == 'assembled-molecule':
+                                assembly_info.setdefault('chromosomes', []).append({
+                                    'name': seq_name,
+                                    'molecule': assigned_molecule
+                                })
+            
+            return assembly_info
+            
+        except Exception as e:
+            logger.error(f"Error parsing assembly report {file_path}: {e}")
+            return {}
+    
+    async def parse_assembly_stats(self, file_path: str) -> Dict[str, Any]:
+        """Parse assembly statistics file for quality metrics"""
+        try:
+            stats = {}
+            
+            with gzip.open(file_path, 'rt') if file_path.endswith('.gz') else open(file_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('#'):
+                        continue
+                    
+                    if 'total-length' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['total_length'] = int(parts[1])
+                    elif 'spanned-gaps' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['spanned_gaps'] = int(parts[1])
+                    elif 'unspanned-gaps' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['unspanned_gaps'] = int(parts[1])
+                    elif 'scaffold-count' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['scaffold_count'] = int(parts[1])
+                    elif 'scaffold-N50' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['scaffold_n50'] = int(parts[1])
+                    elif 'scaffold-L50' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['scaffold_l50'] = int(parts[1])
+                    elif 'contig-count' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['contig_count'] = int(parts[1])
+                    elif 'contig-N50' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['contig_n50'] = int(parts[1])
+                    elif 'contig-L50' in line:
+                        parts = line.split()
+                        if len(parts) >= 2:
+                            stats['contig_l50'] = int(parts[1])
+            
+            return stats
+            
+        except Exception as e:
+            logger.error(f"Error parsing assembly stats {file_path}: {e}")
+            return {}
+    
+    async def parse_quality_reports(self, fcs_file: str, ani_file: str) -> Dict[str, Any]:
+        """Parse quality control reports (FCS and ANI) discovered in web crawl"""
+        quality_info = {}
+        
+        # Parse FCS report (Foreign Contamination Screen)
+        if fcs_file:
+            try:
+                with open(fcs_file, 'r') as f:
+                    fcs_data = []
+                    for line in f:
+                        if line.startswith('#'):
+                            continue
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 8:
+                            fcs_data.append({
+                                'sequence_id': parts[0],
+                                'start_pos': int(parts[1]),
+                                'end_pos': int(parts[2]),
+                                'classification': parts[3],
+                                'evidence': parts[4]
+                            })
+                    quality_info['fcs_contamination'] = fcs_data
+            except Exception as e:
+                logger.error(f"Error parsing FCS report {fcs_file}: {e}")
+        
+        # Parse ANI report (Average Nucleotide Identity)
+        if ani_file:
+            try:
+                with open(ani_file, 'r') as f:
+                    ani_data = {}
+                    for line in f:
+                        if line.startswith('#'):
+                            continue
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 3:
+                            ani_data['query_assembly'] = parts[0]
+                            ani_data['subject_assembly'] = parts[1]
+                            ani_data['ani_value'] = float(parts[2])
+                    quality_info['ani_analysis'] = ani_data
+            except Exception as e:
+                logger.error(f"Error parsing ANI report {ani_file}: {e}")
+        
+        return quality_info
+    
+    async def parse_expression_data(self, expression_file: str, normalized_file: str = "") -> Dict[str, Any]:
+        """Parse RNA-seq expression data files discovered in NCBI FTP crawl"""
+        expression_data = {}
+        
+        # Parse raw expression counts
+        if expression_file:
+            try:
+                with gzip.open(expression_file, 'rt') if expression_file.endswith('.gz') else open(expression_file, 'r') as f:
+                    raw_counts = {}
+                    header = f.readline().strip().split('\t')
+                    
+                    for line in f:
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 2:
+                            gene_id = parts[0]
+                            try:
+                                count = int(parts[1])
+                                raw_counts[gene_id] = count
+                            except ValueError:
+                                continue
+                    
+                    expression_data['raw_counts'] = raw_counts
+                    expression_data['total_genes'] = len(raw_counts)
+                    expression_data['total_reads'] = sum(raw_counts.values())
+                    
+            except Exception as e:
+                logger.error(f"Error parsing expression file {expression_file}: {e}")
+        
+        # Parse normalized expression (TPM)
+        if normalized_file:
+            try:
+                with gzip.open(normalized_file, 'rt') if normalized_file.endswith('.gz') else open(normalized_file, 'r') as f:
+                    normalized_counts = {}
+                    header = f.readline().strip().split('\t')
+                    
+                    for line in f:
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 2:
+                            gene_id = parts[0]
+                            try:
+                                tpm = float(parts[1])
+                                normalized_counts[gene_id] = tpm
+                            except ValueError:
+                                continue
+                    
+                    expression_data['normalized_counts'] = normalized_counts
+                    expression_data['expressed_genes'] = len([g for g, tpm in normalized_counts.items() if tpm > 0.1])
+                    
+            except Exception as e:
+                logger.error(f"Error parsing normalized expression file {normalized_file}: {e}")
+        
+        return expression_data
+    
+    async def parse_gene_ontology(self, go_file: str) -> Dict[str, Any]:
+        """Parse Gene Ontology (GO) annotation file from NCBI FTP"""
+        go_annotations = {}
+        
+        try:
+            with gzip.open(go_file, 'rt') if go_file.endswith('.gz') else open(go_file, 'r') as f:
+                for line in f:
+                    if line.startswith('!'):
+                        continue
+                    
+                    parts = line.strip().split('\t')
+                    if len(parts) >= 5:
+                        gene_id = parts[1]
+                        go_term = parts[4]
+                        evidence_code = parts[6] if len(parts) > 6 else ""
+                        ontology = parts[8] if len(parts) > 8 else ""
+                        
+                        if gene_id not in go_annotations:
+                            go_annotations[gene_id] = {
+                                'biological_process': [],
+                                'molecular_function': [],
+                                'cellular_component': []
+                            }
+                        
+                        # Categorize GO terms
+                        if ontology == 'P':  # Biological Process
+                            go_annotations[gene_id]['biological_process'].append({
+                                'go_term': go_term,
+                                'evidence': evidence_code
+                            })
+                        elif ontology == 'F':  # Molecular Function
+                            go_annotations[gene_id]['molecular_function'].append({
+                                'go_term': go_term,
+                                'evidence': evidence_code
+                            })
+                        elif ontology == 'C':  # Cellular Component
+                            go_annotations[gene_id]['cellular_component'].append({
+                                'go_term': go_term,
+                                'evidence': evidence_code
+                            })
+            
+            # Generate statistics
+            total_genes = len(go_annotations)
+            avg_terms_per_gene = sum(
+                len(ann['biological_process']) + len(ann['molecular_function']) + len(ann['cellular_component'])
+                for ann in go_annotations.values()
+            ) / total_genes if total_genes > 0 else 0
+            
+            return {
+                'annotations': go_annotations,
+                'total_annotated_genes': total_genes,
+                'average_terms_per_gene': avg_terms_per_gene,
+                'biological_process_genes': len([g for g, ann in go_annotations.items() if ann['biological_process']]),
+                'molecular_function_genes': len([g for g, ann in go_annotations.items() if ann['molecular_function']]),
+                'cellular_component_genes': len([g for g, ann in go_annotations.items() if ann['cellular_component']])
+            }
+            
+        except Exception as e:
+            logger.error(f"Error parsing GO annotation file {go_file}: {e}")
+            return {}
+    
+    async def parse_rnaseq_metadata(self, alignment_summary_file: str, runs_file: str) -> Dict[str, Any]:
+        """Parse RNA-seq alignment and run metadata from NCBI FTP"""
+        metadata = {}
+        
+        # Parse alignment summary
+        if alignment_summary_file:
+            try:
+                with open(alignment_summary_file, 'r') as f:
+                    alignment_stats = {}
+                    for line in f:
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 2:
+                            metric = parts[0]
+                            value = parts[1]
+                            try:
+                                alignment_stats[metric] = int(value)
+                            except ValueError:
+                                alignment_stats[metric] = value
+                    
+                    metadata['alignment_summary'] = alignment_stats
+                    
+            except Exception as e:
+                logger.error(f"Error parsing alignment summary {alignment_summary_file}: {e}")
+        
+        # Parse RNA-seq runs information
+        if runs_file:
+            try:
+                with open(runs_file, 'r') as f:
+                    runs_info = []
+                    header = f.readline().strip().split('\t')
+                    
+                    for line in f:
+                        parts = line.strip().split('\t')
+                        if len(parts) >= len(header):
+                            run_data = {}
+                            for i, field in enumerate(header):
+                                if i < len(parts):
+                                    run_data[field] = parts[i]
+                            runs_info.append(run_data)
+                    
+                    metadata['runs_info'] = runs_info
+                    metadata['total_runs'] = len(runs_info)
+                    
+            except Exception as e:
+                logger.error(f"Error parsing runs file {runs_file}: {e}")
+        
+        return metadata
+
     async def close(self):
         """Close aiohttp session"""
         if self.session:

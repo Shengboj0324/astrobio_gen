@@ -1,0 +1,13 @@
+# This file maintains the data/processed directory structure in version control
+# 
+# Directory Purpose: Final, analysis-ready datasets
+# Security Level: Internal access, quality-controlled data
+# 
+# Subdirectories:
+# - kegg/              : Processed KEGG pathways
+# - ncbi/              : Processed genomic data  
+# - agora2/            : Processed metabolic models
+# - quality_reports/   : Data quality reports
+# 
+# Note: Large processed files are excluded via .gitignore
+# Only small config and schema files are committed 

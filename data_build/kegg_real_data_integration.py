@@ -50,17 +50,29 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class KEGGPathway:
-    """Comprehensive KEGG pathway data structure"""
+    """Comprehensive KEGG pathway data structure enhanced with web crawl findings"""
     pathway_id: str
     name: str
     description: str
     class_type: str
+    # Enhanced classification from web crawl
+    category: str = ""  # Metabolism, Signaling, Disease, etc.
+    subcategory: str = ""  # Carbohydrate metabolism, Lipid metabolism, etc.
+    pathway_map: str = ""  # Map reference
+    module: str = ""  # Functional module
+    disease_association: str = ""  # Disease pathway associations
+    drug_targets: List[str] = field(default_factory=list)  # Drug target information
+    # Original fields
     organisms: List[str] = field(default_factory=list)
     reactions: List[str] = field(default_factory=list)
     compounds: List[str] = field(default_factory=list)
     enzymes: List[str] = field(default_factory=list)
     genes: List[str] = field(default_factory=list)
     drugs: List[str] = field(default_factory=list)
+    # Enhanced network and annotation data
+    ortholog_groups: List[str] = field(default_factory=list)  # KO ortholog groups
+    brite_hierarchy: List[str] = field(default_factory=list)  # BRITE functional hierarchy
+    cross_references: Dict[str, List[str]] = field(default_factory=dict)  # External DB refs
     networks: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
     last_updated: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -206,11 +218,12 @@ class KEGGDataDownloader:
             logger.warning(f"Error saving cache {cache_file}: {e}")
     
     async def fetch_pathway_list(self) -> List[Dict[str, str]]:
-        """Fetch comprehensive list of all KEGG pathways"""
+        """Fetch comprehensive list of all KEGG pathways with enhanced categorization"""
         cache_data = self._load_from_cache("list_pathway")
         if cache_data:
             return cache_data.get('pathways', [])
         
+        # Fetch main pathway list
         url = urljoin(self.base_url, "list/pathway")
         response = await self._fetch_with_retry(url)
         
@@ -224,16 +237,42 @@ class KEGGDataDownloader:
                 if len(parts) >= 2:
                     pathway_id = parts[0].replace('path:', '')
                     name = parts[1]
+                    
+                    # Enhanced categorization based on pathway ID patterns from web crawl
+                    category, subcategory = self._categorize_pathway(pathway_id, name)
+                    
                     pathways.append({
                         'pathway_id': pathway_id,
-                        'name': name
+                        'name': name,
+                        'category': category,
+                        'subcategory': subcategory
                     })
         
-        # Cache results
-        self._save_to_cache("list_pathway", "", {'pathways': pathways})
+        # Fetch organism-specific pathways for comprehensive coverage
+        organism_pathways = await self._fetch_organism_pathways()
+        pathways.extend(organism_pathways)
         
-        logger.info(f"Fetched {len(pathways)} pathways")
-        return pathways
+        # Fetch disease pathways
+        disease_pathways = await self._fetch_disease_pathways()
+        pathways.extend(disease_pathways)
+        
+        # Fetch drug pathways
+        drug_pathways = await self._fetch_drug_pathways()
+        pathways.extend(drug_pathways)
+        
+        # Remove duplicates
+        unique_pathways = {}
+        for pathway in pathways:
+            if pathway['pathway_id'] not in unique_pathways:
+                unique_pathways[pathway['pathway_id']] = pathway
+        
+        final_pathways = list(unique_pathways.values())
+        
+        # Cache results
+        self._save_to_cache("list_pathway", "", {'pathways': final_pathways})
+        
+        logger.info(f"Fetched {len(final_pathways)} pathways across all categories")
+        return final_pathways
     
     async def fetch_pathway_details(self, pathway_id: str) -> Optional[KEGGPathway]:
         """Fetch detailed information for a specific pathway"""
@@ -258,15 +297,32 @@ class KEGGDataDownloader:
         enzymes = await self._fetch_pathway_enzymes(pathway_id)
         genes = await self._fetch_pathway_genes(pathway_id)
         
+        # Enhanced categorization using web crawl findings
+        category, subcategory = self._categorize_pathway(pathway_id, pathway_data.get('name', ''))
+        
+        # Fetch additional pathway information discovered in web crawl
+        ortholog_groups = await self._fetch_pathway_orthologs(pathway_id)
+        brite_hierarchy = await self._fetch_pathway_brite(pathway_id)
+        cross_references = await self._fetch_pathway_cross_refs(pathway_id)
+        
         pathway = KEGGPathway(
             pathway_id=pathway_id,
             name=pathway_data.get('name', ''),
             description=pathway_data.get('description', ''),
             class_type=pathway_data.get('class', ''),
+            category=category,
+            subcategory=subcategory,
+            pathway_map=pathway_data.get('pathway_map', ''),
+            module=pathway_data.get('module', ''),
+            disease_association=pathway_data.get('disease', ''),
+            drug_targets=pathway_data.get('drug_targets', []),
             reactions=reactions,
             compounds=compounds,
             enzymes=enzymes,
-            genes=genes
+            genes=genes,
+            ortholog_groups=ortholog_groups,
+            brite_hierarchy=brite_hierarchy,
+            cross_references=cross_references
         )
         
         # Cache results
@@ -593,6 +649,212 @@ class KEGGDataDownloader:
         logger.info(f"Fetched {len(drugs)} drugs")
         return drugs
     
+    def _categorize_pathway(self, pathway_id: str, name: str) -> Tuple[str, str]:
+        """Categorize pathway based on ID patterns discovered in web crawl"""
+        # Metabolic pathways (map00000-map01999)
+        if pathway_id.startswith('map00') or pathway_id.startswith('map01'):
+            if '00010' in pathway_id or '00020' in pathway_id or '00030' in pathway_id:
+                return "Metabolism", "Carbohydrate metabolism"
+            elif '00061' in pathway_id or '00062' in pathway_id or '00071' in pathway_id:
+                return "Metabolism", "Lipid metabolism"
+            elif '00230' in pathway_id or '00240' in pathway_id or '00250' in pathway_id:
+                return "Metabolism", "Amino acid metabolism"
+            elif '00190' in pathway_id or '00195' in pathway_id or '00196' in pathway_id:
+                return "Metabolism", "Folate metabolism"
+            elif '00100' in pathway_id or '00120' in pathway_id or '00121' in pathway_id:
+                return "Metabolism", "Steroid metabolism"
+            elif '00140' in pathway_id or '00130' in pathway_id:
+                return "Metabolism", "Vitamin metabolism"
+            elif '01200' in pathway_id or '01210' in pathway_id or '01220' in pathway_id:
+                return "Metabolism", "Global and overview maps"
+            else:
+                return "Metabolism", "Other metabolic pathways"
+        
+        # Environmental Information Processing (map02000-map02999)
+        elif pathway_id.startswith('map02'):
+            return "Environmental Information Processing", "Signal transduction"
+        
+        # Genetic Information Processing (map03000-map03999)
+        elif pathway_id.startswith('map03'):
+            return "Genetic Information Processing", "Transcription and translation"
+        
+        # Cellular Processes (map04000-map04999)
+        elif pathway_id.startswith('map04'):
+            if 'apoptosis' in name.lower() or 'cell cycle' in name.lower():
+                return "Cellular Processes", "Cell growth and death"
+            elif 'membrane' in name.lower() or 'transport' in name.lower():
+                return "Cellular Processes", "Membrane transport"
+            else:
+                return "Cellular Processes", "Other cellular processes"
+        
+        # Human Diseases (map05000-map05999)
+        elif pathway_id.startswith('map05'):
+            if 'cancer' in name.lower() or 'tumor' in name.lower():
+                return "Human Diseases", "Cancers"
+            elif 'infection' in name.lower() or 'pathogen' in name.lower():
+                return "Human Diseases", "Infectious diseases"
+            elif 'neurodegenerative' in name.lower() or 'alzheimer' in name.lower() or 'parkinson' in name.lower():
+                return "Human Diseases", "Neurodegenerative diseases"
+            else:
+                return "Human Diseases", "Other diseases"
+        
+        # Drug Development (map07000-map07999)
+        elif pathway_id.startswith('map07'):
+            return "Drug Development", "Drug metabolism"
+        
+        # Organism-specific pathways
+        elif any(org in pathway_id for org in ['hsa', 'mmu', 'rno', 'dme', 'cel', 'sce', 'eco']):
+            return "Organism-specific", "Species-specific pathways"
+        
+        # Default classification
+        else:
+            return "Other", "Unclassified"
+    
+    async def _fetch_organism_pathways(self) -> List[Dict[str, str]]:
+        """Fetch organism-specific pathways discovered in web crawl"""
+        organism_codes = ['hsa', 'mmu', 'rno', 'dme', 'cel', 'sce', 'eco', 'bsu', 'mtu', 'syf']
+        pathways = []
+        
+        for org_code in organism_codes:
+            try:
+                url = urljoin(self.base_url, f"list/pathway/{org_code}")
+                response = await self._fetch_with_retry(url)
+                
+                if response:
+                    for line in response.strip().split('\n'):
+                        if line.startswith(f'path:{org_code}'):
+                            parts = line.split('\t', 1)
+                            if len(parts) >= 2:
+                                pathway_id = parts[0].replace('path:', '')
+                                name = parts[1]
+                                pathways.append({
+                                    'pathway_id': pathway_id,
+                                    'name': name,
+                                    'category': 'Organism-specific',
+                                    'subcategory': f'{org_code.upper()} pathways'
+                                })
+            except Exception as e:
+                logger.warning(f"Failed to fetch pathways for organism {org_code}: {e}")
+        
+        return pathways
+    
+    async def _fetch_disease_pathways(self) -> List[Dict[str, str]]:
+        """Fetch disease-related pathways"""
+        try:
+            url = urljoin(self.base_url, "link/disease/pathway")
+            response = await self._fetch_with_retry(url)
+            
+            pathways = []
+            if response:
+                for line in response.strip().split('\n'):
+                    if 'path:' in line and 'ds:' in line:
+                        parts = line.split('\t')
+                        if len(parts) >= 2:
+                            pathway_id = parts[1].replace('path:', '') if 'path:' in parts[1] else parts[0].replace('path:', '')
+                            pathways.append({
+                                'pathway_id': pathway_id,
+                                'name': f"Disease pathway {pathway_id}",
+                                'category': 'Human Diseases',
+                                'subcategory': 'Disease-associated pathways'
+                            })
+            
+            return pathways
+        except Exception as e:
+            logger.warning(f"Failed to fetch disease pathways: {e}")
+            return []
+    
+    async def _fetch_drug_pathways(self) -> List[Dict[str, str]]:
+        """Fetch drug metabolism pathways"""
+        try:
+            url = urljoin(self.base_url, "link/drug/pathway")
+            response = await self._fetch_with_retry(url)
+            
+            pathways = []
+            if response:
+                for line in response.strip().split('\n'):
+                    if 'path:' in line and 'dr:' in line:
+                        parts = line.split('\t')
+                        if len(parts) >= 2:
+                            pathway_id = parts[1].replace('path:', '') if 'path:' in parts[1] else parts[0].replace('path:', '')
+                            pathways.append({
+                                'pathway_id': pathway_id,
+                                'name': f"Drug pathway {pathway_id}",
+                                'category': 'Drug Development',
+                                'subcategory': 'Drug metabolism pathways'
+                            })
+            
+            return pathways
+        except Exception as e:
+            logger.warning(f"Failed to fetch drug pathways: {e}")
+            return []
+    
+    async def _fetch_pathway_orthologs(self, pathway_id: str) -> List[str]:
+        """Fetch KEGG ortholog groups for pathway"""
+        try:
+            url = urljoin(self.base_url, f"link/ko/{pathway_id}")
+            response = await self._fetch_with_retry(url)
+            
+            orthologs = []
+            if response:
+                for line in response.strip().split('\n'):
+                    if line.startswith('ko:'):
+                        parts = line.split('\t')
+                        if len(parts) >= 1:
+                            ko_id = parts[0].replace('ko:', '')
+                            orthologs.append(ko_id)
+            
+            return orthologs
+        except Exception as e:
+            logger.debug(f"No orthologs found for pathway {pathway_id}: {e}")
+            return []
+    
+    async def _fetch_pathway_brite(self, pathway_id: str) -> List[str]:
+        """Fetch BRITE functional hierarchy for pathway"""
+        try:
+            url = urljoin(self.base_url, f"link/brite/{pathway_id}")
+            response = await self._fetch_with_retry(url)
+            
+            brite_terms = []
+            if response:
+                for line in response.strip().split('\n'):
+                    if line.startswith('br:'):
+                        parts = line.split('\t')
+                        if len(parts) >= 1:
+                            brite_id = parts[0].replace('br:', '')
+                            brite_terms.append(brite_id)
+            
+            return brite_terms
+        except Exception as e:
+            logger.debug(f"No BRITE terms found for pathway {pathway_id}: {e}")
+            return []
+    
+    async def _fetch_pathway_cross_refs(self, pathway_id: str) -> Dict[str, List[str]]:
+        """Fetch cross-references to external databases"""
+        cross_refs = {}
+        
+        # Common external databases to check
+        databases = ['uniprot', 'pubmed', 'ncbi-gi', 'pdb']
+        
+        for db in databases:
+            try:
+                url = urljoin(self.base_url, f"conv/{db}/{pathway_id}")
+                response = await self._fetch_with_retry(url)
+                
+                if response:
+                    refs = []
+                    for line in response.strip().split('\n'):
+                        if '\t' in line:
+                            parts = line.split('\t')
+                            if len(parts) >= 2:
+                                ref_id = parts[1]
+                                refs.append(ref_id)
+                    if refs:
+                        cross_refs[db] = refs
+            except Exception as e:
+                logger.debug(f"No {db} cross-references found for pathway {pathway_id}: {e}")
+        
+        return cross_refs
+
     async def close(self):
         """Close aiohttp session"""
         if self.session:

@@ -1,0 +1,12 @@
+# This file maintains the data/raw directory structure in version control
+# Raw data files are excluded via .gitignore for security
+# 
+# Directory Purpose: Store original, immutable source data
+# Security Level: Restricted access, read-only after download
+# 
+# Subdirectories:
+# - kegg/      : KEGG pathway database files
+# - ncbi/      : NCBI genomic data
+# - agora2/    : AGORA2 metabolic models
+# - 1000g_*    : 1000 Genomes project data
+# - stellar_seds/ : Stellar spectral energy distributions 

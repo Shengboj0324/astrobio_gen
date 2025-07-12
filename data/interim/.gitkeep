@@ -1,0 +1,9 @@
+# This file maintains the data/interim directory structure in version control
+# 
+# Directory Purpose: Intermediate processing stages and quality checks
+# Security Level: Internal access for processing pipelines
+# 
+# Expected files:
+# - kegg_edges.csv     : Metabolic reaction networks
+# - env_vectors.csv    : Environmental condition vectors
+# - quality_checks/    : Quality assessment results 

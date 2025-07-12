@@ -521,10 +521,19 @@ class QualityRuleEngine:
         return all_passed, all_issues
 
 class QualityAnalyzer:
-    """Advanced quality analyzer with statistical methods"""
+    """Enhanced quality analyzer with NCBI quality control support from web crawl"""
     
     def __init__(self):
         self.scaler = StandardScaler()
+        # Enhanced support for NCBI quality control files discovered in web crawl
+        self.ncbi_quality_parsers = {
+            'fcs_report': self._parse_fcs_report,
+            'ani_report': self._parse_ani_report,
+            'ani_contam_ranges': self._parse_ani_contamination,
+            'assembly_stats': self._parse_assembly_stats,
+            'busco_report': self._parse_busco_report,
+            'checkm_report': self._parse_checkm_report
+        }
     
     def calculate_completeness(self, data: pd.DataFrame, required_fields: List[str] = None) -> float:
         """Calculate data completeness score"""
@@ -666,6 +675,289 @@ class QualityAnalyzer:
             return max(0.0, 1.0 - (days_old / 365.0))
         except Exception:
             return 1.0
+    
+    def analyze_ncbi_quality_files(self, quality_files: Dict[str, str]) -> Dict[str, Any]:
+        """Analyze NCBI quality control files discovered in web crawl"""
+        quality_analysis = {}
+        
+        for file_type, file_path in quality_files.items():
+            if file_type in self.ncbi_quality_parsers and file_path:
+                try:
+                    parser = self.ncbi_quality_parsers[file_type]
+                    analysis = parser(file_path)
+                    quality_analysis[file_type] = analysis
+                except Exception as e:
+                    logger.warning(f"Error parsing {file_type} file {file_path}: {e}")
+                    quality_analysis[file_type] = {'error': str(e)}
+        
+        return quality_analysis
+    
+    def _parse_fcs_report(self, file_path: str) -> Dict[str, Any]:
+        """Parse Foreign Contamination Screen (FCS) report"""
+        try:
+            contamination_regions = []
+            total_contaminated_length = 0
+            
+            with open(file_path, 'r') as f:
+                for line in f:
+                    if line.startswith('#'):
+                        continue
+                    
+                    parts = line.strip().split('\t')
+                    if len(parts) >= 8:
+                        seq_id = parts[0]
+                        start_pos = int(parts[1])
+                        end_pos = int(parts[2])
+                        classification = parts[3]
+                        evidence = parts[4]
+                        
+                        contamination_regions.append({
+                            'sequence_id': seq_id,
+                            'start': start_pos,
+                            'end': end_pos,
+                            'length': end_pos - start_pos + 1,
+                            'classification': classification,
+                            'evidence': evidence
+                        })
+                        
+                        total_contaminated_length += end_pos - start_pos + 1
+            
+            return {
+                'contamination_regions': contamination_regions,
+                'total_regions': len(contamination_regions),
+                'total_contaminated_length': total_contaminated_length,
+                'quality_score': 1.0 - min(1.0, total_contaminated_length / 1000000)  # Normalize by 1Mb
+            }
+            
+        except Exception as e:
+            return {'error': f"Failed to parse FCS report: {e}"}
+    
+    def _parse_ani_report(self, file_path: str) -> Dict[str, Any]:
+        """Parse Average Nucleotide Identity (ANI) report"""
+        try:
+            ani_results = []
+            
+            with open(file_path, 'r') as f:
+                for line in f:
+                    if line.startswith('#'):
+                        continue
+                    
+                    parts = line.strip().split('\t')
+                    if len(parts) >= 3:
+                        query = parts[0]
+                        subject = parts[1]
+                        ani_value = float(parts[2])
+                        
+                        ani_results.append({
+                            'query_assembly': query,
+                            'subject_assembly': subject,
+                            'ani_value': ani_value
+                        })
+            
+            if ani_results:
+                avg_ani = sum(result['ani_value'] for result in ani_results) / len(ani_results)
+                min_ani = min(result['ani_value'] for result in ani_results)
+                max_ani = max(result['ani_value'] for result in ani_results)
+                
+                return {
+                    'ani_results': ani_results,
+                    'average_ani': avg_ani,
+                    'min_ani': min_ani,
+                    'max_ani': max_ani,
+                    'quality_score': avg_ani / 100.0  # ANI is typically 0-100
+                }
+            else:
+                return {'error': 'No ANI results found'}
+                
+        except Exception as e:
+            return {'error': f"Failed to parse ANI report: {e}"}
+    
+    def _parse_ani_contamination(self, file_path: str) -> Dict[str, Any]:
+        """Parse ANI contamination ranges file"""
+        try:
+            contamination_ranges = []
+            
+            with open(file_path, 'r') as f:
+                for line in f:
+                    if line.startswith('#'):
+                        continue
+                    
+                    parts = line.strip().split('\t')
+                    if len(parts) >= 6:
+                        seq_id = parts[0]
+                        start_pos = int(parts[1])
+                        end_pos = int(parts[2])
+                        ani_value = float(parts[3])
+                        classification = parts[4]
+                        
+                        contamination_ranges.append({
+                            'sequence_id': seq_id,
+                            'start': start_pos,
+                            'end': end_pos,
+                            'length': end_pos - start_pos + 1,
+                            'ani_value': ani_value,
+                            'classification': classification
+                        })
+            
+            total_contaminated_length = sum(r['length'] for r in contamination_ranges)
+            
+            return {
+                'contamination_ranges': contamination_ranges,
+                'total_ranges': len(contamination_ranges),
+                'total_contaminated_length': total_contaminated_length,
+                'quality_score': 1.0 - min(1.0, total_contaminated_length / 1000000)
+            }
+            
+        except Exception as e:
+            return {'error': f"Failed to parse ANI contamination: {e}"}
+    
+    def _parse_assembly_stats(self, file_path: str) -> Dict[str, Any]:
+        """Parse assembly statistics file discovered in web crawl"""
+        try:
+            stats = {}
+            
+            with open(file_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('#') or not line:
+                        continue
+                    
+                    parts = line.split()
+                    if len(parts) >= 2:
+                        metric = parts[0]
+                        value = parts[1]
+                        
+                        # Parse numeric values
+                        try:
+                            if '.' in value:
+                                stats[metric] = float(value)
+                            else:
+                                stats[metric] = int(value)
+                        except ValueError:
+                            stats[metric] = value
+            
+            # Calculate quality score based on assembly metrics
+            quality_score = 1.0
+            
+            # Penalize for gaps
+            if 'unspanned-gaps' in stats:
+                quality_score *= max(0.5, 1.0 - stats['unspanned-gaps'] / 1000)
+            
+            # Reward high N50
+            if 'scaffold-N50' in stats:
+                n50 = stats['scaffold-N50']
+                if n50 > 100000:  # Good N50
+                    quality_score *= 1.0
+                elif n50 > 50000:  # Acceptable N50
+                    quality_score *= 0.9
+                else:  # Poor N50
+                    quality_score *= 0.7
+            
+            stats['quality_score'] = quality_score
+            return stats
+            
+        except Exception as e:
+            return {'error': f"Failed to parse assembly stats: {e}"}
+    
+    def _parse_busco_report(self, file_path: str) -> Dict[str, Any]:
+        """Parse BUSCO completeness report"""
+        try:
+            busco_results = {}
+            
+            with open(file_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if 'Complete BUSCOs' in line:
+                        # Extract percentage
+                        parts = line.split()
+                        for i, part in enumerate(parts):
+                            if part.endswith('%'):
+                                busco_results['complete_percentage'] = float(part.rstrip('%'))
+                                break
+                    elif 'Complete and single-copy BUSCOs' in line:
+                        parts = line.split()
+                        for i, part in enumerate(parts):
+                            if part.endswith('%'):
+                                busco_results['single_copy_percentage'] = float(part.rstrip('%'))
+                                break
+                    elif 'Complete and duplicated BUSCOs' in line:
+                        parts = line.split()
+                        for i, part in enumerate(parts):
+                            if part.endswith('%'):
+                                busco_results['duplicated_percentage'] = float(part.rstrip('%'))
+                                break
+                    elif 'Fragmented BUSCOs' in line:
+                        parts = line.split()
+                        for i, part in enumerate(parts):
+                            if part.endswith('%'):
+                                busco_results['fragmented_percentage'] = float(part.rstrip('%'))
+                                break
+                    elif 'Missing BUSCOs' in line:
+                        parts = line.split()
+                        for i, part in enumerate(parts):
+                            if part.endswith('%'):
+                                busco_results['missing_percentage'] = float(part.rstrip('%'))
+                                break
+            
+            # Calculate quality score based on BUSCO completeness
+            complete_pct = busco_results.get('complete_percentage', 0)
+            quality_score = complete_pct / 100.0
+            busco_results['quality_score'] = quality_score
+            
+            return busco_results
+            
+        except Exception as e:
+            return {'error': f"Failed to parse BUSCO report: {e}"}
+    
+    def _parse_checkm_report(self, file_path: str) -> Dict[str, Any]:
+        """Parse CheckM quality assessment report"""
+        try:
+            checkm_results = {}
+            
+            with open(file_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('Completeness'):
+                        # Extract completeness percentage
+                        parts = line.split(':')
+                        if len(parts) > 1:
+                            value = parts[1].strip().rstrip('%')
+                            try:
+                                checkm_results['completeness'] = float(value)
+                            except ValueError:
+                                pass
+                    elif line.startswith('Contamination'):
+                        # Extract contamination percentage
+                        parts = line.split(':')
+                        if len(parts) > 1:
+                            value = parts[1].strip().rstrip('%')
+                            try:
+                                checkm_results['contamination'] = float(value)
+                            except ValueError:
+                                pass
+                    elif line.startswith('Strain heterogeneity'):
+                        # Extract strain heterogeneity
+                        parts = line.split(':')
+                        if len(parts) > 1:
+                            value = parts[1].strip().rstrip('%')
+                            try:
+                                checkm_results['strain_heterogeneity'] = float(value)
+                            except ValueError:
+                                pass
+            
+            # Calculate quality score based on CheckM metrics
+            completeness = checkm_results.get('completeness', 0)
+            contamination = checkm_results.get('contamination', 100)
+            
+            # High quality: >90% complete, <5% contamination
+            # Medium quality: >70% complete, <10% contamination
+            quality_score = (completeness / 100.0) * (1.0 - min(1.0, contamination / 100.0))
+            checkm_results['quality_score'] = quality_score
+            
+            return checkm_results
+            
+        except Exception as e:
+            return {'error': f"Failed to parse CheckM report: {e}"}
 
 class QualityMonitor:
     """Real-time quality monitoring system"""
