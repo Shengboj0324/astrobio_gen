@@ -11,7 +11,12 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch_geometric.loader import DataLoader as GeometricDataLoader
 import os
 from typing import Dict, Any, Optional
-import wandb
+try:
+    import wandb
+    WANDB_AVAILABLE = True
+except ImportError:
+    WANDB_AVAILABLE = False
+    wandb = None
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 
@@ -251,7 +256,7 @@ def main():
     pl.seed_everything(42)
     
     # Setup logging
-    if cfg.get("logging", {}).get("use_wandb", False):
+    if cfg.get("logging", {}).get("use_wandb", False) and WANDB_AVAILABLE:
         logger = WandbLogger(
             project="astrobio-surrogate",
             name=f"surrogate-{cfg['model']['type']}-{cfg['model'].get('surrogate', {}).get('mode', 'scalar')}",
@@ -339,7 +344,7 @@ def main():
     if cfg["model"]["type"] == "surrogate":
         trainer.fit(module, train_dl, val_dl)
     else:
-    trainer.fit(module, dl)
+        trainer.fit(module, dl)
 
 if __name__ == "__main__":
     main()
