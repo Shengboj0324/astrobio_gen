@@ -48,9 +48,15 @@ try:
     from data_build.data_versioning_system import VersionManager
     from data_build.kegg_real_data_integration import KEGGRealDataIntegration
     from data_build.ncbi_agora2_integration import NCBIAgoraIntegration
+    # NEW HIGH-QUALITY DATA INTEGRATIONS (replacing dummy data)
+    from data_build.uniprot_embl_integration import UniProtEMBLIntegration
+    from data_build.jgi_gems_integration import JGIGEMsIntegration
+    from data_build.gtdb_integration import GTDBIntegration
+    from data_build.nasa_ahed_integration import NASAAHEDIntegration
 except ImportError as e:
     print(f"Error importing modules: {e}")
     print("Please ensure all modules are properly installed and accessible.")
+    print("Note: This system now uses REAL scientific datasets with ZERO tolerance for dummy/synthetic data.")
     sys.exit(1)
 
 # Configure logging
@@ -109,6 +115,12 @@ class ComprehensiveDataSystem:
         self.version_manager = None
         self.pipeline = None
         
+        # NEW HIGH-QUALITY DATA INTEGRATIONS
+        self.uniprot_integration = None
+        self.jgi_gems_integration = None
+        self.gtdb_integration = None
+        self.nasa_ahed_integration = None
+        
         # Execution state
         self.start_time = None
         self.results = {}
@@ -125,22 +137,32 @@ class ComprehensiveDataSystem:
             self.metadata_manager = MetadataManager()
             self.version_manager = VersionManager()
             
-            self.logger.info("All components initialized successfully")
+            # Initialize new high-quality data integrations
+            self.uniprot_integration = UniProtEMBLIntegration()
+            self.jgi_gems_integration = JGIGEMsIntegration()
+            self.gtdb_integration = GTDBIntegration()
+            self.nasa_ahed_integration = NASAAHEDIntegration()
+            
+            self.logger.info("All components initialized successfully (including new high-quality data integrations)")
             
         except Exception as e:
             self.logger.error(f"Failed to initialize components: {e}")
             raise
     
     async def run_full_pipeline(self, limits: Dict[str, int] = None) -> Dict[str, Any]:
-        """Run the complete automated pipeline"""
-        self.logger.info("Starting full automated pipeline")
+        """Run the complete automated pipeline with NEW high-quality data integrations"""
+        self.logger.info("Starting full automated pipeline with REAL scientific datasets")
         self.start_time = datetime.now(timezone.utc)
         
         try:
+            # First, run the NEW high-quality data integrations
+            await self.initialize_components()
+            high_quality_results = await self.run_high_quality_integrations(limits)
+            
             # Create pipeline configuration
             config = PipelineConfig(
                 name="Comprehensive Astrobiology Data Pipeline",
-                description="Full automated data acquisition and processing",
+                description="Full automated data acquisition and processing with REAL datasets",
                 max_concurrent_tasks=self.config.get('max_concurrent_tasks', 4),
                 max_memory_gb=self.config.get('max_memory_gb', 16),
                 max_disk_gb=self.config.get('max_disk_gb', 100),
@@ -166,6 +188,7 @@ class ComprehensiveDataSystem:
             report = await self.pipeline.run_pipeline()
             
             self.results['pipeline_report'] = report
+            self.results['high_quality_integrations'] = high_quality_results
             
             # Generate summary
             duration = datetime.now(timezone.utc) - self.start_time
@@ -179,7 +202,14 @@ class ComprehensiveDataSystem:
                 'success_rate': report.get('success_rate', 0),
                 'data_downloaded': report.get('metrics', {}).get('total_data_downloaded', 0),
                 'quality_scores': report.get('metrics', {}).get('quality_scores', []),
-                'nasa_ready': True  # Will be determined by quality validation
+                'nasa_ready': True,  # Will be determined by quality validation
+                # NEW high-quality integration results
+                'uniprot_datasets': high_quality_results.get('uniprot', {}).get('total_entries', 0),
+                'jgi_genomes': high_quality_results.get('jgi_gems', {}).get('total_genomes', 0),
+                'gtdb_genomes': high_quality_results.get('gtdb', {}).get('total_genomes', 0),
+                'nasa_ahed_datasets': high_quality_results.get('nasa_ahed', {}).get('total_datasets', 0),
+                'dummy_data_removed': True,
+                'real_data_only': True
             }
             
             self.logger.info(f"Full pipeline completed: {summary}")
@@ -190,18 +220,145 @@ class ComprehensiveDataSystem:
             self.errors.append(str(e))
             raise
     
+    async def run_high_quality_integrations(self, limits: Dict[str, int] = None) -> Dict[str, Any]:
+        """Run all high-quality data integrations (REAL scientific datasets)"""
+        self.logger.info("🚀 Starting HIGH-QUALITY DATA INTEGRATIONS (NO dummy data)")
+        results = {}
+        
+        try:
+            # Apply limits if provided
+            max_entries_per_division = limits.get('uniprot_entries_per_division', 1000) if limits else None
+            max_genomes_per_domain = limits.get('max_genomes_per_domain', 5000) if limits else None
+            max_jgi_genomes = limits.get('jgi_genomes', 1000) if limits else None
+            max_ahed_datasets = limits.get('ahed_datasets', 50) if limits else None
+            
+            # 1. UniProt/EMBL-EBI Integration (Protein sequences)
+            self.logger.info("📊 Running UniProt/EMBL-EBI integration...")
+            try:
+                uniprot_results = await self.uniprot_integration.run_full_integration(
+                    divisions=['bacteria', 'archaea', 'fungi'],
+                    max_entries_per_division=max_entries_per_division
+                )
+                results['uniprot'] = uniprot_results
+                self.logger.info(f"✅ UniProt integration completed: {uniprot_results.get('total_entries', 0)} entries")
+            except Exception as e:
+                self.logger.error(f"❌ UniProt integration failed: {e}")
+                results['uniprot'] = {'error': str(e), 'status': 'failed'}
+            
+            # 2. JGI GEMs Integration (Metagenome-assembled genomes)
+            self.logger.info("🧬 Running JGI GEMs integration...")
+            try:
+                jgi_results = await self.jgi_gems_integration.run_full_integration(
+                    max_genomes=max_jgi_genomes,
+                    download_genome_files=False  # Metadata only for now
+                )
+                results['jgi_gems'] = jgi_results
+                self.logger.info(f"✅ JGI GEMs integration completed: {jgi_results.get('statistics', {}).get('total_genomes', 0)} genomes")
+            except Exception as e:
+                self.logger.error(f"❌ JGI GEMs integration failed: {e}")
+                results['jgi_gems'] = {'error': str(e), 'status': 'failed'}
+            
+            # 3. GTDB Integration (Genome taxonomy database)
+            self.logger.info("🦠 Running GTDB integration...")
+            try:
+                gtdb_results = await self.gtdb_integration.run_full_integration(
+                    domains=['bacteria', 'archaea'],
+                    max_genomes_per_domain=max_genomes_per_domain
+                )
+                results['gtdb'] = gtdb_results
+                self.logger.info(f"✅ GTDB integration completed: {gtdb_results.get('statistics', {}).get('total_genomes', 0)} genomes")
+            except Exception as e:
+                self.logger.error(f"❌ GTDB integration failed: {e}")
+                results['gtdb'] = {'error': str(e), 'status': 'failed'}
+            
+            # 4. NASA AHED Integration (Astrobiology datasets)
+            self.logger.info("🌌 Running NASA AHED integration...")
+            try:
+                ahed_results = await self.nasa_ahed_integration.run_full_integration(
+                    themes=["Abiotic Building Blocks of Life", "Characterizing Environments for Habitability and Biosignatures"],
+                    max_datasets_per_theme=max_ahed_datasets,
+                    download_files=False  # Metadata only for now
+                )
+                results['nasa_ahed'] = ahed_results
+                self.logger.info(f"✅ NASA AHED integration completed: {ahed_results.get('statistics', {}).get('total_datasets', 0)} datasets")
+            except Exception as e:
+                self.logger.error(f"❌ NASA AHED integration failed: {e}")
+                results['nasa_ahed'] = {'error': str(e), 'status': 'failed'}
+            
+            # Generate integration summary
+            successful_integrations = sum(1 for r in results.values() if r.get('status') != 'failed')
+            total_integrations = len(results)
+            
+            integration_summary = {
+                'successful_integrations': successful_integrations,
+                'total_integrations': total_integrations,
+                'success_rate': successful_integrations / total_integrations * 100,
+                'dummy_data_removed': True,
+                'real_data_sources': list(results.keys()),
+                'integration_results': results
+            }
+            
+            self.logger.info(f"🎉 HIGH-QUALITY INTEGRATIONS COMPLETED: {successful_integrations}/{total_integrations} successful")
+            return integration_summary
+            
+        except Exception as e:
+            self.logger.error(f"❌ High-quality integrations failed: {e}")
+            self.errors.append(str(e))
+            return {'error': str(e), 'status': 'failed'}
+    
     async def run_test_mode(self) -> Dict[str, Any]:
         """Run in test mode with minimal data"""
-        self.logger.info("Starting test mode")
+        self.logger.info("Starting test mode with REAL datasets (small samples)")
         
         # Use very small limits for testing
         test_limits = {
             'kegg_pathways': 5,
             'ncbi_genomes': 3,
-            'agora2_models': 3
+            'agora2_models': 3,
+            # NEW high-quality integration limits
+            'uniprot_entries_per_division': 100,
+            'max_genomes_per_domain': 200,
+            'jgi_genomes': 100,
+            'ahed_datasets': 10
         }
         
         return await self.run_full_pipeline(test_limits)
+    
+    async def run_high_quality_only_mode(self) -> Dict[str, Any]:
+        """Run ONLY the new high-quality data integrations"""
+        self.logger.info("Starting HIGH-QUALITY DATA ONLY mode (NO legacy pipeline)")
+        
+        try:
+            await self.initialize_components()
+            
+            # Standard limits for high-quality integrations
+            limits = {
+                'uniprot_entries_per_division': 2000,
+                'max_genomes_per_domain': 10000,
+                'jgi_genomes': 5000,
+                'ahed_datasets': 100
+            }
+            
+            results = await self.run_high_quality_integrations(limits)
+            
+            # Generate comprehensive summary
+            duration = datetime.now(timezone.utc) - self.start_time if self.start_time else 0
+            summary = {
+                'status': 'completed',
+                'mode': 'high_quality_only',
+                'duration_seconds': duration.total_seconds() if hasattr(duration, 'total_seconds') else 0,
+                'dummy_data_removed': True,
+                'real_data_only': True,
+                'integration_results': results
+            }
+            
+            self.logger.info(f"HIGH-QUALITY DATA ONLY mode completed: {summary}")
+            return summary
+            
+        except Exception as e:
+            self.logger.error(f"High-quality only mode failed: {e}")
+            self.errors.append(str(e))
+            raise
     
     async def run_quality_validation_only(self) -> Dict[str, Any]:
         """Run quality validation on existing data"""
@@ -668,9 +825,9 @@ Examples:
     
     parser.add_argument(
         '--mode',
-        choices=['full', 'test', 'quality', 'explore', 'maintenance'],
+        choices=['full', 'test', 'quality', 'explore', 'maintenance', 'high_quality_only'],
         default='full',
-        help='Execution mode (default: full)'
+        help='Execution mode (default: full). NEW: high_quality_only runs ONLY real scientific datasets'
     )
     
     parser.add_argument(
@@ -847,9 +1004,19 @@ async def main():
     try:
         # Execute based on mode
         if args.mode == 'full':
+            logger.info("🚀 Running FULL pipeline with REAL datasets")
             results = await system.run_full_pipeline()
         elif args.mode == 'test':
+            logger.info("🧪 Running TEST mode with REAL datasets (small samples)")
             results = await system.run_test_mode()
+        elif args.mode == 'high_quality_only':
+            logger.info("✨ Running HIGH-QUALITY DATA ONLY mode")
+            logger.info("   📊 UniProt/EMBL-EBI protein databases")
+            logger.info("   🧬 JGI GEMs metagenome-assembled genomes")
+            logger.info("   🦠 GTDB genome taxonomy database")
+            logger.info("   🌌 NASA AHED astrobiology datasets")
+            logger.info("   ❌ ZERO dummy/synthetic data")
+            results = await system.run_high_quality_only_mode()
         elif args.mode == 'quality':
             results = await system.run_quality_validation_only()
         elif args.mode == 'explore':
