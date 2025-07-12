@@ -13,7 +13,6 @@ xarray>=2024.2          # NetCDF climate cubes
 tqdm>=4.66
 networkx==3.2.1
 sympy>=1.12             # quick analytic checks / ODE prototypes
-statistics              # built-in module for statistical functions
 
 #########################################################
 # =====  DEEP-LEARNING & CLASSICAL ML  ================ #
@@ -41,7 +40,7 @@ dask[array]>=2024.2      # Dask array support
 #########################################################
 # ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
 #########################################################
-cobra==0.28.0             # Constraint-based modeling
+cobra>=0.29.1             # Constraint-based modeling
 optlang>=1.7              # Solver backend for COBRA
 rdkit-pypi==2022.9.5     # Molecular operations for cheminformatics
 
@@ -75,35 +74,18 @@ urllib3>=2.0.0            # HTTP library with connection pooling
 #########################################################
 # ======  DATA STORAGE & PERSISTENCE  ================= #
 #########################################################
-sqlite3                  # Built-in lightweight database
 h5py>=3.11                # HDF5 file format support
-pickle                    # Built-in serialization
-gzip                      # Built-in compression
-tarfile                   # Built-in archive support
 
 #########################################################
 # ======  ASYNC & CONCURRENCY  ======================== #
 #########################################################
-asyncio                   # Built-in async programming
 asyncpg>=0.29.0           # Async PostgreSQL driver
 schedule>=1.2.0           # Task scheduling
-threading                 # Built-in threading support
-multiprocessing           # Built-in multiprocessing
 
 #########################################################
 # ======  SECURITY & ENCRYPTION  ====================== #
 #########################################################
 cryptography>=41.0.0      # Modern cryptographic library
-hashlib                   # Built-in hashing functions
-getpass                   # Built-in secure password input
-socket                    # Built-in network interface
-uuid                      # Built-in UUID generation
-
-#########################################################
-# ======  EMAIL & NOTIFICATIONS  ====================== #
-#########################################################
-smtplib                   # Built-in SMTP client
-email                     # Built-in email handling
 
 #########################################################
 # ======  WEB API & DATACUBE INFRASTRUCTURE  ========== #
@@ -131,22 +113,7 @@ jupyterlab>=4.1           # Modern Jupyter interface
 #########################################################
 # ======  DATA FORMATS & SERIALIZATION  =============== #
 #########################################################
-json                      # Built-in JSON support
-yaml>=6.0                 # YAML configuration files
-xml                       # Built-in XML support
-csv                       # Built-in CSV support
-
-#########################################################
-# ======  SYSTEM & FILE OPERATIONS  =================== #
-#########################################################
-os                        # Built-in OS interface
-pathlib                   # Built-in path operations
-shutil                    # Built-in file operations
-tempfile                  # Built-in temporary files
-subprocess                # Built-in subprocess management
-platform                  # Built-in platform identification
-stat                      # Built-in file statistics
-fcntl                     # Built-in file control (Unix)
+PyYAML>=6.0               # YAML configuration files
 
 #########################################################
 # ======  DEVELOPMENT & TESTING  ====================== #
@@ -155,50 +122,6 @@ black>=24.3               # Code formatter
 isort>=5.13               # Import sorter
 ruff>=0.3                 # Fast linter combo
 pre-commit>=3.7           # Pre-commit hooks
-
-#########################################################
-# ======  LOGGING & MONITORING  ======================= #
-#########################################################
-logging                   # Built-in logging
-warnings                  # Built-in warning system
-traceback                 # Built-in traceback handling
-time                      # Built-in time functions
-datetime                  # Built-in date/time handling
-
-#########################################################
-# ======  FUNCTIONAL PROGRAMMING  ===================== #
-#########################################################
-functools                 # Built-in functional tools
-collections               # Built-in specialized containers
-itertools                 # Built-in iteration tools
-typing                    # Built-in type hints
-dataclasses               # Built-in dataclass support
-enum                      # Built-in enumeration support
-abc                       # Built-in abstract base classes
-
-#########################################################
-# ======  REGULAR EXPRESSIONS & TEXT PROCESSING  ====== #
-#########################################################
-re                        # Built-in regular expressions
-string                    # Built-in string operations
-
-#########################################################
-# ======  MATHEMATICAL & STATISTICAL  ================= #
-#########################################################
-math                      # Built-in math functions
-random                    # Built-in random number generation
-base64                    # Built-in base64 encoding
-
-#########################################################
-# ======  CONTEXT MANAGEMENT  ========================= #
-#########################################################
-contextlib                # Built-in context management tools
-
-#########################################################
-# ======  SYSTEM INFORMATION  ========================= #
-#########################################################
-sys                       # Built-in system interface
-gc                        # Built-in garbage collection
 
 #########################################################
 # ======  OPTIONAL ADVANCED PACKAGES  ================= #
@@ -232,3 +155,14 @@ gc                        # Built-in garbage collection
 #
 # For optimal performance on Windows:
 # Consider using WSL2 for Linux-specific packages
+
+#########################################################
+# ======  BUILT-IN MODULES (NO INSTALLATION NEEDED)  == #
+#########################################################
+# The following modules are built into Python and should NOT be installed:
+# sqlite3, pickle, gzip, tarfile, asyncio, threading, multiprocessing
+# hashlib, getpass, socket, uuid, smtplib, email, json, xml, csv
+# os, pathlib, shutil, tempfile, subprocess, platform, stat, fcntl
+# logging, warnings, traceback, time, datetime, functools, collections
+# itertools, typing, dataclasses, enum, abc, re, string, math, random
+# base64, contextlib, sys, gc, statistics
