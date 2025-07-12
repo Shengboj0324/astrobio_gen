@@ -1,0 +1,25 @@
+[core]
+    analytics = false
+    autostage = true
+    check_update = false
+
+['remote "gcm-storage"']
+    url = gs://astro-cubes-storage
+    cache_type = reflink,copy
+    
+['remote "backup-storage"']
+    url = s3://astrobio-backup/datacubes
+    cache_type = reflink,copy
+
+[cache]
+    type = reflink,copy
+    protected = true
+    shared = group
+    dir = .dvc/cache
+    slow_link_warning = false
+
+[machine]
+    region = us-central1
+
+[state]
+    save_dvc_files = false 

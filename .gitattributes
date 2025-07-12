@@ -1,0 +1,45 @@
+# Large data files - track with DVC
+*.nc filter=dvc
+*.zarr/** filter=dvc
+data/raw/gcm_cubes/** filter=dvc
+data/processed/gcm_zarr/** filter=dvc
+
+# Additional large file patterns
+*.hdf5 filter=dvc
+*.h5 filter=dvc
+*.npz filter=dvc
+
+# Model weights and checkpoints
+*.pth filter=dvc
+*.pt filter=dvc
+*.ckpt filter=dvc
+lightning_logs/** filter=dvc
+
+# Large processed datasets
+data/processed/**/*.csv filter=dvc
+data/processed/**/*.json filter=dvc
+data/processed/**/*.pkl filter=dvc
+
+# Exclude from LFS (keep in regular git)
+*.py text
+*.md text
+*.yaml text
+*.yml text
+*.json text
+*.txt text
+requirements*.txt text
+.gitignore text
+
+# Line ending configuration
+*.py text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.fits binary
+*.dat binary 

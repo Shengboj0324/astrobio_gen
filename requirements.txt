@@ -27,6 +27,11 @@ lightgbm>=4.3             # fast gradient boosting baseline
 torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
 torch_sparse>=0.6
 
+# ---- Datacube functionality ----
+zarr>=2.16                # chunked array storage for GCM datacubes
+dask>=2024.2             # parallel processing for large arrays
+dask[array]>=2024.2      # dask array support
+
 #########################################################
 # ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
 #########################################################
@@ -60,6 +65,16 @@ h5py>=3.11                # many FITS → HDF pipelines
 # radis==0.15.1            # ExoMol/HITRAN parsing (needs C compiler - has CUDA dependencies)
 # torch_scatter>=2.1          # if you added this one
 # torch_cluster>=1.6
+
+#########################################################
+# ======  WEB API & DATACUBE INFRASTRUCTURE  ========== #
+#########################################################
+fastapi>=0.104            # modern web API framework
+uvicorn>=0.24             # ASGI server for FastAPI
+pydantic>=2.5             # data validation and serialization
+psutil>=5.9               # system monitoring for health checks
+dvc>=3.35                 # data version control for large files
+dvc[gs]>=3.35             # Google Cloud Storage support
 #########################################################
 # ======  QUANTUM / HIGH-THROUGHPUT CHEM (optional) === #
 #########################################################
