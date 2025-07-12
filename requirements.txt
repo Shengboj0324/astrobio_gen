@@ -1,4 +1,9 @@
 #########################################################
+# NASA-Grade Astrobiology Research Platform Requirements
+# Comprehensive unified requirements for all project components
+#########################################################
+
+#########################################################
 # ===== CORE NUMERICAL & DATA-SCIENCE STACK ============ #
 #########################################################
 numpy>=1.26,<2.0
@@ -8,102 +13,222 @@ xarray>=2024.2          # NetCDF climate cubes
 tqdm>=4.66
 networkx==3.2.1
 sympy>=1.12             # quick analytic checks / ODE prototypes
+statistics              # built-in module for statistical functions
 
 #########################################################
 # =====  DEEP-LEARNING & CLASSICAL ML  ================ #
 #########################################################
-# ---- PyTorch (choose ONE block) ----
-torch==2.2.0              # CPU build
-     # CUDA 11.8  ~~ uncomment & add extra-index below
-torchvision==0.17.0
- -f https://download.pytorch.org/whl/torch_stable.html
+# ---- PyTorch ecosystem ----
+torch==2.2.0              # Core PyTorch
+torchvision==0.17.0       # Computer vision utilities
+torchaudio==2.2.0         # Audio processing (for biosignatures)
+pytorch-lightning==2.2.4  # High-level PyTorch training framework
 
-torchvision==0.17.0
-torchaudio==2.2.0         # in case you explore audio biosignatures
-scikit-learn>=1.4
-umap-learn>=0.5           # dimensionality reduction for spectra clusters
-lightgbm>=4.3             # fast gradient boosting baseline
-# ---- optional graph-neural-net ----
-torch_geometric>=2.5     # needs separate wheels per CUDA; comment if difficult
-torch_sparse>=0.6
+# ---- Graph Neural Networks ----
+torch_geometric>=2.5      # Graph neural networks for metabolic pathways
+torch_sparse>=0.6         # Sparse tensor operations
+
+# ---- Classical ML ----
+scikit-learn>=1.4         # Classical machine learning
+umap-learn>=0.5           # Dimensionality reduction for spectra clusters
+lightgbm>=4.3             # Fast gradient boosting baseline
 
 # ---- Datacube functionality ----
-zarr>=2.16                # chunked array storage for GCM datacubes
-dask>=2024.2             # parallel processing for large arrays
-dask[array]>=2024.2      # dask array support
+zarr>=2.16                # Chunked array storage for GCM datacubes
+dask>=2024.2             # Parallel processing for large arrays
+dask[array]>=2024.2      # Dask array support
 
 #########################################################
 # ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
 #########################################################
-cobra==0.28.0             # constraint-based modeling
-optlang>=1.7              # solver backend for COBRA
-# escher>=1.7               # pathway diagrams (optional) - conflicts with pytest/ipywidgets
-rdkit-pypi==2022.9.5     # molecular ops if you start QC cheminformatics
-pytorch-lightning==2.2.4
+cobra==0.28.0             # Constraint-based modeling
+optlang>=1.7              # Solver backend for COBRA
+rdkit-pypi==2022.9.5     # Molecular operations for cheminformatics
+
 #########################################################
-# ======  ATMOSPHERIC & CLIMATE SIM  (lightweight) ==== #
+# ======  ATMOSPHERIC & CLIMATE SIM  ================= #
 #########################################################
-atmos==0.2.6              # simple 1-D photochem model fork
-pint>=0.23                # unit-handling for chemistry
-pyproj>=3.6               # map projections if you output 2-D climate
-netCDF4>=1.6              # read pre-run ROCKE-3D cubes
-# ---- heavy 3-D GCM wrappers — *install only in WSL/Linux* ----
-#rocke3d==1.3              # if you compile ROCKE-3D python hooks
+atmos==0.2.6              # Simple 1-D photochem model fork
+pint>=0.23                # Unit-handling for chemistry
+pyproj>=3.6               # Map projections for 2-D climate output
+netCDF4>=1.6              # Read pre-run ROCKE-3D cubes
 
 #########################################################
 # ======  ASTRONOMY / ASTROCHEMISTRY STACK ============ #
 #########################################################
-astropy>=6.0
+astropy>=6.0              # Core astronomy library
 astroquery>=0.4.7         # NASA archive, Vizier, etc.
-specutils>=1.13           # spectrum containers / ops
-lightkurve>=2.4           # transit light-curve helpers
-pysynphot>=2.0            # synthetic spectra utilities
-pysiaf>=0.19             # JWST aperture data if you need pixel-level sims
-requests>=2.31            # PSG and other REST APIs
-h5py>=3.11                # many FITS → HDF pipelines
-#petitRADTRANS>=2.7.1     # fast RT (Linux/conda only; comment on Windows)
-# radis==0.15.1            # ExoMol/HITRAN parsing (needs C compiler - has CUDA dependencies)
-# torch_scatter>=2.1          # if you added this one
-# torch_cluster>=1.6
+specutils>=1.13           # Spectrum containers / operations
+lightkurve>=2.4           # Transit light-curve helpers
+pysynphot>=2.0            # Synthetic spectra utilities
+pysiaf>=0.19             # JWST aperture data for pixel-level sims
+
+#########################################################
+# ======  WEB SCRAPING & HTTP REQUESTS  =============== #
+#########################################################
+requests>=2.31            # HTTP library for REST APIs
+aiohttp>=3.8.0            # Async HTTP client/server framework
+beautifulsoup4>=4.12      # HTML/XML parsing for web scraping
+lxml>=4.9.0               # Fast XML/HTML parser backend
+urllib3>=2.0.0            # HTTP library with connection pooling
+
+#########################################################
+# ======  DATA STORAGE & PERSISTENCE  ================= #
+#########################################################
+sqlite3                  # Built-in lightweight database
+h5py>=3.11                # HDF5 file format support
+pickle                    # Built-in serialization
+gzip                      # Built-in compression
+tarfile                   # Built-in archive support
+
+#########################################################
+# ======  ASYNC & CONCURRENCY  ======================== #
+#########################################################
+asyncio                   # Built-in async programming
+asyncpg>=0.29.0           # Async PostgreSQL driver
+schedule>=1.2.0           # Task scheduling
+threading                 # Built-in threading support
+multiprocessing           # Built-in multiprocessing
+
+#########################################################
+# ======  SECURITY & ENCRYPTION  ====================== #
+#########################################################
+cryptography>=41.0.0      # Modern cryptographic library
+hashlib                   # Built-in hashing functions
+getpass                   # Built-in secure password input
+socket                    # Built-in network interface
+uuid                      # Built-in UUID generation
+
+#########################################################
+# ======  EMAIL & NOTIFICATIONS  ====================== #
+#########################################################
+smtplib                   # Built-in SMTP client
+email                     # Built-in email handling
 
 #########################################################
 # ======  WEB API & DATACUBE INFRASTRUCTURE  ========== #
 #########################################################
-fastapi>=0.104            # modern web API framework
+fastapi>=0.104            # Modern web API framework
 uvicorn>=0.24             # ASGI server for FastAPI
-pydantic>=2.5             # data validation and serialization
-psutil>=5.9               # system monitoring for health checks
-dvc>=3.35                 # data version control for large files
+pydantic>=2.5             # Data validation and serialization
+psutil>=5.9               # System monitoring for health checks
+
+#########################################################
+# ======  DATA VERSION CONTROL  ======================= #
+#########################################################
+dvc>=3.35                 # Data version control for large files
 dvc[gs]>=3.35             # Google Cloud Storage support
-#########################################################
-# ======  QUANTUM / HIGH-THROUGHPUT CHEM (optional) === #
-#########################################################
-# openbabel>=3.1           # molecule conversions (needs C++ compiler)
-# ase>=3.23                # atomic simulation environment for QC workflows
-# dftbplus==23.1           # semi-empirical if you venture into QM spectra (not available for Python 3.9)
-pytorch-lightning==2.2.4
+
 #########################################################
 # ======  VISUALISATION & NOTEBOOK EXPERIENCE  ======== #
 #########################################################
-matplotlib>=3.8
-seaborn>=0.13
-plotly>=5.19              # interactive spectral plots
-# ipywidgets>=8.1           # conflicts with escher  
-# ipympl>=0.9               # live Matplotlib in JupyterLab
-ipykernel>=6.29
-jupyterlab>=4.1
+matplotlib>=3.8           # Core plotting library
+seaborn>=0.13             # Statistical data visualization
+plotly>=5.19              # Interactive spectral plots
+ipykernel>=6.29           # Jupyter kernel
+jupyterlab>=4.1           # Modern Jupyter interface
 
 #########################################################
-# ======  DEV / TEST / LINT (OPTIONAL)  =============== #
+# ======  DATA FORMATS & SERIALIZATION  =============== #
 #########################################################
-black>=24.3
-isort>=5.13
-ruff>=0.3                 # fast linter combo
-# pytest>=8.1               # conflicts with escher
-# pytest-cov>=4.1
-pre-commit>=3.7           # ensure formatting before commits
+json                      # Built-in JSON support
+yaml>=6.0                 # YAML configuration files
+xml                       # Built-in XML support
+csv                       # Built-in CSV support
 
 #########################################################
-# ======  WINDOWS-ONLY BUILD HELPERS  ================= #
+# ======  SYSTEM & FILE OPERATIONS  =================== #
 #########################################################
-# msvc-runtime           # auto-pulled if missing for compiled wheels
+os                        # Built-in OS interface
+pathlib                   # Built-in path operations
+shutil                    # Built-in file operations
+tempfile                  # Built-in temporary files
+subprocess                # Built-in subprocess management
+platform                  # Built-in platform identification
+stat                      # Built-in file statistics
+fcntl                     # Built-in file control (Unix)
+
+#########################################################
+# ======  DEVELOPMENT & TESTING  ====================== #
+#########################################################
+black>=24.3               # Code formatter
+isort>=5.13               # Import sorter
+ruff>=0.3                 # Fast linter combo
+pre-commit>=3.7           # Pre-commit hooks
+
+#########################################################
+# ======  LOGGING & MONITORING  ======================= #
+#########################################################
+logging                   # Built-in logging
+warnings                  # Built-in warning system
+traceback                 # Built-in traceback handling
+time                      # Built-in time functions
+datetime                  # Built-in date/time handling
+
+#########################################################
+# ======  FUNCTIONAL PROGRAMMING  ===================== #
+#########################################################
+functools                 # Built-in functional tools
+collections               # Built-in specialized containers
+itertools                 # Built-in iteration tools
+typing                    # Built-in type hints
+dataclasses               # Built-in dataclass support
+enum                      # Built-in enumeration support
+abc                       # Built-in abstract base classes
+
+#########################################################
+# ======  REGULAR EXPRESSIONS & TEXT PROCESSING  ====== #
+#########################################################
+re                        # Built-in regular expressions
+string                    # Built-in string operations
+
+#########################################################
+# ======  MATHEMATICAL & STATISTICAL  ================= #
+#########################################################
+math                      # Built-in math functions
+random                    # Built-in random number generation
+base64                    # Built-in base64 encoding
+
+#########################################################
+# ======  CONTEXT MANAGEMENT  ========================= #
+#########################################################
+contextlib                # Built-in context management tools
+
+#########################################################
+# ======  SYSTEM INFORMATION  ========================= #
+#########################################################
+sys                       # Built-in system interface
+gc                        # Built-in garbage collection
+
+#########################################################
+# ======  OPTIONAL ADVANCED PACKAGES  ================= #
+#########################################################
+# Uncomment as needed for advanced features:
+# escher>=1.7               # Pathway diagrams (conflicts with pytest/ipywidgets)
+# ipywidgets>=8.1           # Jupyter widgets (conflicts with escher)
+# ipympl>=0.9               # Live Matplotlib in JupyterLab
+# pytest>=8.1               # Testing framework (conflicts with escher)
+# pytest-cov>=4.1          # Test coverage
+# openbabel>=3.1            # Molecule conversions (needs C++ compiler)
+# ase>=3.23                 # Atomic simulation environment
+# petitRADTRANS>=2.7.1      # Fast radiative transfer (Linux/conda only)
+# radis==0.15.1             # ExoMol/HITRAN parsing (needs C compiler)
+# rocke3d==1.3              # 3-D GCM wrappers (WSL/Linux only)
+# torch_scatter>=2.1        # Additional PyTorch geometric operations
+# torch_cluster>=1.6        # Graph clustering operations
+
+#########################################################
+# ======  INSTALLATION NOTES  ========================= #
+#########################################################
+# For GPU support, install PyTorch with CUDA:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# 
+# For graph neural networks after PyTorch:
+# pip install torch_geometric torch_sparse
+#
+# For Windows users:
+# Some packages may require Visual Studio Build Tools
+# Install from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+#
+# For optimal performance on Windows:
+# Consider using WSL2 for Linux-specific packages
