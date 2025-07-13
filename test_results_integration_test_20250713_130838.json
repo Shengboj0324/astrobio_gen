@@ -1,0 +1,129 @@
+{
+  "test_session": "integration_test_20250713_130838",
+  "start_time": "2025-07-13T13:08:38.333215+00:00",
+  "total_tests": 10,
+  "passed_tests": 5,
+  "failed_tests": 5,
+  "test_results": {
+    "sqlite_database": {
+      "status": "passed",
+      "sqlite_version": "3.42.0",
+      "sqlalchemy_version": "1.4.0",
+      "basic_operations": "success",
+      "metadata_manager": "success",
+      "dataset_registration": "success (ID: 1)",
+      "dataset_query": "success (1 datasets found)"
+    },
+    "metadata_integration": {
+      "status": "passed",
+      "available_domains": 9,
+      "available_storage_tiers": 6,
+      "datasets_registered": 2,
+      "total_datasets_found": 2,
+      "large_datasets_found": 1,
+      "statistics_generated": true
+    },
+    "data_capture_systems": {
+      "status": "failed",
+      "error": "No module named 'aiofiles'",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\test_first_round_integration.py\", line 270, in test_data_capture_systems\n    from data_build.real_data_sources import RealDataSourcesScraper\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\data_build\\real_data_sources.py\", line 31, in <module>\n    import aiofiles\nModuleNotFoundError: No module named 'aiofiles'\n"
+    },
+    "quality_system": {
+      "status": "passed",
+      "quality_monitor": "initialized",
+      "data_types_available": 9,
+      "assessment_ready": true
+    },
+    "version_management": {
+      "status": "passed",
+      "version_manager": "initialized",
+      "versioning_ready": true
+    },
+    "requirements_dependencies": {
+      "status": "failed",
+      "results": {
+        "core": {
+          "numpy": "available (version 1.26.0)",
+          "pandas": "available (version 2.2.0)",
+          "scipy": "available (version 1.16.0)"
+        },
+        "data_capture": {
+          "aiohttp": "available (version 3.12.14)",
+          "aiofiles": "missing",
+          "requests": "available (version 2.32.4)",
+          "beautifulsoup4": "missing"
+        },
+        "database": {
+          "sqlalchemy": "available (version 1.4.0)",
+          "sqlite3": "available (version 3.42.0)"
+        },
+        "quality": {
+          "scikit-learn": "missing"
+        },
+        "async": {
+          "asyncio": "available (built-in)"
+        },
+        "web_scraping": {
+          "selenium": "missing",
+          "cloudscraper": "missing",
+          "paramiko": "missing"
+        },
+        "scientific": {
+          "astropy": "available (version 7.1.0)",
+          "netCDF4": "available (version 1.7.2)",
+          "h5py": "available (version 3.14.0)"
+        }
+      },
+      "missing_packages": [
+        "aiofiles",
+        "beautifulsoup4",
+        "scikit-learn",
+        "selenium",
+        "cloudscraper",
+        "paramiko"
+      ],
+      "total_tested": 17,
+      "missing_count": 6
+    },
+    "configuration_files": {
+      "status": "passed",
+      "config_files": {
+        "config/first_round_config.json": {
+          "exists": true,
+          "size_kb": 1.6025390625,
+          "readable": true,
+          "json_valid": true
+        },
+        "requirements.txt": {
+          "exists": true,
+          "size_kb": 9.259765625,
+          "readable": true
+        },
+        "FIRST_ROUND_DATA_CAPTURE_README.md": {
+          "exists": true,
+          "size_kb": 12.40625,
+          "readable": true
+        }
+      },
+      "all_files_exist": true
+    },
+    "api_integration": {
+      "status": "failed",
+      "error": "",
+      "api_integration_ready": false
+    },
+    "shap_integration": {
+      "status": "failed",
+      "error": "No module named 'onnx'",
+      "shap_integration_ready": false
+    },
+    "cross_system_flow": {
+      "status": "failed",
+      "error": "No module named 'aiofiles'",
+      "cross_system_ready": false
+    }
+  },
+  "overall_status": "mostly_failed",
+  "end_time": "2025-07-13T13:10:49.650630+00:00",
+  "duration_seconds": 131.317415
+}
