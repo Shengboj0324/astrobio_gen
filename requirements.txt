@@ -25,7 +25,8 @@ pytorch-lightning==2.2.4  # High-level PyTorch training framework
 
 # ---- Graph Neural Networks ----
 torch_geometric>=2.5      # Graph neural networks for metabolic pathways
-torch_sparse>=0.6         # Sparse tensor operations
+torch_sparse>=0.6.18      # Sparse tensor operations (compatible with torch 2.2.0)
+torch_scatter>=2.1        # Scatter operations for torch_sparse (install from PyG wheels)
 
 # ---- Classical ML ----
 scikit-learn>=1.4         # Classical machine learning
@@ -148,6 +149,7 @@ pre-commit>=3.7           # Pre-commit hooks
 # 
 # For graph neural networks after PyTorch:
 # pip install torch_geometric torch_sparse
+# pip install torch-scatter -f https://data.pyg.org/whl/torch-2.2.0+cu118.html
 #
 # For Windows users:
 # Some packages may require Visual Studio Build Tools
