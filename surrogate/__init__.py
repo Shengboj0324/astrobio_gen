@@ -24,6 +24,7 @@ import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
 import json
+from datetime import datetime
 
 import torch
 import torch.nn as nn
@@ -37,6 +38,9 @@ from models.datacube_unet import CubeUNet
 from models.surrogate_transformer import SurrogateTransformer
 from models.graph_vae import GVAE
 from models.fusion_transformer import FusionModel
+
+# Add SHAP explainer imports at the top
+from .shap_explainer import SHAPExplainer, SHAPExplainerManager, ExplanationConfig, create_shap_explainer_manager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -186,8 +190,154 @@ class BaseModelWrapper(ABC):
         if not self.config.validation_data or not self.config.validation_data.exists():
             return {'status': 'no_validation_data'}
         
-        # TODO: Implement validation logic
-        return {'status': 'validation_passed', 'accuracy': 0.95}
+        try:
+            # Load validation data
+            validation_data = self._load_validation_data()
+            if not validation_data:
+                return {'status': 'failed_to_load_validation_data'}
+            
+            # Run validation
+            results = self._run_validation(validation_data)
+            
+            # Check if accuracy meets threshold
+            accuracy = results.get('accuracy', 0.0)
+            rmse = results.get('rmse', float('inf'))
+            
+            if accuracy >= self.config.accuracy_threshold:
+                status = 'validation_passed'
+            else:
+                status = 'validation_failed'
+            
+            return {
+                'status': status,
+                'accuracy': accuracy,
+                'rmse': rmse,
+                'r2_score': results.get('r2_score', 0.0),
+                'mae': results.get('mae', float('inf')),
+                'num_samples': results.get('num_samples', 0),
+                'inference_time_ms': results.get('inference_time_ms', 0.0),
+                'passed_threshold': accuracy >= self.config.accuracy_threshold
+            }
+            
+        except Exception as e:
+            logger.error(f"Validation failed for {self.config.name}: {e}")
+            return {'status': 'validation_error', 'error': str(e)}
+    
+    def _load_validation_data(self) -> Optional[Dict[str, Any]]:
+        """Load validation data from file"""
+        try:
+            file_path = self.config.validation_data
+            
+            if file_path.suffix == '.npz':
+                # NumPy archive
+                data = np.load(file_path)
+                return {
+                    'inputs': data['inputs'],
+                    'targets': data['targets'],
+                    'metadata': data.get('metadata', {})
+                }
+            
+            elif file_path.suffix == '.json':
+                # JSON format
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                return {
+                    'inputs': np.array(data['inputs']),
+                    'targets': np.array(data['targets']),
+                    'metadata': data.get('metadata', {})
+                }
+                
+            elif file_path.suffix in ['.pt', '.pth']:
+                # PyTorch format
+                data = torch.load(file_path, map_location='cpu')
+                return {
+                    'inputs': data['inputs'].numpy() if isinstance(data['inputs'], torch.Tensor) else data['inputs'],
+                    'targets': data['targets'].numpy() if isinstance(data['targets'], torch.Tensor) else data['targets'],
+                    'metadata': data.get('metadata', {})
+                }
+                
+            else:
+                logger.error(f"Unsupported validation data format: {file_path.suffix}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Failed to load validation data: {e}")
+            return None
+    
+    def _run_validation(self, validation_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Run validation on loaded data"""
+        inputs = validation_data['inputs']
+        targets = validation_data['targets']
+        
+        # Ensure inputs are properly shaped
+        if len(inputs.shape) == 3:  # Add batch dimension if needed
+            inputs = inputs[np.newaxis, ...]
+        
+        # Run inference
+        start_time = time.time()
+        predictions = self.predict(inputs)
+        inference_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+        
+        # Convert predictions to numpy if needed
+        if isinstance(predictions, torch.Tensor):
+            predictions = predictions.cpu().numpy()
+        
+        # Reshape predictions and targets to match if needed
+        if predictions.shape != targets.shape:
+            if len(predictions.shape) == 4 and len(targets.shape) == 3:
+                predictions = predictions.squeeze(0)
+            elif len(predictions.shape) == 3 and len(targets.shape) == 4:
+                targets = targets.squeeze(0)
+        
+        # Calculate metrics
+        metrics = self._calculate_metrics(predictions, targets)
+        metrics['inference_time_ms'] = inference_time
+        metrics['num_samples'] = inputs.shape[0]
+        
+        return metrics
+    
+    def _calculate_metrics(self, predictions: np.ndarray, targets: np.ndarray) -> Dict[str, float]:
+        """Calculate validation metrics"""
+        # Flatten arrays for metric calculation
+        pred_flat = predictions.flatten()
+        target_flat = targets.flatten()
+        
+        # Remove NaN values
+        valid_mask = ~(np.isnan(pred_flat) | np.isnan(target_flat))
+        pred_flat = pred_flat[valid_mask]
+        target_flat = target_flat[valid_mask]
+        
+        if len(pred_flat) == 0:
+            return {
+                'accuracy': 0.0,
+                'rmse': float('inf'),
+                'mae': float('inf'),
+                'r2_score': 0.0
+            }
+        
+        # Mean Squared Error and RMSE
+        mse = np.mean((pred_flat - target_flat) ** 2)
+        rmse = np.sqrt(mse)
+        
+        # Mean Absolute Error
+        mae = np.mean(np.abs(pred_flat - target_flat))
+        
+        # R² Score
+        ss_res = np.sum((target_flat - pred_flat) ** 2)
+        ss_tot = np.sum((target_flat - np.mean(target_flat)) ** 2)
+        r2_score = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0.0
+        
+        # Accuracy based on relative error threshold
+        relative_errors = np.abs(pred_flat - target_flat) / (np.abs(target_flat) + 1e-8)
+        accuracy = np.mean(relative_errors < 0.1)  # Within 10% relative error
+        
+        return {
+            'accuracy': float(accuracy),
+            'rmse': float(rmse),
+            'mae': float(mae),
+            'r2_score': float(r2_score),
+            'mse': float(mse)
+        }
 
 class PyTorchModelWrapper(BaseModelWrapper):
     """Wrapper for PyTorch models"""
@@ -359,6 +509,86 @@ class SurrogateManager:
         self.current_mode = SurrogateMode.SCALAR
         self.fallback_chain = []
         
+        # Initialize SHAP explainer manager
+        self.shap_manager = None
+        self.explanation_cache = {}
+        
+        logger.info("Surrogate manager initialized with SHAP explanation support")
+    
+    def initialize_shap_explainer(self, metadata_manager):
+        """Initialize SHAP explainer manager"""
+        self.shap_manager = create_shap_explainer_manager(self, metadata_manager)
+        logger.info("SHAP explainer manager initialized")
+    
+    def explain_prediction(self, inputs: Union[torch.Tensor, np.ndarray], 
+                          domain: str, mode: SurrogateMode = None, 
+                          feature_names: List[str] = None,
+                          config: ExplanationConfig = None) -> Dict[str, Any]:
+        """Generate SHAP explanations for predictions"""
+        
+        if self.shap_manager is None:
+            raise ValueError("SHAP explainer not initialized. Call initialize_shap_explainer() first.")
+        
+        # Convert domain string to DataDomain enum
+        from data_build.metadata_db import DataDomain
+        domain_enum = DataDomain(domain)
+        
+        # Convert inputs to numpy if needed
+        if isinstance(inputs, torch.Tensor):
+            inputs = inputs.cpu().numpy()
+        
+        # Generate explanations
+        explanations = self.shap_manager.explain_prediction(
+            domain_enum, inputs, feature_names=feature_names
+        )
+        
+        # Cache explanations
+        cache_key = f"{domain}_{hash(inputs.tobytes())}"
+        self.explanation_cache[cache_key] = explanations
+        
+        return explanations
+    
+    def predict_with_explanation(self, inputs: Union[torch.Tensor, np.ndarray], 
+                               domain: str, mode: SurrogateMode = None,
+                               feature_names: List[str] = None,
+                               include_explanation: bool = True) -> Dict[str, Any]:
+        """Make prediction with optional SHAP explanation"""
+        
+        # Get regular prediction
+        prediction = self.predict(inputs, mode)
+        
+        result = {
+            'prediction': prediction,
+            'domain': domain,
+            'mode': mode.value if mode else self.current_mode.value,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Add explanation if requested
+        if include_explanation and self.shap_manager is not None:
+            try:
+                explanation = self.explain_prediction(inputs, domain, mode, feature_names)
+                result['explanation'] = explanation
+            except Exception as e:
+                logger.warning(f"Failed to generate explanation: {e}")
+                result['explanation_error'] = str(e)
+        
+        return result
+    
+    def get_explanation_stats(self) -> Dict[str, Any]:
+        """Get explanation statistics"""
+        
+        if not self.explanation_cache:
+            return {'total_explanations': 0}
+        
+        stats = {
+            'total_explanations': len(self.explanation_cache),
+            'cache_size_mb': sum(len(str(exp)) for exp in self.explanation_cache.values()) / (1024*1024),
+            'domains_explained': len(set(key.split('_')[0] for key in self.explanation_cache.keys()))
+        }
+        
+        return stats
+    
     def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
         """Load configuration"""
         if not config_path or not Path(config_path).exists():
@@ -530,5 +760,8 @@ __all__ = [
     'SurrogateMode',
     'ModelFormat',
     'get_surrogate_manager',
-    'load_surrogate'
+    'load_surrogate',
+    'SHAPExplainer',
+    'SHAPExplainerManager',
+    'ExplanationConfig'
 ] 

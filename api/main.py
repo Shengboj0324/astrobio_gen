@@ -7,7 +7,7 @@ Supports all operational modes: scalar, datacube, joint, spectral.
 """
 
 from __future__ import annotations
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import torch
@@ -1026,6 +1026,252 @@ async def model_info():
         "gpu_available": torch.cuda.is_available(),
         "torch_version": torch.__version__
     }
+
+
+# Add SHAP explanation endpoints
+
+@app.post("/explain")
+async def explain_prediction(
+    request: PredictionRequest,
+    domain: str = Query(..., description="Scientific domain (astronomical, exoplanet, environmental, etc.)"),
+    include_plots: bool = Query(False, description="Include explanation plots"),
+    feature_names: List[str] = Query(None, description="Feature names for explanation")
+):
+    """
+    Generate SHAP explanations for model predictions
+    
+    Provides scientific interpretability including:
+    - Feature importance analysis
+    - Pathway-level explanations
+    - Physics-informed insights
+    """
+    
+    try:
+        # Validate domain
+        valid_domains = ["astronomical", "exoplanet", "environmental", "physics", 
+                        "optical", "physiological", "biosignature", "metabolomics"]
+        if domain not in valid_domains:
+            raise HTTPException(status_code=400, detail=f"Invalid domain. Must be one of: {valid_domains}")
+        
+        # Get surrogate manager
+        surrogate_manager = get_surrogate_manager()
+        
+        # Initialize SHAP explainer if not already done
+        if surrogate_manager.shap_manager is None:
+            metadata_manager = MetadataManager()
+            surrogate_manager.initialize_shap_explainer(metadata_manager)
+        
+        # Prepare input data
+        input_data = np.array(request.input_data)
+        
+        # Generate explanations
+        explanations = surrogate_manager.explain_prediction(
+            input_data, domain, feature_names=feature_names
+        )
+        
+        # Format response
+        response = {
+            "domain": domain,
+            "feature_importance": explanations["feature_importance"],
+            "pathway_importance": explanations["pathway_importance"],
+            "explanation_time": explanations["explanation_time"],
+            "timestamp": explanations["timestamp"]
+        }
+        
+        # Add plots if requested
+        if include_plots:
+            try:
+                from surrogate.shap_explainer import SHAPExplainer
+                from data_build.metadata_db import DataDomain
+                
+                # Create temporary explainer for plotting
+                domain_enum = DataDomain(domain)
+                model = surrogate_manager.get_model()
+                explainer = SHAPExplainer(model, domain_enum)
+                explainer.fit(input_data, feature_names)
+                
+                # Generate plots (base64 encoded)
+                import base64
+                from io import BytesIO
+                
+                # Feature importance plot
+                fig = explainer.plot_feature_importance(explanations)
+                img_buffer = BytesIO()
+                fig.savefig(img_buffer, format='png')
+                img_buffer.seek(0)
+                feature_plot = base64.b64encode(img_buffer.read()).decode()
+                
+                # Pathway importance plot
+                fig = explainer.plot_pathway_importance(explanations)
+                img_buffer = BytesIO()
+                fig.savefig(img_buffer, format='png')
+                img_buffer.seek(0)
+                pathway_plot = base64.b64encode(img_buffer.read()).decode()
+                
+                response["plots"] = {
+                    "feature_importance": feature_plot,
+                    "pathway_importance": pathway_plot
+                }
+                
+            except Exception as e:
+                logger.warning(f"Failed to generate plots: {e}")
+                response["plot_error"] = str(e)
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Explanation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Explanation failed: {str(e)}")
+
+@app.post("/predict_with_explanation")
+async def predict_with_explanation(
+    request: PredictionRequest,
+    domain: str = Query(..., description="Scientific domain"),
+    resolution: str = Query("128x64", description="Output resolution"),
+    include_explanation: bool = Query(True, description="Include SHAP explanation"),
+    feature_names: List[str] = Query(None, description="Feature names")
+):
+    """
+    Make prediction with integrated SHAP explanation
+    
+    Combines model prediction with scientific interpretability
+    """
+    
+    try:
+        # Get surrogate manager
+        surrogate_manager = get_surrogate_manager()
+        
+        # Initialize SHAP explainer if needed
+        if include_explanation and surrogate_manager.shap_manager is None:
+            metadata_manager = MetadataManager()
+            surrogate_manager.initialize_shap_explainer(metadata_manager)
+        
+        # Prepare input data
+        input_data = np.array(request.input_data)
+        
+        # Make prediction with explanation
+        result = surrogate_manager.predict_with_explanation(
+            input_data, domain, feature_names=feature_names,
+            include_explanation=include_explanation
+        )
+        
+        # Format prediction output
+        prediction = result["prediction"]
+        if isinstance(prediction, torch.Tensor):
+            prediction = prediction.cpu().numpy()
+        
+        response = {
+            "prediction": prediction.tolist(),
+            "domain": domain,
+            "resolution": resolution,
+            "timestamp": result["timestamp"]
+        }
+        
+        # Add explanation if included
+        if "explanation" in result:
+            explanation = result["explanation"]
+            response["explanation"] = {
+                "top_features": dict(list(explanation["feature_importance"].items())[:10]),
+                "pathway_importance": explanation["pathway_importance"],
+                "explanation_time": explanation["explanation_time"]
+            }
+        
+        if "explanation_error" in result:
+            response["explanation_error"] = result["explanation_error"]
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Prediction with explanation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
+@app.get("/explanation_stats")
+async def get_explanation_stats():
+    """Get SHAP explanation statistics"""
+    
+    try:
+        surrogate_manager = get_surrogate_manager()
+        stats = surrogate_manager.get_explanation_stats()
+        
+        # Add system info
+        stats["shap_available"] = surrogate_manager.shap_manager is not None
+        stats["supported_domains"] = [
+            "astronomical", "exoplanet", "environmental", "physics", 
+            "optical", "physiological", "biosignature", "metabolomics"
+        ]
+        
+        return stats
+        
+    except Exception as e:
+        logger.error(f"Stats error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Stats failed: {str(e)}")
+
+@app.post("/batch_explain")
+async def batch_explain(
+    requests: List[PredictionRequest],
+    domains: List[str] = Query(..., description="Domains for each request"),
+    feature_names_list: List[List[str]] = Query(None, description="Feature names for each request")
+):
+    """
+    Generate explanations for multiple predictions in batch
+    
+    Efficient batch processing for multiple domains
+    """
+    
+    if len(requests) != len(domains):
+        raise HTTPException(status_code=400, detail="Number of requests must match number of domains")
+    
+    try:
+        # Get surrogate manager
+        surrogate_manager = get_surrogate_manager()
+        
+        # Initialize SHAP explainer if needed
+        if surrogate_manager.shap_manager is None:
+            metadata_manager = MetadataManager()
+            surrogate_manager.initialize_shap_explainer(metadata_manager)
+        
+        # Prepare batch data
+        batch_data = {}
+        batch_features = {}
+        
+        for i, (request, domain) in enumerate(zip(requests, domains)):
+            input_data = np.array(request.input_data)
+            
+            if domain not in batch_data:
+                batch_data[domain] = []
+                batch_features[domain] = []
+            
+            batch_data[domain].append(input_data)
+            
+            # Add feature names if provided
+            if feature_names_list and i < len(feature_names_list):
+                batch_features[domain] = feature_names_list[i]
+        
+        # Convert to numpy arrays
+        for domain in batch_data:
+            batch_data[domain] = np.vstack(batch_data[domain])
+        
+        # Generate batch explanations
+        from data_build.metadata_db import DataDomain
+        domain_enums = [DataDomain(domain) for domain in batch_data.keys()]
+        
+        explanations = surrogate_manager.shap_manager.batch_explain(
+            domain_enums, batch_data, batch_features
+        )
+        
+        # Format response
+        response = {
+            "batch_size": len(requests),
+            "domains_processed": len(batch_data),
+            "explanations": explanations,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Batch explanation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Batch explanation failed: {str(e)}")
 
 
 if __name__ == "__main__":
