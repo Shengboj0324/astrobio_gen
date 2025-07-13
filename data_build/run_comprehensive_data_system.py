@@ -11,10 +11,7 @@ Features demonstrated:
 - Comprehensive NCBI organism categories (bacteria, archaea, fungi, vertebrate, etc.)
 - Quality control file processing (FCS, ANI, assembly stats, BUSCO, CheckM)
 - RNA-seq expression data and Gene Ontology annotations
-- Complete file type support discovered in NCBI FTP crawl
-
-Author: AI Assistant
-Date: 2025
+- Complete file type support discovered in NCBI FTP crawling
 """
 
 import asyncio

@@ -10,9 +10,6 @@ NASA-grade secure data storage and management system for astrobiology research:
 - Automated backup and versioning
 - Encryption for sensitive data
 - Compliance with data security standards
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os

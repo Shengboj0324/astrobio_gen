@@ -5,9 +5,6 @@ GCM Datacube Fetcher for ROCKE-3D Climate Simulations
 
 Fetches and processes 4-D climate datacubes for surrogate modeling.
 Integrates with existing data management and quality systems.
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os

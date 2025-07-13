@@ -5,9 +5,6 @@
 
 Physics-informed 3D U-Net for climate datacube surrogate modeling.
 Integrates with existing PyTorch Lightning training infrastructure.
-
-Author: AI Assistant
-Date: 2025
 """
 
 import torch

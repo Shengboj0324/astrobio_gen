@@ -11,9 +11,6 @@ Usage examples:
 - Accessing files with proper logging
 - Creating backups
 - Running integrity checks
-
-Author: AI Assistant
-Date: 2025
 """
 
 import sys

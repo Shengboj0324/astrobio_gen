@@ -13,10 +13,7 @@ Comprehensive data versioning system for astrobiology genomics research:
 - Collaborative version management
 - Integration with quality systems
 
-NASA-grade data versioning with full audit trails.
-
-Author: AI Assistant
-Date: 2025
+NASA-grade data versioning with full audit traiining
 """
 
 import os

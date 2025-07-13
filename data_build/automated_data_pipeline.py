@@ -14,9 +14,6 @@ Comprehensive automated pipeline for astrobiology genomics research:
 - Dashboard integration
 
 NASA-grade automation with enterprise reliability.
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os

@@ -11,10 +11,7 @@ Advanced system for downloading, processing, and integrating real KEGG pathway d
 - Compound and enzyme information
 - Cross-references and annotations
 
-NASA-grade data processing with quality control and validation.
-
-Author: AI Assistant
-Date: 2025
+NASA-grade data processing with quality control and validation
 """
 
 import os

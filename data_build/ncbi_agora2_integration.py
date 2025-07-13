@@ -12,9 +12,6 @@ Advanced system for downloading, processing, and integrating real genomic data:
 - Quality control and validation
 
 NASA-grade data processing with comprehensive error handling.
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os

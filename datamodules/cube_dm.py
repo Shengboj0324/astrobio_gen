@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """
-4-D Climate Datacube DataModule
-==============================
+Advanced 4-D Climate Datacube DataModule
+========================================
 
-PyTorch Lightning DataModule for streaming 4-D climate datacubes.
-Handles zarr-formatted GCM simulation data with chunked loading.
+Industry-grade PyTorch Lightning DataModule for streaming 4-D climate datacubes.
+Features advanced caching, adaptive chunking, memory optimization, and streaming.
 
-Author: AI Assistant
-Date: 2025
+Key Features:
+- Adaptive chunking based on available memory
+- Advanced caching with LRU eviction
+- Streaming data loading with prefetching
+- Physics-informed data validation
+- Real-time memory monitoring
+- Multi-zarr store support
+- Configuration-driven setup
 """
 
 import torch
@@ -15,13 +21,290 @@ import pytorch_lightning as pl
 import xarray as xr
 import numpy as np
 from pathlib import Path
-from typing import Optional, Dict, List, Tuple, Any
+from typing import Optional, Dict, List, Tuple, Any, Union
 import logging
-from torch.utils.data import Dataset, DataLoader, IterableDataset
 import warnings
+import os
+import time
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+import psutil
+import gc
+import yaml
+from functools import lru_cache
+from threading import RLock
+import queue
+from collections import deque
+
+from torch.utils.data import Dataset, DataLoader, IterableDataset
+import torch.nn.functional as F
 
 # Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+@dataclass
+class CacheConfig:
+    """Configuration for advanced caching system"""
+    enabled: bool = True
+    max_size_gb: float = 2.0
+    eviction_policy: str = "lru"  # lru, fifo, lfu
+    persist_to_disk: bool = True
+    cache_dir: Path = Path("data/cache/cube_cache")
+    compression: bool = True
+    
+class MemoryMonitor:
+    """Real-time memory monitoring for datacube operations"""
+    
+    def __init__(self, memory_limit_gb: float = 8.0):
+        self.memory_limit_gb = memory_limit_gb
+        self.memory_history = deque(maxlen=100)
+        self.warning_threshold = 0.85
+        self.critical_threshold = 0.95
+        self._lock = RLock()
+        
+    def check_memory(self) -> Dict[str, float]:
+        """Check current memory usage"""
+        with self._lock:
+            memory = psutil.virtual_memory()
+            usage_gb = memory.used / (1024**3)
+            usage_percent = memory.percent / 100.0
+            
+            memory_info = {
+                'used_gb': usage_gb,
+                'available_gb': memory.available / (1024**3),
+                'usage_percent': usage_percent,
+                'within_limit': usage_gb < self.memory_limit_gb
+            }
+            
+            self.memory_history.append(memory_info)
+            
+            # Issue warnings if necessary
+            if usage_percent > self.critical_threshold:
+                logger.critical(f"Critical memory usage: {usage_percent:.1%}")
+                gc.collect()
+            elif usage_percent > self.warning_threshold:
+                logger.warning(f"High memory usage: {usage_percent:.1%}")
+                
+            return memory_info
+    
+    def get_memory_trend(self) -> Dict[str, float]:
+        """Get memory usage trend"""
+        if len(self.memory_history) < 2:
+            return {'trend': 0.0, 'stability': 1.0}
+            
+        recent_usage = [m['usage_percent'] for m in list(self.memory_history)[-10:]]
+        trend = np.polyfit(range(len(recent_usage)), recent_usage, 1)[0]
+        stability = 1.0 - np.std(recent_usage)
+        
+        return {'trend': trend, 'stability': max(0.0, stability)}
+
+class AdaptiveChunker:
+    """Adaptive chunking based on memory constraints and data characteristics"""
+    
+    def __init__(self, memory_monitor: MemoryMonitor, base_chunks: Dict[str, int]):
+        self.memory_monitor = memory_monitor
+        self.base_chunks = base_chunks
+        self.chunk_history = []
+        
+    def optimize_chunks(self, dataset: xr.Dataset, target_memory_gb: float = 1.0) -> Dict[str, int]:
+        """Optimize chunk sizes based on dataset characteristics and memory"""
+        
+        # Calculate current memory usage
+        memory_info = self.memory_monitor.check_memory()
+        
+        # Start with base chunks
+        optimized_chunks = self.base_chunks.copy()
+        
+        # Estimate dataset size per chunk
+        sample_var = list(dataset.data_vars.keys())[0]
+        var_data = dataset[sample_var]
+        
+        # Calculate bytes per element
+        bytes_per_element = np.dtype(var_data.dtype).itemsize
+        
+        # Calculate current chunk size in bytes
+        current_chunk_size = bytes_per_element
+        for dim in var_data.dims:
+            current_chunk_size *= optimized_chunks.get(dim, var_data.sizes[dim])
+        
+        current_chunk_gb = current_chunk_size / (1024**3)
+        
+        # Adjust chunks if needed
+        if current_chunk_gb > target_memory_gb:
+            scale_factor = (target_memory_gb / current_chunk_gb) ** 0.25
+            
+            for dim in optimized_chunks:
+                if dim in var_data.dims:
+                    optimized_chunks[dim] = max(1, int(optimized_chunks[dim] * scale_factor))
+        
+        # Consider memory pressure
+        if memory_info['usage_percent'] > 0.8:
+            # Reduce chunks further under memory pressure
+            for dim in optimized_chunks:
+                optimized_chunks[dim] = max(1, int(optimized_chunks[dim] * 0.8))
+        
+        self.chunk_history.append({
+            'chunks': optimized_chunks.copy(),
+            'memory_usage': memory_info['usage_percent'],
+            'chunk_size_gb': current_chunk_gb
+        })
+        
+        logger.info(f"Optimized chunks: {optimized_chunks} (target: {target_memory_gb:.2f}GB)")
+        return optimized_chunks
+
+class DataValidator:
+    """Physics-informed data validation"""
+    
+    def __init__(self):
+        self.validation_stats = {
+            'total_samples': 0,
+            'valid_samples': 0,
+            'validation_errors': []
+        }
+        
+    def validate_physics(self, data: torch.Tensor, variable: str) -> Dict[str, bool]:
+        """Validate physical constraints"""
+        results = {}
+        
+        # Basic range checks
+        if 'temp' in variable.lower() or 'T_surf' in variable:
+            results['temperature_range'] = torch.all((data >= 150.0) & (data <= 400.0))
+        elif 'pressure' in variable.lower() or 'psurf' in variable:
+            results['pressure_range'] = torch.all((data >= 0.001) & (data <= 1000.0))
+        elif 'humidity' in variable.lower() or 'q_H2O' in variable:
+            results['humidity_range'] = torch.all((data >= 0.0) & (data <= 1.0))
+        
+        # Check for NaN/Inf values
+        results['finite_values'] = torch.all(torch.isfinite(data))
+        
+        # Check for extreme gradients
+        if data.dim() >= 3:
+            gradients = torch.gradient(data, dim=-1)[0]
+            results['gradient_check'] = torch.all(torch.abs(gradients) < 1000.0)
+        
+        return results
+    
+    def validate_batch(self, batch: torch.Tensor, variable_names: List[str]) -> Dict[str, Any]:
+        """Validate a batch of data"""
+        batch_results = {}
+        
+        for i, var_name in enumerate(variable_names):
+            if i < batch.size(1):  # Check if variable exists in batch
+                var_data = batch[:, i]
+                var_results = self.validate_physics(var_data, var_name)
+                batch_results[var_name] = var_results
+        
+        # Overall batch validation
+        all_valid = all(
+            all(results.values()) for results in batch_results.values()
+        )
+        
+        batch_results['batch_valid'] = all_valid
+        
+        self.validation_stats['total_samples'] += batch.size(0)
+        if all_valid:
+            self.validation_stats['valid_samples'] += batch.size(0)
+        
+        return batch_results
+
+class StreamingCache:
+    """Advanced caching system with streaming capabilities"""
+    
+    def __init__(self, config: CacheConfig):
+        self.config = config
+        self.cache = {}
+        self.access_times = {}
+        self.access_counts = {}
+        self.cache_size_bytes = 0
+        self.max_size_bytes = config.max_size_gb * (1024**3)
+        self._lock = RLock()
+        
+        # Create cache directory
+        if config.persist_to_disk:
+            config.cache_dir.mkdir(parents=True, exist_ok=True)
+    
+    def _get_cache_key(self, zarr_path: Path, time_idx: int, variables: List[str]) -> str:
+        """Generate cache key"""
+        var_str = "_".join(sorted(variables))
+        return f"{zarr_path.name}_{time_idx}_{var_str}"
+    
+    def _estimate_size(self, data: torch.Tensor) -> int:
+        """Estimate tensor size in bytes"""
+        return data.numel() * data.element_size()
+    
+    def _evict_lru(self):
+        """Evict least recently used items"""
+        with self._lock:
+            if not self.cache:
+                return
+                
+            # Sort by access time
+            sorted_items = sorted(self.access_times.items(), key=lambda x: x[1])
+            
+            # Evict oldest items until under limit
+            for key, _ in sorted_items:
+                if self.cache_size_bytes <= self.max_size_bytes * 0.8:
+                    break
+                    
+                if key in self.cache:
+                    data = self.cache[key]
+                    size = self._estimate_size(data)
+                    
+                    del self.cache[key]
+                    del self.access_times[key]
+                    del self.access_counts[key]
+                    
+                    self.cache_size_bytes -= size
+                    logger.debug(f"Evicted cache entry: {key} ({size} bytes)")
+    
+    def get(self, zarr_path: Path, time_idx: int, variables: List[str]) -> Optional[torch.Tensor]:
+        """Get data from cache"""
+        if not self.config.enabled:
+            return None
+            
+        key = self._get_cache_key(zarr_path, time_idx, variables)
+        
+        with self._lock:
+            if key in self.cache:
+                self.access_times[key] = time.time()
+                self.access_counts[key] = self.access_counts.get(key, 0) + 1
+                logger.debug(f"Cache hit: {key}")
+                return self.cache[key]
+                
+        return None
+    
+    def put(self, zarr_path: Path, time_idx: int, variables: List[str], data: torch.Tensor):
+        """Put data into cache"""
+        if not self.config.enabled:
+            return
+            
+        key = self._get_cache_key(zarr_path, time_idx, variables)
+        data_size = self._estimate_size(data)
+        
+        with self._lock:
+            # Check if we need to evict
+            if self.cache_size_bytes + data_size > self.max_size_bytes:
+                self._evict_lru()
+            
+            # Add to cache
+            self.cache[key] = data.clone()
+            self.access_times[key] = time.time()
+            self.access_counts[key] = 1
+            self.cache_size_bytes += data_size
+            
+            logger.debug(f"Cached: {key} ({data_size} bytes)")
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get cache statistics"""
+        with self._lock:
+            return {
+                'cache_size_mb': self.cache_size_bytes / (1024**2),
+                'cache_entries': len(self.cache),
+                'hit_rate': sum(self.access_counts.values()) / max(1, len(self.access_counts)),
+                'memory_usage_percent': self.cache_size_bytes / self.max_size_bytes * 100
+            }
 
 class CubeDataset(IterableDataset):
     """
@@ -245,14 +528,23 @@ class CubeDataset(IterableDataset):
 
 class CubeDM(pl.LightningDataModule):
     """
-    Lightning DataModule for 4-D climate datacubes
+    Advanced Lightning DataModule for 4-D climate datacubes
+    
+    Features:
+    - Configuration-driven setup with environment variable support
+    - Advanced caching and memory management
+    - Adaptive chunking based on available memory
+    - Physics-informed data validation
+    - Real-time performance monitoring
+    - Multi-zarr store support
     """
     
     def __init__(
         self,
-        zarr_root: str = "data/processed/gcm_zarr",
+        zarr_root: Optional[str] = None,
+        config_path: Optional[str] = "config/config.yaml",
         batch_size: int = 4,
-        num_workers: int = 4,
+        num_workers: int = 6,
         variables: List[str] = None,
         target_variables: List[str] = None,
         time_window: int = 10,
@@ -261,13 +553,19 @@ class CubeDM(pl.LightningDataModule):
         val_fraction: float = 0.1,
         normalize: bool = True,
         pin_memory: bool = True,
+        enable_caching: bool = True,
+        cache_size_gb: float = 2.0,
+        memory_limit_gb: float = 8.0,
+        enable_validation: bool = True,
+        adaptive_chunking: bool = True,
         **kwargs
     ):
         """
-        Initialize CubeDM
+        Initialize advanced CubeDM
         
         Args:
-            zarr_root: Root directory containing zarr stores
+            zarr_root: Root directory containing zarr stores (overrides config)
+            config_path: Path to configuration file
             batch_size: Batch size for training
             num_workers: Number of data loading workers
             variables: List of input variables to load
@@ -278,15 +576,25 @@ class CubeDM(pl.LightningDataModule):
             val_fraction: Fraction of data for validation
             normalize: Whether to normalize data
             pin_memory: Whether to use pinned memory
+            enable_caching: Enable advanced caching
+            cache_size_gb: Cache size limit in GB
+            memory_limit_gb: Memory limit in GB
+            enable_validation: Enable physics validation
+            adaptive_chunking: Enable adaptive chunking
         """
         super().__init__()
         self.save_hyperparameters()
         
-        self.zarr_root = Path(zarr_root)
+        # Load configuration
+        self.config = self._load_config(config_path)
+        
+        # Setup paths with environment variable support
+        self.zarr_root = self._resolve_zarr_root(zarr_root)
+        self.additional_zarr_stores = self._get_additional_stores()
+        
+        # Basic parameters
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.variables = variables or ['temp', 'humidity', 'pressure', 'wind_u', 'wind_v']
-        self.target_variables = target_variables or []
         self.time_window = time_window
         self.spatial_crop = spatial_crop
         self.train_fraction = train_fraction
@@ -294,12 +602,176 @@ class CubeDM(pl.LightningDataModule):
         self.normalize = normalize
         self.pin_memory = pin_memory
         
+        # Variables configuration
+        self.variables = variables or self._get_config_variables('input_variables')
+        self.target_variables = target_variables or self._get_config_variables('output_variables')
+        
+        # Advanced features
+        self.enable_caching = enable_caching
+        self.enable_validation = enable_validation
+        self.adaptive_chunking = adaptive_chunking
+        
+        # Initialize advanced components
+        self.memory_monitor = MemoryMonitor(memory_limit_gb)
+        
+        # Initialize cache
+        if enable_caching:
+            cache_config = CacheConfig(
+                enabled=True,
+                max_size_gb=cache_size_gb,
+                cache_dir=Path(self.config.get('paths', {}).get('cache', 'data/cache/cube_cache'))
+            )
+            self.cache = StreamingCache(cache_config)
+        else:
+            self.cache = None
+        
+        # Initialize validator
+        if enable_validation:
+            self.validator = DataValidator()
+        else:
+            self.validator = None
+        
+        # Initialize adaptive chunker
+        if adaptive_chunking:
+            base_chunks = self._get_base_chunks()
+            self.chunker = AdaptiveChunker(self.memory_monitor, base_chunks)
+        else:
+            self.chunker = None
+        
         # Dataset storage
         self.train_paths = None
         self.val_paths = None
         self.test_paths = None
         
-        logger.info(f"Initialized CubeDM with zarr_root={zarr_root}, batch_size={batch_size}")
+        # Performance monitoring
+        self.performance_stats = {
+            'total_samples_loaded': 0,
+            'total_load_time': 0.0,
+            'cache_hits': 0,
+            'cache_misses': 0,
+            'validation_failures': 0
+        }
+        
+        logger.info(f"Initialized advanced CubeDM:")
+        logger.info(f"  Zarr root: {self.zarr_root}")
+        logger.info(f"  Variables: {self.variables}")
+        logger.info(f"  Batch size: {batch_size}")
+        logger.info(f"  Caching: {enable_caching}")
+        logger.info(f"  Validation: {enable_validation}")
+        logger.info(f"  Adaptive chunking: {adaptive_chunking}")
+    
+    def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
+        """Load configuration from YAML file"""
+        if not config_path or not Path(config_path).exists():
+            logger.warning(f"Config file not found: {config_path}, using defaults")
+            return {}
+        
+        try:
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+            return config
+        except Exception as e:
+            logger.error(f"Failed to load config: {e}")
+            return {}
+    
+    def _resolve_zarr_root(self, zarr_root: Optional[str]) -> Path:
+        """Resolve zarr root path with environment variable support"""
+        if zarr_root:
+            return Path(zarr_root)
+        
+        # Try environment variable
+        env_path = os.getenv('ASTRO_CUBE_ZARR')
+        if env_path:
+            return Path(env_path)
+        
+        # Try config file
+        config_path = self.config.get('datacube', {}).get('zarr_root')
+        if config_path:
+            # Handle environment variable substitution in config
+            if config_path.startswith('${') and config_path.endswith('}'):
+                env_var = config_path[2:-1]
+                if ',' in env_var:
+                    env_var, default = env_var.split(',')
+                    return Path(os.getenv(env_var, default))
+                else:
+                    return Path(os.getenv(env_var, 'data/processed/gcm_zarr'))
+            return Path(config_path)
+        
+        # Default fallback
+        return Path('data/processed/gcm_zarr')
+    
+    def _get_additional_stores(self) -> List[Path]:
+        """Get additional zarr stores from config"""
+        additional = self.config.get('datacube', {}).get('additional_zarr_stores', [])
+        return [Path(store) for store in additional]
+    
+    def _get_config_variables(self, var_type: str) -> List[str]:
+        """Get variables from configuration"""
+        variables = self.config.get('datacube', {}).get(var_type, [])
+        if not variables:
+            # Default variables
+            default_vars = ['T_surf', 'q_H2O', 'cldfrac', 'albedo', 'psurf']
+            logger.warning(f"No {var_type} in config, using defaults: {default_vars}")
+            return default_vars
+        return variables
+    
+    def _get_base_chunks(self) -> Dict[str, int]:
+        """Get base chunk configuration"""
+        chunking_config = self.config.get('datacube', {}).get('chunking', {})
+        return chunking_config.get('base_chunks', {
+            'lat': 40, 'lon': 40, 'lev': 15, 'time': 4
+        })
+    
+    def get_memory_info(self) -> Dict[str, Any]:
+        """Get current memory information"""
+        return self.memory_monitor.check_memory()
+    
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """Get cache statistics"""
+        if self.cache:
+            return self.cache.get_stats()
+        return {'cache_enabled': False}
+    
+    def get_performance_stats(self) -> Dict[str, Any]:
+        """Get performance statistics"""
+        stats = self.performance_stats.copy()
+        
+        # Add derived metrics
+        if stats['total_samples_loaded'] > 0:
+            stats['avg_load_time'] = stats['total_load_time'] / stats['total_samples_loaded']
+        
+        if self.cache:
+            total_requests = stats['cache_hits'] + stats['cache_misses']
+            if total_requests > 0:
+                stats['cache_hit_rate'] = stats['cache_hits'] / total_requests
+        
+        if self.validator:
+            stats.update(self.validator.validation_stats)
+        
+        return stats
+    
+    def optimize_for_memory(self) -> Dict[str, Any]:
+        """Optimize settings for current memory conditions"""
+        memory_info = self.memory_monitor.check_memory()
+        
+        optimizations = {
+            'original_batch_size': self.batch_size,
+            'original_num_workers': self.num_workers,
+            'memory_usage': memory_info['usage_percent']
+        }
+        
+        # Reduce batch size if memory usage is high
+        if memory_info['usage_percent'] > 0.8:
+            self.batch_size = max(1, self.batch_size // 2)
+            optimizations['reduced_batch_size'] = self.batch_size
+            
+        # Reduce workers if memory usage is critical
+        if memory_info['usage_percent'] > 0.9:
+            self.num_workers = max(1, self.num_workers // 2)
+            optimizations['reduced_num_workers'] = self.num_workers
+        
+        logger.info(f"Memory optimizations applied: {optimizations}")
+        return optimizations
     
     def setup(self, stage: Optional[str] = None):
         """Setup datasets for each stage"""

@@ -9,9 +9,6 @@ NASA-grade data management system for comprehensive integration of:
 - Genomic and metabolic datasets
 - Advanced quality control and validation
 - Automated data provenance and versioning
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os

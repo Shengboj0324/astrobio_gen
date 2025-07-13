@@ -1,9 +1,100 @@
 defaults:
   - _self_
-  - model: graph_vae
-  - trainer: gpu_light
+  - model: datacube_unet
+  - trainer: gpu_production
+  - data: datacube
 
+# Advanced datacube configuration
+datacube:
+  # Primary zarr store path (environment variable supported)
+  zarr_root: "${oc.env:ASTRO_CUBE_ZARR,data/processed/gcm_zarr}"
+  
+  # Backup/additional zarr stores for ensemble processing
+  additional_zarr_stores: []
+  
+  # Variables configuration
+  input_variables:
+    - "T_surf"      # Surface temperature
+    - "q_H2O"       # Water vapor mixing ratio
+    - "cldfrac"     # Cloud fraction
+    - "albedo"      # Surface albedo
+    - "psurf"       # Surface pressure
+  
+  output_variables:
+    - "T_surf"
+    - "q_H2O"
+    - "cldfrac"
+    - "albedo"
+    - "psurf"
+  
+  # Chunking strategy for optimal performance
+  chunking:
+    adaptive: true
+    base_chunks:
+      lat: 40
+      lon: 40
+      lev: 15
+      time: 4
+    memory_limit: "2GB"
+    
+  # Spatial and temporal configuration
+  spatial:
+    resolution: "auto"  # auto, high, medium, low
+    crop_region: null   # [lat_min, lat_max, lon_min, lon_max]
+    
+  temporal:
+    window_size: 10
+    stride: 5
+    seasonal_normalization: true
+    
+  # Advanced processing options
+  processing:
+    normalize_globally: true
+    remove_climatology: false
+    apply_physics_constraints: true
+    quality_filtering: true
+    
+  # Caching and performance
+  caching:
+    enabled: true
+    cache_dir: "data/cache/cube_cache"
+    max_cache_size: "10GB"
+    
+# Model configuration
+model:
+  type: "datacube"
+  mode: "datacube"  # scalar, datacube, joint, spectral
+  
+# Data configuration  
 data:
-  root: data/kegg_graphs
-  batch_size: 64
-  num_workers: 4
+  root: "${datacube.zarr_root}"
+  batch_size: 4
+  num_workers: 6
+  pin_memory: true
+  
+# Training configuration
+trainer:
+  max_epochs: 120
+  precision: "16-mixed"
+  accelerator: "gpu"
+  devices: "auto"
+  strategy: "ddp"
+  
+# Surrogate configuration
+surrogate:
+  mode: "datacube"
+  export_format: "onnx"
+  weights_path: "models/surrogate_cube.onnx"
+  
+# API configuration
+api:
+  enable_streaming: true
+  max_cube_size: "1GB"
+  compression: "lz4"
+  
+# Paths configuration
+paths:
+  cube_zarr: "${datacube.zarr_root}"
+  model_checkpoints: "models/checkpoints"
+  logs: "logs"
+  cache: "${datacube.caching.cache_dir}"

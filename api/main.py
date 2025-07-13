@@ -485,17 +485,40 @@ async def predict_batch_habitability(
 @app.post("/predict/datacube", response_model=DatacubeResponse)
 async def predict_datacube(
     planet: PlanetParameters,
+    resolution: str = "medium",
+    include_physics_validation: bool = True,
+    return_format: str = "json",
     model = Depends(lambda: get_model("datacube"))
 ):
     """
     Predict full 3D climate datacube for detailed analysis.
     
-    Returns temperature and humidity fields across latitude×longitude×pressure grid.
-    Requires datacube model (Upgrade 1 from roadmap).
+    Enhanced datacube prediction with multiple resolution options and physics validation.
+    
+    Args:
+        planet: Planet parameters
+        resolution: Grid resolution (low, medium, high)
+        include_physics_validation: Include physics constraint validation
+        return_format: Response format (json, zarr, netcdf)
+        model: Datacube model
     """
     start_time = time.time()
     
     try:
+        # Import enhanced components
+        from surrogate import get_surrogate_manager, SurrogateMode
+        from validation.eval_cube import PhysicsValidator, EvaluationConfig
+        
+        # Get surrogate manager
+        surrogate_manager = get_surrogate_manager()
+        datacube_model = surrogate_manager.get_model(SurrogateMode.DATACUBE)
+        
+        if not datacube_model:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Datacube model not available"
+            )
+        
         # Convert parameters to tensor
         params_tensor = torch.tensor([
             planet.radius_earth, planet.mass_earth, planet.orbital_period,
@@ -505,39 +528,396 @@ async def predict_datacube(
         
         # Prediction
         with torch.no_grad():
-            outputs = model(params_tensor)
+            outputs = datacube_model.predict(params_tensor)
             
-            # Extract 3D fields
-            temp_field = outputs["temperature_field"][0].cpu().numpy().tolist()
-            humidity_field = outputs["humidity_field"][0].cpu().numpy().tolist()
+            # Convert to numpy for processing
+            if isinstance(outputs, torch.Tensor):
+                outputs = outputs.cpu().numpy()
+        
+        # Create enhanced datacube response
+        if outputs.ndim == 5:  # (batch, vars, lat, lon, pressure)
+            outputs = outputs[0]  # Remove batch dimension
+        
+        # Resolution-dependent grid sizes
+        grid_sizes = {
+            "low": {"lat": 32, "lon": 64, "pressure": 10},
+            "medium": {"lat": 64, "lon": 128, "pressure": 20},
+            "high": {"lat": 128, "lon": 256, "pressure": 40}
+        }
+        
+        grid_size = grid_sizes.get(resolution, grid_sizes["medium"])
+        
+        # Extract fields with proper dimensions
+        temp_field = outputs[0][:grid_size["lat"], :grid_size["lon"], :grid_size["pressure"]]
+        humidity_field = outputs[1][:grid_size["lat"], :grid_size["lon"], :grid_size["pressure"]] if outputs.shape[0] > 1 else np.zeros_like(temp_field)
+        cloud_field = outputs[2][:grid_size["lat"], :grid_size["lon"], :grid_size["pressure"]] if outputs.shape[0] > 2 else np.zeros_like(temp_field)
+        pressure_field = outputs[3][:grid_size["lat"], :grid_size["lon"], :grid_size["pressure"]] if outputs.shape[0] > 3 else np.ones_like(temp_field)
+        
+        # Physics validation
+        physics_results = {}
+        if include_physics_validation:
+            try:
+                # Create mock xarray dataset for validation
+                import xarray as xr
+                
+                lat = np.linspace(-90, 90, grid_size["lat"])
+                lon = np.linspace(-180, 180, grid_size["lon"])
+                pressure = np.logspace(2, -2, grid_size["pressure"])
+                
+                cube = xr.Dataset({
+                    'T_surf': (['lat', 'lon', 'pressure'], temp_field),
+                    'q_H2O': (['lat', 'lon', 'pressure'], humidity_field),
+                    'cldfrac': (['lat', 'lon', 'pressure'], cloud_field),
+                    'psurf': (['lat', 'lon'], pressure_field[:, :, 0])
+                }, coords={
+                    'lat': lat,
+                    'lon': lon,
+                    'pressure': pressure
+                })
+                
+                cube.attrs['insolation'] = planet.insolation
+                
+                # Validate physics
+                validator = PhysicsValidator(EvaluationConfig(
+                    model_path=Path("dummy"),
+                    test_data_path=Path("dummy")
+                ))
+                
+                physics_results = validator.validate_cube(cube)
+            except Exception as e:
+                physics_results = {'error': str(e)}
         
         inference_time = time.time() - start_time
         
-        return DatacubeResponse(
-            temperature_field=temp_field,
-            humidity_field=humidity_field,
+        # Build response
+        response = DatacubeResponse(
+            temperature_field=temp_field.tolist(),
+            humidity_field=humidity_field.tolist(),
             grid_info={
-                "n_lat": 64,
-                "n_lon": 32,
-                "n_pressure": 20,
+                "n_lat": grid_size["lat"],
+                "n_lon": grid_size["lon"],
+                "n_pressure": grid_size["pressure"],
+                "resolution": resolution,
                 "lat_range": [-90, 90],
                 "lon_range": [-180, 180],
-                "pressure_range": [1000, 0.1]  # hPa
+                "pressure_range": [100, 0.01],
+                "units": {
+                    "temperature": "K",
+                    "humidity": "kg/kg",
+                    "pressure": "bar"
+                }
             },
-            physics_constraints={
-                "energy_balance": float(outputs["energy_balance"].item()),
-                "mass_conservation": 1.0  # Placeholder
-            },
+            physics_constraints=physics_results,
             inference_time=inference_time,
-            model_version="datacube-v2.0",
-            timestamp=datetime.utcnow()
+            model_version="datacube_v1.0",
+            timestamp=datetime.now()
         )
+        
+        return response
         
     except Exception as e:
         logger.error(f"Datacube prediction failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Datacube prediction failed: {str(e)}"
+        )
+
+
+@app.post("/predict/datacube/streaming")
+async def predict_datacube_streaming(
+    planet: PlanetParameters,
+    resolution: str = "medium",
+    chunk_size: int = 1000,
+    model = Depends(lambda: get_model("datacube"))
+):
+    """
+    Stream datacube prediction for large datasets.
+    
+    Returns data in chunks to handle large datacubes efficiently.
+    """
+    from fastapi.responses import StreamingResponse
+    import json
+    
+    async def generate_datacube_chunks():
+        try:
+            # Get datacube prediction
+            from surrogate import get_surrogate_manager, SurrogateMode
+            
+            surrogate_manager = get_surrogate_manager()
+            datacube_model = surrogate_manager.get_model(SurrogateMode.DATACUBE)
+            
+            if not datacube_model:
+                yield json.dumps({"error": "Datacube model not available"})
+                return
+            
+            # Convert parameters to tensor
+            params_tensor = torch.tensor([
+                planet.radius_earth, planet.mass_earth, planet.orbital_period,
+                planet.insolation, planet.stellar_teff, planet.stellar_logg,
+                planet.stellar_metallicity, planet.host_mass
+            ], dtype=torch.float32).unsqueeze(0)
+            
+            # Prediction
+            with torch.no_grad():
+                outputs = datacube_model.predict(params_tensor)
+                
+                if isinstance(outputs, torch.Tensor):
+                    outputs = outputs.cpu().numpy()
+            
+            # Stream in chunks
+            if outputs.ndim == 5:
+                outputs = outputs[0]  # Remove batch dimension
+            
+            total_elements = outputs.size if hasattr(outputs, 'size') else len(outputs.flatten())
+            
+            # Send metadata first
+            metadata = {
+                "type": "metadata",
+                "shape": outputs.shape,
+                "total_elements": total_elements,
+                "chunk_size": chunk_size,
+                "resolution": resolution
+            }
+            yield json.dumps(metadata) + "\n"
+            
+            # Send data chunks
+            flattened = outputs.flatten()
+            for i in range(0, len(flattened), chunk_size):
+                chunk = flattened[i:i + chunk_size]
+                chunk_data = {
+                    "type": "data",
+                    "chunk_index": i // chunk_size,
+                    "data": chunk.tolist()
+                }
+                yield json.dumps(chunk_data) + "\n"
+            
+            # Send completion signal
+            completion = {
+                "type": "complete",
+                "total_chunks": (len(flattened) + chunk_size - 1) // chunk_size
+            }
+            yield json.dumps(completion) + "\n"
+            
+        except Exception as e:
+            error_data = {
+                "type": "error",
+                "error": str(e)
+            }
+            yield json.dumps(error_data) + "\n"
+    
+    return StreamingResponse(
+        generate_datacube_chunks(),
+        media_type="application/x-ndjson",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Content-Encoding": "identity"
+        }
+    )
+
+
+@app.post("/predict/datacube/batch")
+async def predict_datacube_batch(
+    planets: List[PlanetParameters],
+    resolution: str = "medium",
+    parallel: bool = True,
+    background_tasks: BackgroundTasks = None,
+    model = Depends(lambda: get_model("datacube"))
+):
+    """
+    Batch datacube prediction for multiple planets.
+    
+    Efficiently process multiple planets with optional parallel processing.
+    """
+    if len(planets) > 50:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum 50 planets per batch request"
+        )
+    
+    start_time = time.time()
+    
+    try:
+        from surrogate import get_surrogate_manager, SurrogateMode
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        
+        surrogate_manager = get_surrogate_manager()
+        datacube_model = surrogate_manager.get_model(SurrogateMode.DATACUBE)
+        
+        if not datacube_model:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Datacube model not available"
+            )
+        
+        def predict_single_planet(planet: PlanetParameters):
+            """Process single planet"""
+            try:
+                # Convert parameters to tensor
+                params_tensor = torch.tensor([
+                    planet.radius_earth, planet.mass_earth, planet.orbital_period,
+                    planet.insolation, planet.stellar_teff, planet.stellar_logg,
+                    planet.stellar_metallicity, planet.host_mass
+                ], dtype=torch.float32).unsqueeze(0)
+                
+                # Prediction
+                with torch.no_grad():
+                    outputs = datacube_model.predict(params_tensor)
+                    
+                    if isinstance(outputs, torch.Tensor):
+                        outputs = outputs.cpu().numpy()
+                
+                # Extract key metrics instead of full cube for batch processing
+                if outputs.ndim == 5:
+                    outputs = outputs[0]  # Remove batch dimension
+                
+                # Calculate summary statistics
+                temp_field = outputs[0] if outputs.shape[0] > 0 else np.zeros((64, 64, 20))
+                humidity_field = outputs[1] if outputs.shape[0] > 1 else np.zeros_like(temp_field)
+                
+                summary = {
+                    "planet_params": planet.dict(),
+                    "climate_summary": {
+                        "global_mean_temperature": float(temp_field.mean()),
+                        "temperature_range": [float(temp_field.min()), float(temp_field.max())],
+                        "global_mean_humidity": float(humidity_field.mean()),
+                        "humidity_range": [float(humidity_field.min()), float(humidity_field.max())],
+                        "temperature_std": float(temp_field.std()),
+                        "humidity_std": float(humidity_field.std())
+                    },
+                    "habitability_indicators": {
+                        "temperature_habitable": 250.0 <= temp_field.mean() <= 320.0,
+                        "water_present": humidity_field.mean() > 0.001,
+                        "temperature_stable": temp_field.std() < 50.0
+                    }
+                }
+                
+                return summary
+                
+            except Exception as e:
+                return {
+                    "planet_params": planet.dict(),
+                    "error": str(e)
+                }
+        
+        # Process planets
+        results = []
+        
+        if parallel and len(planets) > 1:
+            # Parallel processing
+            with ThreadPoolExecutor(max_workers=min(len(planets), 8)) as executor:
+                futures = {executor.submit(predict_single_planet, planet): planet for planet in planets}
+                
+                for future in as_completed(futures):
+                    result = future.result()
+                    results.append(result)
+        else:
+            # Sequential processing
+            for planet in planets:
+                result = predict_single_planet(planet)
+                results.append(result)
+        
+        # Sort results by habitability score
+        def get_habitability_score(result):
+            if "error" in result:
+                return 0.0
+            
+            indicators = result.get("habitability_indicators", {})
+            score = 0.0
+            
+            if indicators.get("temperature_habitable", False):
+                score += 0.4
+            if indicators.get("water_present", False):
+                score += 0.3
+            if indicators.get("temperature_stable", False):
+                score += 0.3
+            
+            return score
+        
+        results.sort(key=get_habitability_score, reverse=True)
+        
+        processing_time = time.time() - start_time
+        
+        return {
+            "batch_results": results,
+            "batch_summary": {
+                "total_planets": len(planets),
+                "successful_predictions": len([r for r in results if "error" not in r]),
+                "failed_predictions": len([r for r in results if "error" in r]),
+                "processing_time": processing_time,
+                "average_time_per_planet": processing_time / len(planets)
+            },
+            "timestamp": datetime.now()
+        }
+        
+    except Exception as e:
+        logger.error(f"Batch datacube prediction failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Batch prediction failed: {str(e)}"
+        )
+
+
+@app.get("/models/datacube/performance")
+async def get_datacube_performance():
+    """
+    Get performance statistics for datacube models.
+    """
+    try:
+        from surrogate import get_surrogate_manager
+        
+        surrogate_manager = get_surrogate_manager()
+        performance_stats = surrogate_manager.get_performance_stats()
+        
+        # Filter for datacube models
+        datacube_stats = {
+            name: stats for name, stats in performance_stats.items()
+            if "cube" in name.lower() or "datacube" in name.lower()
+        }
+        
+        return {
+            "datacube_models": datacube_stats,
+            "timestamp": datetime.now()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get performance stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get performance stats: {str(e)}"
+        )
+
+
+@app.get("/models/datacube/health")
+async def get_datacube_health():
+    """
+    Get health status of datacube models.
+    """
+    try:
+        from surrogate import get_surrogate_manager
+        
+        surrogate_manager = get_surrogate_manager()
+        health_status = surrogate_manager.health_check()
+        
+        # Filter for datacube models
+        datacube_health = {
+            name: healthy for name, healthy in health_status.items()
+            if "cube" in name.lower() or "datacube" in name.lower()
+        }
+        
+        overall_health = all(datacube_health.values()) if datacube_health else False
+        
+        return {
+            "overall_health": overall_health,
+            "datacube_models": datacube_health,
+            "timestamp": datetime.now()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get health status: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get health status: {str(e)}"
         )
 
 

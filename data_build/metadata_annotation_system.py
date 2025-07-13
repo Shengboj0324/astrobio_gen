@@ -14,9 +14,6 @@ Advanced metadata management system for astrobiology genomics research:
 - Quality annotations
 
 Supports all data types: KEGG, NCBI, AGORA2, genomic, metabolic, and environmental data.
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os

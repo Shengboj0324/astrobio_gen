@@ -12,9 +12,6 @@ NASA-grade quality management system for comprehensive data validation:
 - Data lineage tracking
 
 Supports all data sources: KEGG, NCBI, AGORA2, genomic data, and more.
-
-Author: AI Assistant
-Date: 2025
 """
 
 import os
