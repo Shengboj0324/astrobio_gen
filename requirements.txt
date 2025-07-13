@@ -21,7 +21,7 @@ sympy>=1.12             # quick analytic checks / ODE prototypes
 torch==2.2.0              # Core PyTorch
 torchvision==0.17.0       # Computer vision utilities
 torchaudio==2.2.0         # Audio processing (for biosignatures)
-pytorch-lightning==2.2.4  # High-level PyTorch training framework
+pytorch-lightning==2.4.0  # High-level PyTorch training framework
 
 # ---- Graph Neural Networks ----
 torch_geometric>=2.5      # Graph neural networks for metabolic pathways
