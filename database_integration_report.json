@@ -1,0 +1,212 @@
+{
+  "timestamp": "1752491957.4686859",
+  "configuration": {
+    "total_databases": 11,
+    "database_names": [
+      "metadata",
+      "versions",
+      "quality",
+      "security",
+      "pipeline",
+      "kegg",
+      "agora2",
+      "gems",
+      "gtdb",
+      "uniprot",
+      "ahed"
+    ]
+  },
+  "verification": {
+    "total_databases": 11,
+    "accessible": 5,
+    "errors": [],
+    "database_info": {
+      "metadata": {
+        "name": "metadata",
+        "path": "data\\metadata\\metadata.db",
+        "description": "Main scientific metadata and dataset registry",
+        "exists": true,
+        "size_mb": 0.16015625,
+        "tables": [
+          "metadata_records",
+          "annotations",
+          "cross_references",
+          "provenance",
+          "quality_annotations",
+          "relationships",
+          "datasets",
+          "astronomical_objects",
+          "experiments",
+          "data_chunks",
+          "object_dataset_link",
+          "predictions",
+          "validation_results",
+          "sqlite_stat1"
+        ],
+        "table_counts": {
+          "metadata_records": 0,
+          "annotations": 0,
+          "cross_references": 0,
+          "provenance": 0,
+          "quality_annotations": 0,
+          "relationships": 0,
+          "datasets": 0,
+          "astronomical_objects": 0,
+          "experiments": 0,
+          "data_chunks": 0,
+          "object_dataset_link": 0,
+          "predictions": 0,
+          "validation_results": 0,
+          "sqlite_stat1": 0
+        }
+      },
+      "versions": {
+        "name": "versions",
+        "path": "data\\versions\\versions.db",
+        "description": "Data versioning and provenance tracking",
+        "exists": true,
+        "size_mb": 0.0546875,
+        "tables": [
+          "datasets",
+          "versions",
+          "changes",
+          "provenance",
+          "conflicts",
+          "branches"
+        ],
+        "table_counts": {
+          "datasets": 0,
+          "versions": 0,
+          "changes": 0,
+          "provenance": 0,
+          "conflicts": 0,
+          "branches": 0
+        }
+      },
+      "quality": {
+        "name": "quality",
+        "path": "data\\quality\\quality_monitor.db",
+        "description": "Data quality reports and monitoring",
+        "exists": true,
+        "size_mb": 0.03515625,
+        "tables": [
+          "quality_reports",
+          "quality_issues",
+          "quality_trends",
+          "sqlite_sequence",
+          "quality_alerts"
+        ],
+        "table_counts": {
+          "quality_reports": 0,
+          "quality_issues": 0,
+          "quality_trends": 0,
+          "sqlite_sequence": 0,
+          "quality_alerts": 0
+        }
+      },
+      "security": {
+        "name": "security",
+        "path": "data\\metadata\\security.db",
+        "description": "Security, encryption, and access logging",
+        "exists": false,
+        "size_mb": 0,
+        "tables": [],
+        "table_counts": {}
+      },
+      "pipeline": {
+        "name": "pipeline",
+        "path": "data\\pipeline\\pipeline_state.db",
+        "description": "Automated pipeline execution state",
+        "exists": false,
+        "size_mb": 0,
+        "tables": [],
+        "table_counts": {}
+      },
+      "kegg": {
+        "name": "kegg",
+        "path": "data\\processed\\kegg\\kegg_database.db",
+        "description": "KEGG pathway and metabolic data",
+        "exists": false,
+        "size_mb": 0,
+        "tables": [],
+        "table_counts": {}
+      },
+      "agora2": {
+        "name": "agora2",
+        "path": "data\\processed\\agora2\\metabolic_models.db",
+        "description": "AGORA2 metabolic models and genome data",
+        "exists": false,
+        "size_mb": 0,
+        "tables": [],
+        "table_counts": {}
+      },
+      "gems": {
+        "name": "gems",
+        "path": "data\\processed\\jgi\\gems.db",
+        "description": "JGI genome annotation and functional analysis",
+        "exists": false,
+        "size_mb": 0,
+        "tables": [],
+        "table_counts": {}
+      },
+      "gtdb": {
+        "name": "gtdb",
+        "path": "data\\processed\\gtdb\\gtdb.db",
+        "description": "GTDB taxonomic and phylogenetic data",
+        "exists": true,
+        "size_mb": 0.05078125,
+        "tables": [
+          "genomes",
+          "taxonomy",
+          "phylogeny",
+          "sqlite_sequence"
+        ],
+        "table_counts": {
+          "genomes": 0,
+          "taxonomy": 0,
+          "phylogeny": 0,
+          "sqlite_sequence": 0
+        }
+      },
+      "uniprot": {
+        "name": "uniprot",
+        "path": "data\\processed\\uniprot\\uniprot.db",
+        "description": "UniProt protein sequences and annotations",
+        "exists": true,
+        "size_mb": 1.96484375,
+        "tables": [
+          "protein_entries",
+          "protein_families",
+          "sqlite_sequence",
+          "cross_references"
+        ],
+        "table_counts": {
+          "protein_entries": 2000,
+          "protein_families": 0,
+          "sqlite_sequence": 0,
+          "cross_references": 0
+        }
+      },
+      "ahed": {
+        "name": "ahed",
+        "path": "data\\processed\\nasa\\ahed.db",
+        "description": "NASA astrobiology and habitability data",
+        "exists": false,
+        "size_mb": 0,
+        "tables": [],
+        "table_counts": {}
+      }
+    }
+  },
+  "performance": {
+    "accessible_databases": 5,
+    "total_size_mb": 2.27,
+    "largest_database": [
+      "uniprot",
+      1.96484375
+    ]
+  },
+  "recommendations": [
+    "Run comprehensive data acquisition to create missing databases"
+  ]
+}

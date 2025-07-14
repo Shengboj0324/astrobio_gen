@@ -314,8 +314,18 @@ class ValidationResult(Base):
 class MetadataManager:
     """Manager for scientific metadata database"""
     
-    def __init__(self, db_path: str = "data/metadata.db"):
-        self.db_path = Path(db_path)
+    def __init__(self, db_path: Optional[str] = None):
+        # Use centralized database configuration
+        if db_path is None:
+            try:
+                from .database_config import get_database_path
+                self.db_path = Path(get_database_path('metadata'))
+            except ImportError:
+                # Fallback to default path if database_config not available
+                self.db_path = Path("data/metadata/metadata.db")
+        else:
+            self.db_path = Path(db_path)
+            
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         
         # Create SQLAlchemy engine
@@ -522,8 +532,8 @@ class MetadataManager:
         self.session.close()
 
 # Utility functions
-def create_metadata_manager(db_path: str = "data/metadata.db") -> MetadataManager:
-    """Create a metadata manager instance"""
+def create_metadata_manager(db_path: Optional[str] = None) -> MetadataManager:
+    """Create a metadata manager instance with centralized configuration"""
     return MetadataManager(db_path)
 
 def register_astronomical_dataset(manager: MetadataManager, data_path: Path, 

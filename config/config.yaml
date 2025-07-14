@@ -98,3 +98,101 @@ paths:
   model_checkpoints: "models/checkpoints"
   logs: "logs"
   cache: "${datacube.caching.cache_dir}"
+
+# Database Configuration (Centralized SQLite Management)
+database:
+  # Base data directory for all databases
+  base_path: "data"
+  
+  # Core system databases with consistent paths
+  databases:
+    # Main metadata database (primary)
+    metadata:
+      path: "data/metadata/metadata.db"
+      description: "Main scientific metadata and dataset registry"
+      tables: ["datasets", "experiments", "data_chunks", "predictions", "astronomical_objects"]
+      
+    # Data versioning and provenance
+    versions:
+      path: "data/versions/versions.db" 
+      description: "Data versioning and provenance tracking"
+      tables: ["datasets", "versions", "changes", "provenance", "branches"]
+      
+    # Quality monitoring and validation
+    quality:
+      path: "data/quality/quality_monitor.db"
+      description: "Data quality reports and monitoring"
+      tables: ["quality_reports", "quality_issues", "quality_trends"]
+      
+    # Security and access control
+    security:
+      path: "data/metadata/security.db"
+      description: "Security, encryption, and access logging"
+      tables: ["file_metadata", "access_log", "security_alerts"]
+      
+    # Pipeline state and execution tracking
+    pipeline:
+      path: "data/pipeline/pipeline_state.db"
+      description: "Automated pipeline execution state"
+      tables: ["pipeline_runs", "task_executions"]
+      
+    # Domain-specific databases
+    kegg:
+      path: "data/processed/kegg/kegg_database.db"
+      description: "KEGG pathway and metabolic data"
+      tables: ["pathways", "reactions", "compounds", "organisms"]
+      
+    agora2:
+      path: "data/processed/agora2/metabolic_models.db"
+      description: "AGORA2 metabolic models and genome data"
+      tables: ["agora2_models", "reactions", "metabolites", "genes", "ncbi_genomes"]
+      
+    gems:
+      path: "data/processed/jgi/gems.db"
+      description: "JGI genome annotation and functional analysis"
+      tables: ["genomes", "annotations", "functional_categories"]
+      
+    gtdb:
+      path: "data/processed/gtdb/gtdb.db"
+      description: "GTDB taxonomic and phylogenetic data"
+      tables: ["genomes", "taxonomy", "trees", "metadata"]
+      
+    uniprot:
+      path: "data/processed/uniprot/uniprot.db"
+      description: "UniProt protein sequences and annotations"
+      tables: ["proteins", "annotations", "cross_references"]
+      
+    ahed:
+      path: "data/processed/nasa/ahed.db"
+      description: "NASA astrobiology and habitability data"
+      tables: ["datasets", "analyses", "habitability_metrics"]
+  
+  # Database configuration settings
+  settings:
+    # SQLite configuration
+    sqlite:
+      journal_mode: "WAL"  # Write-Ahead Logging for better performance
+      synchronous: "NORMAL"  # Balance between safety and speed
+      cache_size: 10000  # Cache size in pages (roughly 40MB)
+      temp_store: "MEMORY"  # Store temporary tables in memory
+      foreign_keys: true  # Enable foreign key constraints
+      
+    # Connection pooling
+    connection:
+      max_connections: 10
+      pool_timeout: 30
+      pool_recycle: 3600  # Recycle connections every hour
+      
+    # Backup and maintenance
+    maintenance:
+      auto_vacuum: "INCREMENTAL"  # Automatic space reclamation
+      backup_interval: "daily"  # Daily backup schedule
+      optimize_interval: "weekly"  # Weekly VACUUM and ANALYZE
+      checkpoint_interval: 1000  # WAL checkpoint after 1000 transactions
+      
+    # Security settings
+    security:
+      encryption_enabled: false  # Enable for sensitive data
+      access_logging: true  # Log all database access
+      permission_checks: true  # Enforce file permissions
+      backup_encryption: false  # Encrypt backup files
