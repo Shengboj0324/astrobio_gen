@@ -186,4 +186,5 @@ gputil>=1.4.0
 boto3==1.39.4              # AWS SDK for Python (pinned for compatibility)
 botocore==1.39.4           # Core AWS library (pinned for compatibility)
 s3fs==2024.10.0            # S3 filesystem interface for easier file operations
+aiofiles>=24.1.0           # Async file operations for data acquisition
 # aiobotocore==2.15.2      # Async boto3 support (uncomment if async needed, compatible with boto3 1.39.4)
