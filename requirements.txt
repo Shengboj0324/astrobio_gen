@@ -181,3 +181,9 @@ plotly>=5.15.0
 sqlalchemy>=1.4.0
 psutil>=5.9.0
 gputil>=1.4.0
+
+# AWS Integration (using boto3 instead of awscli to avoid dependency conflicts)
+boto3==1.39.4              # AWS SDK for Python (pinned for compatibility)
+botocore==1.39.4           # Core AWS library (pinned for compatibility)
+s3fs==2024.10.0            # S3 filesystem interface for easier file operations
+# aiobotocore==2.15.2      # Async boto3 support (uncomment if async needed, compatible with boto3 1.39.4)

@@ -190,9 +190,33 @@ database:
       optimize_interval: "weekly"  # Weekly VACUUM and ANALYZE
       checkpoint_interval: 1000  # WAL checkpoint after 1000 transactions
       
-    # Security settings
-    security:
-      encryption_enabled: false  # Enable for sensitive data
-      access_logging: true  # Log all database access
-      permission_checks: true  # Enforce file permissions
-      backup_encryption: false  # Encrypt backup files
+         # Security settings
+     security:
+       encryption_enabled: false  # Enable for sensitive data
+       access_logging: true  # Log all database access
+       permission_checks: true  # Enforce file permissions
+       backup_encryption: false  # Encrypt backup files
+
+# AWS Configuration
+aws:
+  region: "us-east-1"
+  
+  # S3 Buckets (will be created automatically)
+  s3_buckets:
+    primary: "astrobio-data-primary"  # Main data storage
+    backup: "astrobio-data-backup"    # Cross-region backup
+    zarr: "astrobio-zarr-cubes"       # Zarr datacubes
+    logs: "astrobio-logs-metadata"    # Logs and metadata
+  
+  # Compute Configuration
+  compute:
+    dev_instance_type: "t3.large"
+    training_instance_type: "g4dn.xlarge"  # GPU for ML training
+    batch_instance_type: "c5.4xlarge"      # CPU for data processing
+  
+  # Cost Management
+  cost_management:
+    daily_budget_alert: 100   # USD
+    monthly_budget_limit: 1000  # USD
+    auto_shutdown_idle: true
+    lifecycle_policies: true   # Auto-archive old data
