@@ -1,0 +1,22 @@
+{
+  "name": "super_earth",
+  "parameters": {
+    "name": "super_earth",
+    "stellar_flux": 1.2,
+    "co2_ppm": 800,
+    "o2_percent": 21
+  },
+  "grid_resolution": "64x32x20",
+  "time_steps": 1000,
+  "output_frequency": "monthly",
+  "variables": [
+    "temperature",
+    "pressure",
+    "humidity",
+    "wind_u",
+    "wind_v",
+    "clouds"
+  ],
+  "created": "2025-07-14T14:29:05.532524+00:00",
+  "description": "ROCKE-3D climate simulation for super_earth conditions"
+}

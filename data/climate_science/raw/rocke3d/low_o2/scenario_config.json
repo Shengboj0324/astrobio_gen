@@ -1,0 +1,22 @@
+{
+  "name": "low_o2",
+  "parameters": {
+    "name": "low_o2",
+    "stellar_flux": 1.0,
+    "co2_ppm": 400,
+    "o2_percent": 5
+  },
+  "grid_resolution": "64x32x20",
+  "time_steps": 1000,
+  "output_frequency": "monthly",
+  "variables": [
+    "temperature",
+    "pressure",
+    "humidity",
+    "wind_u",
+    "wind_v",
+    "clouds"
+  ],
+  "created": "2025-07-14T14:29:05.794397+00:00",
+  "description": "ROCKE-3D climate simulation for low_o2 conditions"
+}

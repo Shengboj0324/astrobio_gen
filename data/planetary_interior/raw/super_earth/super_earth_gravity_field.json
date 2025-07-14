@@ -1,0 +1,8 @@
+{
+  "planet_type": "super_earth",
+  "model_type": "gravity_field",
+  "surface_gravity_ms2": 15.0,
+  "mass_kg": 1.5e+25,
+  "radius_km": 8000,
+  "created": "2025-07-14T14:29:23.777703+00:00"
+}

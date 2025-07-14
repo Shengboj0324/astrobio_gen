@@ -1,0 +1,22 @@
+{
+  "name": "venus_like",
+  "parameters": {
+    "name": "venus_like",
+    "stellar_flux": 1.9,
+    "co2_ppm": 960000,
+    "o2_percent": 0
+  },
+  "grid_resolution": "64x32x20",
+  "time_steps": 1000,
+  "output_frequency": "monthly",
+  "variables": [
+    "temperature",
+    "pressure",
+    "humidity",
+    "wind_u",
+    "wind_v",
+    "clouds"
+  ],
+  "created": "2025-07-14T14:29:05.889907+00:00",
+  "description": "ROCKE-3D climate simulation for venus_like conditions"
+}

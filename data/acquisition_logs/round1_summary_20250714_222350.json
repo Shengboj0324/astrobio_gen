@@ -1,0 +1,28 @@
+{
+  "acquisition_id": "round1_20250714_222350",
+  "start_time": "2025-07-14T14:23:50.369722+00:00",
+  "end_time": "2025-07-14T14:23:50.369722+00:00",
+  "duration_hours": 0.0,
+  "domains_processed": 0,
+  "successful_domains": 0,
+  "failed_domains": 0,
+  "total_data_acquired_gb": 0.0,
+  "nasa_grade_datasets": 0,
+  "quality_metrics": {
+    "average_quality_score": NaN,
+    "nasa_compliance_rate": 0.0
+  },
+  "domain_results": {},
+  "storage_usage": {
+    "total_used_gb": 0.0,
+    "storage_limit_tb": 0.1,
+    "utilization_percent": 0.0
+  },
+  "next_steps": [
+    "Validate data quality across all domains",
+    "Update metadata database with cross-references",
+    "Begin data processing and integration",
+    "Plan second round data acquisition",
+    "Optimize storage and access patterns"
+  ]
+}

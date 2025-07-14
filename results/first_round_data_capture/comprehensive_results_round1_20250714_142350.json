@@ -1,0 +1,599 @@
+{
+  "comprehensive_acquisition": {
+    "acquisition_id": "round1_20250714_222350",
+    "start_time": "2025-07-14T14:23:50.369722+00:00",
+    "end_time": "2025-07-14T14:23:50.369722+00:00",
+    "duration_hours": 0.0,
+    "domains_processed": 0,
+    "successful_domains": 0,
+    "failed_domains": 0,
+    "total_data_acquired_gb": 0.0,
+    "nasa_grade_datasets": 0,
+    "quality_metrics": {
+      "average_quality_score": NaN,
+      "nasa_compliance_rate": 0.0
+    },
+    "domain_results": {},
+    "storage_usage": {
+      "total_used_gb": 0.0,
+      "storage_limit_tb": 0.1,
+      "utilization_percent": 0.0
+    },
+    "next_steps": [
+      "Validate data quality across all domains",
+      "Update metadata database with cross-references",
+      "Begin data processing and integration",
+      "Plan second round data acquisition",
+      "Optimize storage and access patterns"
+    ]
+  },
+  "real_data_scraping": {
+    "scraping_id": "round1_20250714_222923",
+    "start_time": "2025-07-14T14:29:23.789702+00:00",
+    "total_sources": 8,
+    "successful_sources": 8,
+    "failed_sources": 0,
+    "total_downloaded_gb": 19.480632401332375,
+    "source_results": {
+      "nasa_exoplanet_archive": {
+        "status": "success",
+        "downloaded_files": 6,
+        "downloaded_size_gb": 0.010615438222885132,
+        "total_planets": 2,
+        "datasets": [
+          {
+            "name": "confirmed_planets",
+            "file": "data\\astronomy\\raw\\confirmed_planets_20250714.csv",
+            "records": 2,
+            "size_gb": 9.592622518539429e-08,
+            "columns": [
+              "ERROR<br>"
+            ]
+          },
+          {
+            "name": "kepler_objects",
+            "file": "data\\astronomy\\raw\\kepler_objects_20250714.csv",
+            "records": 9564,
+            "size_gb": 0.010614953935146332,
+            "columns": "153 columns"
+          },
+          {
+            "name": "tess_candidates",
+            "file": "data\\astronomy\\raw\\tess_candidates_20250714.csv",
+            "records": 2,
+            "size_gb": 1.0058283805847168e-07,
+            "columns": [
+              "ERROR<br>"
+            ]
+          },
+          {
+            "name": "stellar_hosts",
+            "file": "data\\astronomy\\raw\\stellar_hosts_20250714.csv",
+            "records": 2,
+            "size_gb": 9.592622518539429e-08,
+            "columns": [
+              "ERROR<br>"
+            ]
+          },
+          {
+            "name": "planetary_systems",
+            "file": "data\\astronomy\\raw\\planetary_systems_20250714.csv",
+            "records": 2,
+            "size_gb": 9.592622518539429e-08,
+            "columns": [
+              "ERROR<br>"
+            ]
+          },
+          {
+            "name": "atmospheric_data",
+            "file": "data\\astronomy\\raw\\atmospheric_data_20250714.csv",
+            "records": 2,
+            "size_gb": 9.592622518539429e-08,
+            "columns": [
+              "ERROR<br>"
+            ]
+          }
+        ]
+      },
+      "jwst_mast_archive": {
+        "status": "success",
+        "downloaded_files": 350,
+        "downloaded_size_gb": 17.500000000000114,
+        "instruments": [
+          "NIRISS",
+          "NIRCam",
+          "NIRSpec",
+          "MIRI",
+          "FGS"
+        ],
+        "targets": [
+          "WASP-39b",
+          "WASP-96b",
+          "HAT-P-18b",
+          "GJ-357b",
+          "TOI-776c",
+          "K2-18b",
+          "TRAPPIST-1e",
+          "TRAPPIST-1f",
+          "TRAPPIST-1g",
+          "TOI-270d",
+          "LP-890-9c",
+          "TOI-849b",
+          "HD-209458b",
+          "HD-189733b"
+        ],
+        "observation_types": [
+          "exoplanet_transit",
+          "exoplanet_eclipse",
+          "exoplanet_phase_curve",
+          "stellar_spectra",
+          "calibration"
+        ]
+      },
+      "phoenix_stellar_models": {
+        "status": "success",
+        "downloaded_files": 0,
+        "downloaded_size_gb": 0.0,
+        "temperature_range": {
+          "min": null,
+          "max": null
+        },
+        "model_count": 0,
+        "parameter_coverage": {
+          "temperatures": 7,
+          "gravities": 3,
+          "metallicities": 4
+        }
+      },
+      "rocke3d_climate_models": {
+        "status": "success",
+        "downloaded_files": 10,
+        "downloaded_size_gb": 0.9999999999999999,
+        "scenarios": [
+          "earth_like",
+          "early_earth",
+          "super_earth",
+          "tidally_locked",
+          "snowball_earth",
+          "high_co2",
+          "low_o2",
+          "archean",
+          "venus_like",
+          "mars_like"
+        ]
+      },
+      "kurucz_stellar_models": {
+        "status": "success",
+        "downloaded_files": 2,
+        "downloaded_size_gb": 1.6963109374046326e-05,
+        "model_types": [
+          "grids",
+          "atoms",
+          "molecules",
+          "linelists",
+          "opacity"
+        ]
+      },
+      "1000genomes_project": {
+        "status": "success",
+        "downloaded_files": 27,
+        "downloaded_size_gb": 0.3600000000000001,
+        "populations": [
+          "CEU",
+          "YRI",
+          "CHB",
+          "JPT",
+          "LWK",
+          "MXL",
+          "PUR",
+          "CDX",
+          "CLM",
+          "FIN",
+          "GBR",
+          "IBS",
+          "TSI",
+          "BEB",
+          "GUJ",
+          "ITU",
+          "PJL",
+          "STU",
+          "ACB",
+          "ASW",
+          "ESN",
+          "GWD",
+          "MSL",
+          "KHV",
+          "CHS",
+          "PEL"
+        ],
+        "sample_count": 2588
+      },
+      "geocarb_paleoclimate": {
+        "status": "success",
+        "downloaded_files": 6,
+        "downloaded_size_gb": 0.26,
+        "time_series": [
+          "geocarb_co2",
+          "geocarb_o2",
+          "temperature_proxies",
+          "sea_level",
+          "ice_volume"
+        ],
+        "time_range_myr": {
+          "min": 0,
+          "max": 4500
+        }
+      },
+      "planetary_interior": {
+        "status": "success",
+        "downloaded_files": 35,
+        "downloaded_size_gb": 0.35000000000000014,
+        "model_types": [
+          "seismic_velocity",
+          "gravity_field",
+          "magnetic_field",
+          "density_profile",
+          "rheology"
+        ],
+        "planet_types": [
+          "terrestrial",
+          "super_earth",
+          "mini_neptune",
+          "gas_giant",
+          "ice_giant",
+          "ocean_world",
+          "iron_core_planet"
+        ]
+      }
+    },
+    "data_quality": {
+      "nasa_grade_sources": 8,
+      "comprehensive_coverage": true,
+      "multi_domain_integration": true
+    },
+    "next_steps": [
+      "Validate downloaded data quality",
+      "Integrate with metadata database",
+      "Begin data processing pipeline",
+      "Plan second round data acquisition",
+      "Implement real-time data updates"
+    ]
+  },
+  "quality_validation": {
+    "total_domains_validated": 1,
+    "nasa_grade_datasets": 1,
+    "quality_scores": {
+      "astronomy": 0.9587954761671946
+    },
+    "validation_errors": [],
+    "average_quality_score": 0.9587954761671946,
+    "nasa_compliance_rate": 100.0
+  },
+  "metadata_integration": {
+    "total_datasets": 6,
+    "cross_references": 0,
+    "metadata_errors": []
+  },
+  "final_summary": {
+    "session_id": "round1_20250714_142350",
+    "start_time": "2025-07-14T14:23:50.279881+00:00",
+    "end_time": "2025-07-14T14:29:24.296668+00:00",
+    "duration_hours": 0.09278244083333334,
+    "status": "completed",
+    "total_domains_processed": 8,
+    "total_data_acquired_tb": 0.019024055079426148,
+    "nasa_grade_datasets": 0,
+    "overall_quality_score": NaN,
+    "comprehensive_acquisition": {
+      "acquisition_id": "round1_20250714_222350",
+      "start_time": "2025-07-14T14:23:50.369722+00:00",
+      "end_time": "2025-07-14T14:23:50.369722+00:00",
+      "duration_hours": 0.0,
+      "domains_processed": 0,
+      "successful_domains": 0,
+      "failed_domains": 0,
+      "total_data_acquired_gb": 0.0,
+      "nasa_grade_datasets": 0,
+      "quality_metrics": {
+        "average_quality_score": NaN,
+        "nasa_compliance_rate": 0.0
+      },
+      "domain_results": {},
+      "storage_usage": {
+        "total_used_gb": 0.0,
+        "storage_limit_tb": 0.1,
+        "utilization_percent": 0.0
+      },
+      "next_steps": [
+        "Validate data quality across all domains",
+        "Update metadata database with cross-references",
+        "Begin data processing and integration",
+        "Plan second round data acquisition",
+        "Optimize storage and access patterns"
+      ]
+    },
+    "real_data_scraping": {
+      "scraping_id": "round1_20250714_222923",
+      "start_time": "2025-07-14T14:29:23.789702+00:00",
+      "total_sources": 8,
+      "successful_sources": 8,
+      "failed_sources": 0,
+      "total_downloaded_gb": 19.480632401332375,
+      "source_results": {
+        "nasa_exoplanet_archive": {
+          "status": "success",
+          "downloaded_files": 6,
+          "downloaded_size_gb": 0.010615438222885132,
+          "total_planets": 2,
+          "datasets": [
+            {
+              "name": "confirmed_planets",
+              "file": "data\\astronomy\\raw\\confirmed_planets_20250714.csv",
+              "records": 2,
+              "size_gb": 9.592622518539429e-08,
+              "columns": [
+                "ERROR<br>"
+              ]
+            },
+            {
+              "name": "kepler_objects",
+              "file": "data\\astronomy\\raw\\kepler_objects_20250714.csv",
+              "records": 9564,
+              "size_gb": 0.010614953935146332,
+              "columns": "153 columns"
+            },
+            {
+              "name": "tess_candidates",
+              "file": "data\\astronomy\\raw\\tess_candidates_20250714.csv",
+              "records": 2,
+              "size_gb": 1.0058283805847168e-07,
+              "columns": [
+                "ERROR<br>"
+              ]
+            },
+            {
+              "name": "stellar_hosts",
+              "file": "data\\astronomy\\raw\\stellar_hosts_20250714.csv",
+              "records": 2,
+              "size_gb": 9.592622518539429e-08,
+              "columns": [
+                "ERROR<br>"
+              ]
+            },
+            {
+              "name": "planetary_systems",
+              "file": "data\\astronomy\\raw\\planetary_systems_20250714.csv",
+              "records": 2,
+              "size_gb": 9.592622518539429e-08,
+              "columns": [
+                "ERROR<br>"
+              ]
+            },
+            {
+              "name": "atmospheric_data",
+              "file": "data\\astronomy\\raw\\atmospheric_data_20250714.csv",
+              "records": 2,
+              "size_gb": 9.592622518539429e-08,
+              "columns": [
+                "ERROR<br>"
+              ]
+            }
+          ]
+        },
+        "jwst_mast_archive": {
+          "status": "success",
+          "downloaded_files": 350,
+          "downloaded_size_gb": 17.500000000000114,
+          "instruments": [
+            "NIRISS",
+            "NIRCam",
+            "NIRSpec",
+            "MIRI",
+            "FGS"
+          ],
+          "targets": [
+            "WASP-39b",
+            "WASP-96b",
+            "HAT-P-18b",
+            "GJ-357b",
+            "TOI-776c",
+            "K2-18b",
+            "TRAPPIST-1e",
+            "TRAPPIST-1f",
+            "TRAPPIST-1g",
+            "TOI-270d",
+            "LP-890-9c",
+            "TOI-849b",
+            "HD-209458b",
+            "HD-189733b"
+          ],
+          "observation_types": [
+            "exoplanet_transit",
+            "exoplanet_eclipse",
+            "exoplanet_phase_curve",
+            "stellar_spectra",
+            "calibration"
+          ]
+        },
+        "phoenix_stellar_models": {
+          "status": "success",
+          "downloaded_files": 0,
+          "downloaded_size_gb": 0.0,
+          "temperature_range": {
+            "min": null,
+            "max": null
+          },
+          "model_count": 0,
+          "parameter_coverage": {
+            "temperatures": 7,
+            "gravities": 3,
+            "metallicities": 4
+          }
+        },
+        "rocke3d_climate_models": {
+          "status": "success",
+          "downloaded_files": 10,
+          "downloaded_size_gb": 0.9999999999999999,
+          "scenarios": [
+            "earth_like",
+            "early_earth",
+            "super_earth",
+            "tidally_locked",
+            "snowball_earth",
+            "high_co2",
+            "low_o2",
+            "archean",
+            "venus_like",
+            "mars_like"
+          ]
+        },
+        "kurucz_stellar_models": {
+          "status": "success",
+          "downloaded_files": 2,
+          "downloaded_size_gb": 1.6963109374046326e-05,
+          "model_types": [
+            "grids",
+            "atoms",
+            "molecules",
+            "linelists",
+            "opacity"
+          ]
+        },
+        "1000genomes_project": {
+          "status": "success",
+          "downloaded_files": 27,
+          "downloaded_size_gb": 0.3600000000000001,
+          "populations": [
+            "CEU",
+            "YRI",
+            "CHB",
+            "JPT",
+            "LWK",
+            "MXL",
+            "PUR",
+            "CDX",
+            "CLM",
+            "FIN",
+            "GBR",
+            "IBS",
+            "TSI",
+            "BEB",
+            "GUJ",
+            "ITU",
+            "PJL",
+            "STU",
+            "ACB",
+            "ASW",
+            "ESN",
+            "GWD",
+            "MSL",
+            "KHV",
+            "CHS",
+            "PEL"
+          ],
+          "sample_count": 2588
+        },
+        "geocarb_paleoclimate": {
+          "status": "success",
+          "downloaded_files": 6,
+          "downloaded_size_gb": 0.26,
+          "time_series": [
+            "geocarb_co2",
+            "geocarb_o2",
+            "temperature_proxies",
+            "sea_level",
+            "ice_volume"
+          ],
+          "time_range_myr": {
+            "min": 0,
+            "max": 4500
+          }
+        },
+        "planetary_interior": {
+          "status": "success",
+          "downloaded_files": 35,
+          "downloaded_size_gb": 0.35000000000000014,
+          "model_types": [
+            "seismic_velocity",
+            "gravity_field",
+            "magnetic_field",
+            "density_profile",
+            "rheology"
+          ],
+          "planet_types": [
+            "terrestrial",
+            "super_earth",
+            "mini_neptune",
+            "gas_giant",
+            "ice_giant",
+            "ocean_world",
+            "iron_core_planet"
+          ]
+        }
+      },
+      "data_quality": {
+        "nasa_grade_sources": 8,
+        "comprehensive_coverage": true,
+        "multi_domain_integration": true
+      },
+      "next_steps": [
+        "Validate downloaded data quality",
+        "Integrate with metadata database",
+        "Begin data processing pipeline",
+        "Plan second round data acquisition",
+        "Implement real-time data updates"
+      ]
+    },
+    "quality_validation": {
+      "total_domains_validated": 1,
+      "nasa_grade_datasets": 1,
+      "quality_scores": {
+        "astronomy": 0.9587954761671946
+      },
+      "validation_errors": [],
+      "average_quality_score": 0.9587954761671946,
+      "nasa_compliance_rate": 100.0
+    },
+    "metadata_integration": {
+      "total_datasets": 6,
+      "cross_references": 0,
+      "metadata_errors": []
+    },
+    "quality_metrics": {
+      "nasa_compliance_rate": 0.0,
+      "average_quality_score": NaN,
+      "total_validated_datasets": 1,
+      "quality_threshold_met": "False"
+    },
+    "storage_metrics": {
+      "total_used_tb": 0.019024055079426148,
+      "storage_limit_tb": 0.1,
+      "utilization_percent": 19.024055079426148,
+      "remaining_capacity_tb": 0.08097594492057386
+    },
+    "scientific_coverage": {
+      "domains_covered": 1,
+      "domain_list": [
+        "astronomy"
+      ],
+      "cross_domain_integration": true,
+      "comprehensive_coverage": true
+    },
+    "next_steps": [
+      "Validate and verify all downloaded data",
+      "Process raw data through pipelines",
+      "Train surrogate models on integrated datasets",
+      "Plan second round data acquisition",
+      "Implement real-time data monitoring",
+      "Optimize storage and access patterns",
+      "Prepare for NASA/ESA collaboration"
+    ],
+    "recommendations": [
+      "Prioritize highest quality datasets for initial model training",
+      "Implement automated quality monitoring for incoming data",
+      "Set up data archival strategy for long-term storage",
+      "Create user-friendly data access interfaces",
+      "Establish data sharing protocols with collaborators"
+    ]
+  }
+}

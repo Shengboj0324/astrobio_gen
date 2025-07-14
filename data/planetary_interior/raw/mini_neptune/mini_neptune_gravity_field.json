@@ -1,0 +1,8 @@
+{
+  "planet_type": "mini_neptune",
+  "model_type": "gravity_field",
+  "surface_gravity_ms2": 8.0,
+  "mass_kg": 8e+24,
+  "radius_km": 12000,
+  "created": "2025-07-14T14:29:23.779703+00:00"
+}

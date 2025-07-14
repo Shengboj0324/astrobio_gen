@@ -1,0 +1,16 @@
+{
+  "total_time_series": 5,
+  "time_range_myr": {
+    "min": 0,
+    "max": 4500
+  },
+  "time_series": [
+    "geocarb_co2",
+    "geocarb_o2",
+    "temperature_proxies",
+    "sea_level",
+    "ice_volume"
+  ],
+  "description": "Comprehensive paleoclimate data compilation",
+  "created": "2025-07-14T14:29:23.773702+00:00"
+}

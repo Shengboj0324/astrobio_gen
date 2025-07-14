@@ -1,0 +1,74 @@
+{
+  "base_path": "data",
+  "max_storage_tb": 0.1,
+  "max_download_size_gb": 1000.0,
+  "quality_threshold": 0.9,
+  "nasa_grade_threshold": 0.92,
+  "priority_domains": [
+    "astronomy"
+  ],
+  "max_concurrent_domains": 3,
+  "max_parallel": 10,
+  "rate_limit_delay": 1.0,
+  "enable_real_data_sources": true,
+  "enable_comprehensive_acquisition": true,
+  "enable_quality_validation": true,
+  "enable_metadata_tracking": true,
+  "resume_capability": true,
+  "backup_enabled": true,
+  "chunk_size_mb": 100,
+  "verification_enabled": true,
+  "data_source_priorities": {
+    "nasa_exoplanet_archive": 1,
+    "phoenix_stellar_models": 1,
+    "jwst_mast_archive": 1,
+    "rocke3d_climate_models": 1,
+    "kurucz_stellar_models": 2,
+    "1000genomes_project": 2,
+    "geocarb_paleoclimate": 2,
+    "planetary_interior": 3
+  },
+  "quality_standards": {
+    "completeness_threshold": 0.95,
+    "accuracy_threshold": 0.99,
+    "consistency_threshold": 0.92,
+    "timeliness_threshold": 0.9
+  },
+  "performance_targets": {
+    "download_speed_mbps": 100,
+    "quality_validation_minutes": 30,
+    "metadata_query_ms": 5,
+    "storage_efficiency": 0.9
+  },
+  "error_handling": {
+    "max_retries": 3,
+    "retry_delay_seconds": 5,
+    "timeout_seconds": 300,
+    "graceful_shutdown": true
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "first_round_data_capture.log",
+    "max_size_mb": 100,
+    "backup_count": 5
+  },
+  "storage_config": {
+    "mode": "cloud_first",
+    "local_cache_gb": 5,
+    "temp_processing_gb": 2,
+    "immediate_s3_upload": true,
+    "cleanup_local_after_upload": true,
+    "s3_buckets": {
+      "primary": "astrobio-data-primary-20250714",
+      "zarr": "astrobio-zarr-cubes-20250714",
+      "backup": "astrobio-data-backup-20250714",
+      "logs": "astrobio-logs-metadata-20250714"
+    },
+    "temp_paths": {
+      "download": "temp/download",
+      "processing": "temp/processing",
+      "cache": "temp/cache"
+    }
+  },
+  "dry_run": false
+}

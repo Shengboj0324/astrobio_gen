@@ -49,7 +49,10 @@ from data_build.real_data_sources import RealDataSourcesScraper
 from data_build.metadata_db import MetadataManager
 from data_build.advanced_quality_system import QualityMonitor
 from data_build.data_versioning_system import VersionManager
+from selenium import webdriver
 
+# This will auto-download ChromeDriver if needed
+driver = webdriver.Chrome()
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

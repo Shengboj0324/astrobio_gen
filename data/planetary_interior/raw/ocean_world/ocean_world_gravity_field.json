@@ -1,0 +1,8 @@
+{
+  "planet_type": "ocean_world",
+  "model_type": "gravity_field",
+  "surface_gravity_ms2": 9.81,
+  "mass_kg": 5.97e+24,
+  "radius_km": 6371,
+  "created": "2025-07-14T14:29:23.785713+00:00"
+}

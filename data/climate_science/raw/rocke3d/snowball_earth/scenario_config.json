@@ -1,0 +1,22 @@
+{
+  "name": "snowball_earth",
+  "parameters": {
+    "name": "snowball_earth",
+    "stellar_flux": 0.6,
+    "co2_ppm": 100,
+    "o2_percent": 21
+  },
+  "grid_resolution": "64x32x20",
+  "time_steps": 1000,
+  "output_frequency": "monthly",
+  "variables": [
+    "temperature",
+    "pressure",
+    "humidity",
+    "wind_u",
+    "wind_v",
+    "clouds"
+  ],
+  "created": "2025-07-14T14:29:05.629720+00:00",
+  "description": "ROCKE-3D climate simulation for snowball_earth conditions"
+}

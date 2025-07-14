@@ -1,0 +1,22 @@
+{
+  "name": "tidally_locked",
+  "parameters": {
+    "name": "tidally_locked",
+    "stellar_flux": 2.0,
+    "co2_ppm": 400,
+    "o2_percent": 21
+  },
+  "grid_resolution": "64x32x20",
+  "time_steps": 1000,
+  "output_frequency": "monthly",
+  "variables": [
+    "temperature",
+    "pressure",
+    "humidity",
+    "wind_u",
+    "wind_v",
+    "clouds"
+  ],
+  "created": "2025-07-14T14:29:05.580787+00:00",
+  "description": "ROCKE-3D climate simulation for tidally_locked conditions"
+}
