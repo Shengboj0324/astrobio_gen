@@ -198,7 +198,7 @@ class BaseModelWrapper(ABC):
             
             # Run validation
             results = self._run_validation(validation_data)
-            
+    
             # Check if accuracy meets threshold
             accuracy = results.get('accuracy', 0.0)
             rmse = results.get('rmse', float('inf'))
@@ -256,14 +256,14 @@ class BaseModelWrapper(ABC):
                     'metadata': data.get('metadata', {})
                 }
                 
-            else:
+    else:
                 logger.error(f"Unsupported validation data format: {file_path.suffix}")
                 return None
                 
         except Exception as e:
             logger.error(f"Failed to load validation data: {e}")
-            return None
-    
+        return None
+
     def _run_validation(self, validation_data: Dict[str, Any]) -> Dict[str, Any]:
         """Run validation on loaded data"""
         inputs = validation_data['inputs']
@@ -308,7 +308,7 @@ class BaseModelWrapper(ABC):
         target_flat = target_flat[valid_mask]
         
         if len(pred_flat) == 0:
-            return {
+    return {
                 'accuracy': 0.0,
                 'rmse': float('inf'),
                 'mae': float('inf'),
@@ -508,7 +508,7 @@ class SurrogateManager:
         self.monitors: Dict[str, PerformanceMonitor] = {}
         self.current_mode = SurrogateMode.SCALAR
         self.fallback_chain = []
-        
+
         # Initialize SHAP explainer manager
         self.shap_manager = None
         self.explanation_cache = {}

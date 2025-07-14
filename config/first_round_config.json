@@ -59,5 +59,23 @@
     "file": "first_round_data_capture.log",
     "max_size_mb": 100,
     "backup_count": 5
+  },
+  "storage_config": {
+    "mode": "cloud_first",
+    "local_cache_gb": 5,
+    "temp_processing_gb": 2,
+    "immediate_s3_upload": true,
+    "cleanup_local_after_upload": true,
+    "s3_buckets": {
+      "primary": "astrobio-data-primary-20250714",
+      "zarr": "astrobio-zarr-cubes-20250714",
+      "backup": "astrobio-data-backup-20250714",
+      "logs": "astrobio-logs-metadata-20250714"
+    },
+    "temp_paths": {
+      "download": "temp/download",
+      "processing": "temp/processing",
+      "cache": "temp/cache"
+    }
   }
 } 

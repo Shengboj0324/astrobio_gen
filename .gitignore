@@ -147,3 +147,12 @@ Thumbs.db
 !*.yaml
 !*.json
 !*.py
+
+# ===== TEMPORARY CLOUD PROCESSING =====
+# Temporary processing directories (cloud-first storage)
+temp/
+temp/**
+*.tmp
+*.temp
+cache/
+download_cache/

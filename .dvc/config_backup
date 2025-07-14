@@ -1,0 +1,21 @@
+# Clean DVC Configuration for AWS S3
+[core]
+    analytics = false
+    autostage = true
+    check_update = false
+    remote = aws-primary
+
+['remote "aws-primary"']
+    url = s3://astrobio-data-primary-20250714
+
+['remote "aws-backup"']
+    url = s3://astrobio-data-backup-20250714
+
+['remote "aws-zarr"']
+    url = s3://astrobio-zarr-cubes-20250714
+
+[cache]
+    type = reflink,copy
+
+[state]
+    save_dvc_files = false 

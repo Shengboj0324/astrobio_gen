@@ -7,10 +7,15 @@ defaults:
 # Advanced datacube configuration
 datacube:
   # Primary zarr store path (environment variable supported)
-  zarr_root: "${oc.env:ASTRO_CUBE_ZARR,data/processed/gcm_zarr}"
+  zarr_root: "${oc.env:ASTRO_CUBE_ZARR,s3://astrobio-zarr-cubes-20250714}"
   
   # Backup/additional zarr stores for ensemble processing
   additional_zarr_stores: []
+  
+  # Cloud-first storage configuration
+  storage_mode: "cloud_first"  # Options: local, cloud_first, cloud_only
+  local_cache_size_gb: 5       # Small local cache for active processing
+  temp_download_path: "temp/"  # Temporary local processing space
   
   # Variables configuration
   input_variables:
@@ -220,3 +225,11 @@ aws:
     monthly_budget_limit: 1000  # USD
     auto_shutdown_idle: true
     lifecycle_policies: true   # Auto-archive old data
+  
+  # Storage Configuration
+  storage:
+    mode: "cloud_first"              # Store data directly to S3
+    local_cache_gb: 5                # Small local cache (5GB max)
+    temp_processing_gb: 2            # Temporary space for processing
+    immediate_upload: true           # Upload processed data immediately
+    cleanup_local_after_upload: true # Delete local files after S3 upload
