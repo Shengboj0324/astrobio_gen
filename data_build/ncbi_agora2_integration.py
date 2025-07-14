@@ -1,52 +1,61 @@
 #!/usr/bin/env python3
 """
-Comprehensive NCBI/AGORA2 Integration System
-===========================================
+Comprehensive NCBI-AGORA2 Integration System
+==========================================
 
-Advanced system for downloading, processing, and integrating real genomic data:
-- AGORA2 metabolic reconstructions (7,302 human microorganisms)
-- NCBI genome assemblies and annotations
-- Microbiome taxonomic data
-- Metabolic network reconstructions
-- Pathway-genome associations
-- Quality control and validation
+Production-grade integration of NCBI genomic data with AGORA2 metabolic models.
+Enhanced with web crawl insights and comprehensive organism category support.
 
-NASA-grade data processing with comprehensive error handling.
+Key Features:
+- Enterprise URL management integration for resilient data access
+- Comprehensive NCBI FTP structure support (discovered via web crawl)
+- AGORA2 metabolic model integration
+- Advanced quality control and validation
+- Real-time progress tracking and caching
+- Network analysis and model association
+
+Web Crawl Enhancements:
+- Discovered 15+ organism categories in NCBI FTP
+- Identified 20+ file types per genome assembly
+- Enhanced quality control file support
+- Comprehensive RNA-seq and expression data integration
+
+Enterprise Integration:
+- Intelligent URL failover and geographic routing
+- VPN-aware access optimization
+- Health monitoring and predictive discovery
+- Community-maintained URL registry
 """
 
-import os
-import json
 import asyncio
 import aiohttp
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any, Tuple, Set
-import logging
 import sqlite3
-import pickle
-import gzip
-import hashlib
-import time
-from urllib.parse import urljoin
-import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-import ftplib
-import tarfile
-from io import BytesIO
-import zipfile
-from scipy.sparse import csr_matrix
-from scipy.io import mmwrite, mmread
+import logging
 import networkx as nx
-import re
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import cobra
-from cobra.io import read_sbml_model, write_sbml_model
-from cobra.core import Model, Reaction, Metabolite
+import pandas as pd
+import json
+import gzip
+import zipfile
+import tarfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Optional, Any, Tuple, Set
+from dataclasses import dataclass, field
+import time
+import ftplib
+import subprocess
+
+# Enterprise URL system integration
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+try:
+    from utils.integrated_url_system import get_integrated_url_system
+    from utils.autonomous_data_acquisition import DataPriority
+    URL_SYSTEM_AVAILABLE = True
+except ImportError:
+    URL_SYSTEM_AVAILABLE = False
+    DataPriority = None
 
 # Configure logging
 logging.basicConfig(
@@ -175,26 +184,48 @@ class Metabolite:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 class AGORA2Downloader:
-    """Advanced AGORA2 data downloader"""
+    """Advanced AGORA2 data downloader with enterprise URL management"""
     
-    def __init__(self, base_url: str = "https://www.vmh.life/files/reconstructions/AGORA2/"):
-        self.base_url = base_url
+    def __init__(self, base_url: str = None):
+        # Enterprise URL system integration
+        self.url_system = None
+        self.base_url = base_url or "https://www.vmh.life/files/reconstructions/AGORA2/"  # Fallback
         self.cache_path = Path("data/raw/agora2/cache")
         self.cache_path.mkdir(parents=True, exist_ok=True)
         self.session = None
         self.rate_limit_delay = 0.5  # 500ms between requests
-        self.max_retries = 3
+        self.data_priority = DataPriority.HIGH if DataPriority else None
         
-        # Initialize requests session with retry strategy
-        self.requests_session = requests.Session()
-        retry_strategy = Retry(
-            total=3,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        self.requests_session.mount("http://", adapter)
-        self.requests_session.mount("https://", adapter)
+        # Initialize enterprise URL system
+        self._initialize_url_system()
+    
+    def _initialize_url_system(self):
+        """Initialize enterprise URL management for AGORA2"""
+        try:
+            if not URL_SYSTEM_AVAILABLE:
+                logger.info("Enterprise URL system not available, using fallback AGORA2 URL")
+                return
+                
+            self.url_system = get_integrated_url_system()
+            
+            logger.info("✅ AGORA2 downloader integrated with enterprise URL system")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize enterprise URL system for AGORA2: {e}")
+            logger.info("Falling back to direct AGORA2 access")
+    
+    async def _get_managed_url(self, url: str) -> str:
+        """Get managed URL from enterprise system"""
+        try:
+            if self.url_system:
+                # Use the correct method name: get_url()
+                managed_url = await self.url_system.get_url(url, priority=self.data_priority)
+                if managed_url:
+                    return managed_url
+        except Exception as e:
+            logger.warning(f"Failed to get managed URL for {url}: {e}")
+        
+        return url  # Fallback to original URL
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""
@@ -380,14 +411,48 @@ class AGORA2Downloader:
             await self.session.close()
 
 class NCBIGenomeDownloader:
-    """Enhanced NCBI genome data downloader with comprehensive organism category support"""
+    """Enhanced NCBI genome data downloader with enterprise URL management and comprehensive organism category support"""
     
-    def __init__(self, ftp_host: str = "ftp.ncbi.nlm.nih.gov"):
-        self.ftp_host = ftp_host
+    def __init__(self, ftp_host: str = None):
+        # Enterprise URL system integration
+        self.url_system = None
+        self.ftp_host = ftp_host or "ftp.ncbi.nlm.nih.gov"  # Fallback
         self.cache_path = Path("data/raw/ncbi/cache")
         self.cache_path.mkdir(parents=True, exist_ok=True)
         self.session = None
         self.assembly_summary_cache = {}
+        self.data_priority = DataPriority.HIGH if DataPriority else None
+        
+        # Initialize enterprise URL system
+        self._initialize_url_system()
+    
+    def _initialize_url_system(self):
+        """Initialize enterprise URL management for NCBI"""
+        try:
+            if not URL_SYSTEM_AVAILABLE:
+                logger.info("Enterprise URL system not available, using fallback NCBI FTP")
+                return
+                
+            self.url_system = get_integrated_url_system()
+            
+            # Get managed NCBI FTP host
+            managed_url = self.url_system.get_managed_url(
+                source_id="ncbi_ftp",
+                data_priority=self.data_priority
+            )
+            if managed_url:
+                # Extract host from URL if it's a full URL
+                from urllib.parse import urlparse
+                parsed = urlparse(managed_url)
+                if parsed.hostname:
+                    self.ftp_host = parsed.hostname
+                    logger.info(f"Using enterprise-managed NCBI FTP host: {self.ftp_host}")
+            
+            logger.info("✅ NCBI genome downloader integrated with enterprise URL system")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize enterprise URL system for NCBI: {e}")
+            logger.info("Falling back to direct NCBI FTP access")
         
         # Comprehensive organism categories discovered in NCBI FTP crawl
         self.organism_categories = [

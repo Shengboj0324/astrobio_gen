@@ -1,42 +1,44 @@
 #!/usr/bin/env python3
 """
-Comprehensive KEGG Real Data Integration System
-==============================================
+Real KEGG Data Integration System
+================================
 
-Advanced system for downloading, processing, and integrating real KEGG pathway data:
-- All 7,302+ KEGG pathways
-- Metabolic networks and reactions
-- Drug metabolism pathways
-- Organism-specific data
-- Compound and enzyme information
-- Cross-references and annotations
+Production-grade KEGG pathway data integration with comprehensive error handling,
+rate limiting, and structured data storage.
 
-NASA-grade data processing with quality control and validation
+Enhanced with web crawl insights from https://www.genome.jp/kegg/ for improved
+pathway categorization and cross-referencing.
+
+Integration Features:
+- Enterprise URL management integration
+- Intelligent failover and mirror support  
+- Real-time data source monitoring
+- Autonomous data acquisition
 """
 
-import os
-import json
 import asyncio
 import aiohttp
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any, Tuple, Set
+import sqlite3
+import json
 import logging
 import networkx as nx
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import sqlite3
-import pickle
-import gzip
-import hashlib
-import time
-from urllib.parse import urljoin
-import xml.etree.ElementTree as ET
+import pandas as pd
+from pathlib import Path
+from datetime import datetime, timezone
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+import time
+
+# Enterprise URL system integration
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+try:
+    from utils.integrated_url_system import get_integrated_url_system
+    from utils.autonomous_data_acquisition import DataPriority
+    URL_SYSTEM_AVAILABLE = True
+except ImportError:
+    URL_SYSTEM_AVAILABLE = False
+    DataPriority = None
 
 # Configure logging
 logging.basicConfig(
@@ -117,16 +119,21 @@ class KEGGOrganism:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 class KEGGDataDownloader:
-    """Advanced KEGG data downloader with rate limiting and error handling"""
+    """Advanced KEGG data downloader with enterprise URL management and rate limiting"""
     
-    def __init__(self, base_url: str = "https://rest.kegg.jp/", max_concurrent: int = 5):
-        self.base_url = base_url
+    def __init__(self, base_url: str = None, max_concurrent: int = 5):
+        # Enterprise URL system integration
+        self.url_system = None
+        self.base_url = base_url or "https://rest.kegg.jp/"  # Fallback for backward compatibility
         self.max_concurrent = max_concurrent
         self.session = None
         self.rate_limit_delay = 0.1  # 100ms between requests
         self.max_retries = 3
         self.cache_path = Path("data/raw/kegg/cache")
         self.cache_path.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize enterprise URL system
+        self._initialize_url_system()
         
         # Initialize requests session with retry strategy
         self.requests_session = requests.Session()
@@ -138,6 +145,41 @@ class KEGGDataDownloader:
         adapter = HTTPAdapter(max_retries=retry_strategy)
         self.requests_session.mount("http://", adapter)
         self.requests_session.mount("https://", adapter)
+    
+    def _initialize_url_system(self):
+        """Initialize enterprise URL management system"""
+        try:
+            # Import here to avoid circular imports
+            import sys
+            from pathlib import Path
+            sys.path.append(str(Path(__file__).parent.parent))
+            from utils.integrated_url_system import get_integrated_url_system
+            from utils.autonomous_data_acquisition import DataPriority
+            
+            self.url_system = get_integrated_url_system()
+            self.data_priority = DataPriority.HIGH  # KEGG is high priority for pathway data
+            
+            logger.info("✅ KEGG integration connected to enterprise URL system")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize enterprise URL system: {e}")
+            self.url_system = None
+    
+    async def _get_managed_base_url(self) -> str:
+        """Get managed base URL from enterprise system"""
+        try:
+            if self.url_system:
+                # Use the correct method name: get_url() instead of get_managed_url()
+                managed_url = await self.url_system.get_url(
+                    self.base_url, 
+                    priority=self.data_priority
+                )
+                if managed_url:
+                    return managed_url
+        except Exception as e:
+            logger.warning(f"Failed to get managed URL: {e}")
+        
+        return self.base_url  # Fallback to original URL
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""
@@ -219,14 +261,18 @@ class KEGGDataDownloader:
         cache_data = self._load_from_cache("list_pathway")
         if cache_data:
             return cache_data.get('pathways', [])
+
+        # Get managed base URL from enterprise system
+        managed_base_url = await self._get_managed_base_url()
         
         # Fetch main pathway list
-        url = urljoin(self.base_url, "list/pathway")
+        from urllib.parse import urljoin
+        url = urljoin(managed_base_url, "list/pathway")
         response = await self._fetch_with_retry(url)
-        
+
         if not response:
             return []
-        
+
         pathways = []
         for line in response.strip().split('\n'):
             if line.startswith('path:'):
@@ -277,8 +323,12 @@ class KEGGDataDownloader:
         if cache_data:
             return KEGGPathway(**cache_data.get('pathway', {}))
         
+        # Get managed base URL from enterprise system
+        managed_base_url = await self._get_managed_base_url()
+        
         # Fetch pathway information
-        url = urljoin(self.base_url, f"get/{pathway_id}")
+        from urllib.parse import urljoin
+        url = urljoin(managed_base_url, f"get/{pathway_id}")
         response = await self._fetch_with_retry(url)
         
         if not response:

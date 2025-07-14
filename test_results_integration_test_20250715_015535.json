@@ -1,0 +1,160 @@
+{
+  "test_start_time": "2025-07-15T01:55:21.836768",
+  "components_tested": [],
+  "tests_passed": 0,
+  "tests_failed": 0,
+  "test_details": {
+    "enterprise_url_system": {
+      "nasa_exoplanet_archive": {
+        "url_acquired": false,
+        "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+      },
+      "kegg_api": {
+        "url_acquired": false,
+        "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+      },
+      "ncbi_ftp": {
+        "url_acquired": false,
+        "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+      },
+      "uniprot_ftp": {
+        "url_acquired": false,
+        "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+      },
+      "gtdb_release": {
+        "url_acquired": false,
+        "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+      },
+      "health_check": {
+        "completed": false,
+        "error": "'IntegratedURLSystem' object has no attribute 'run_health_check_async'"
+      }
+    },
+    "data_acquisition_integration": {
+      "kegg": {
+        "error": "name 'requests' is not defined"
+      },
+      "ncbi_agora2": {
+        "error": "'IntegratedURLSystem' object has no attribute 'get_session'"
+      },
+      "uniprot": {
+        "error": "'IntegratedURLSystem' object has no attribute 'get_session'"
+      },
+      "gtdb": {
+        "error": "name 'requests' is not defined"
+      },
+      "psg": {
+        "error": "No module named 'tenacity'"
+      }
+    },
+    "surrogate_model_integration": {
+      "data_manager": {
+        "initialized": true,
+        "enterprise_integrated": false,
+        "components_available": {
+          "kegg": false,
+          "ncbi": false,
+          "gtdb": false,
+          "psg": false
+        }
+      },
+      "data_acquisition": {
+        "completed": true,
+        "data_types_acquired": [
+          "planetary_params",
+          "spectral_data",
+          "genomic_features",
+          "climate_profiles",
+          "quality_scores"
+        ],
+        "sample_counts": {
+          "planetary_params": 0,
+          "spectral_data": 0,
+          "genomic_features": 0,
+          "climate_profiles": 0,
+          "quality_scores": 1
+        }
+      },
+      "preprocessing": {
+        "completed": true,
+        "processed_shapes": {}
+      },
+      "model_compatibility": {
+        "model_created": true,
+        "forward_pass_successful": true,
+        "output_shapes": {
+          "habitability": [
+            4,
+            1
+          ],
+          "surface_temp": [
+            4,
+            1
+          ],
+          "atmospheric_pressure": [
+            4,
+            1
+          ],
+          "energy_balance": [
+            4,
+            1
+          ],
+          "atmospheric_composition": [
+            4,
+            4
+          ],
+          "planet_params": [
+            4,
+            8
+          ],
+          "physics_weights": [
+            3
+          ]
+        }
+      }
+    },
+    "datacube_integration": {
+      "error": "operator torchvision::nms does not exist"
+    },
+    "end_to_end_pipeline": {
+      "error": "'IntegratedURLSystem' object has no attribute 'get_session'"
+    },
+    "performance_quality": {
+      "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+    }
+  },
+  "performance_metrics": {
+    "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+  },
+  "enterprise_url_status": {
+    "nasa_exoplanet_archive": {
+      "url_acquired": false,
+      "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+    },
+    "kegg_api": {
+      "url_acquired": false,
+      "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+    },
+    "ncbi_ftp": {
+      "url_acquired": false,
+      "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+    },
+    "uniprot_ftp": {
+      "url_acquired": false,
+      "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+    },
+    "gtdb_release": {
+      "url_acquired": false,
+      "error": "'IntegratedURLSystem' object has no attribute 'get_managed_url'"
+    },
+    "health_check": {
+      "completed": false,
+      "error": "'IntegratedURLSystem' object has no attribute 'run_health_check_async'"
+    }
+  },
+  "data_quality_metrics": {},
+  "test_duration": 13.698123931884766,
+  "test_end_time": "2025-07-15T01:55:35.534892",
+  "overall_success": true,
+  "test_summary": "\n\ud83c\udfaf COMPREHENSIVE INTEGRATION TEST RESULTS\n=========================================\n\n\ud83d\udcca Overall Statistics:\n   \u2022 Total Tests: 6\n   \u2022 Tests Passed: 1\n   \u2022 Tests Failed: 5\n   \u2022 Success Rate: 16.7%\n   \u2022 Test Duration: 13.70 seconds\n\n\ud83d\udd27 Components Tested:\n   \u2022 enterprise_url_system, data_acquisition_integration, surrogate_model_integration, datacube_integration, end_to_end_pipeline, performance_quality\n\n\ud83c\udf10 Enterprise URL System:\n   \u2022 Integration Status: \u2705 Active\n   \u2022 Health Monitoring: \u26a0\ufe0f Limited\n\n\ud83c\udfaf Overall Assessment: \u274c FAIL - Critical integration issues\n\n\ud83d\udcdd Detailed results saved to test_results.json\n        "
+}

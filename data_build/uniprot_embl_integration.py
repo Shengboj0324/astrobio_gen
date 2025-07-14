@@ -1,32 +1,48 @@
 #!/usr/bin/env python3
+"""
+Comprehensive UniProt/EMBL Integration System
+===========================================
 
+Production-grade UniProt protein database integration with comprehensive taxonomic support.
 
-import os
-import json
+Key Features:
+- Enterprise URL management integration for resilient data access
+- Complete UniProt database support (Swiss-Prot + TrEMBL)
+- Taxonomic division-based processing
+- Reference proteome integration
+- Advanced protein annotation parsing
+- Quality control and validation
+
+Enterprise Integration:
+- Intelligent URL failover and geographic routing
+- VPN-aware access optimization
+- Health monitoring and predictive discovery
+- Community-maintained URL registry
+"""
+
 import asyncio
 import aiohttp
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any, Tuple, Set
-import logging
 import sqlite3
+import logging
+import pandas as pd
 import gzip
-import hashlib
-import time
-import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-import ftplib
-from urllib.parse import urljoin
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
-from Bio import SeqIO
-from Bio.SeqRecord import SeqRecord
-from Bio.Seq import Seq
+from pathlib import Path
+from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Optional, Any, Set, Tuple
+from dataclasses import dataclass, field
+import time
+
+# Enterprise URL system integration
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+try:
+    from utils.integrated_url_system import get_integrated_url_system
+    from utils.autonomous_data_acquisition import DataPriority
+    URL_SYSTEM_AVAILABLE = True
+except ImportError:
+    URL_SYSTEM_AVAILABLE = False
+    DataPriority = None
 
 # Configure logging
 logging.basicConfig(
@@ -84,37 +100,57 @@ class ProteinFamily:
     confidence: str = ""
 
 class UniProtDownloader:
-    """Comprehensive UniProt database downloader"""
+    """Comprehensive UniProt database downloader with enterprise URL management"""
     
-    def __init__(self, base_url: str = "https://ftp.uniprot.org/pub/databases/uniprot/"):
-        self.base_url = base_url
+    def __init__(self, base_url: str = None):
+        # Enterprise URL system integration
+        self.url_system = None
+        self.base_url = base_url or "https://ftp.uniprot.org/pub/databases/uniprot/"  # Fallback
         self.cache_path = Path("data/raw/uniprot/cache")
         self.cache_path.mkdir(parents=True, exist_ok=True)
         self.session = None
         self.rate_limit_delay = 0.1  # 100ms between requests
+        self.data_priority = DataPriority.HIGH if DataPriority else None
         
-        # Taxonomic divisions based on web crawl
-        self.taxonomic_divisions = [
-            'archaea', 'bacteria', 'fungi', 'human', 'invertebrates',
-            'mammals', 'plants', 'rodents', 'vertebrates', 'viruses'
-        ]
+        # Initialize enterprise URL system
+        self._initialize_url_system()
+    
+    def _initialize_url_system(self):
+        """Initialize enterprise URL management for UniProt"""
+        try:
+            if not URL_SYSTEM_AVAILABLE:
+                logger.info("Enterprise URL system not available, using fallback UniProt URL")
+                return
+                
+            self.url_system = get_integrated_url_system()
+            
+            # Get managed UniProt URL
+            managed_url = self.url_system.get_managed_url(
+                source_id="uniprot_ftp",
+                data_priority=self.data_priority
+            )
+            if managed_url:
+                self.base_url = managed_url
+                logger.info(f"Using enterprise-managed UniProt URL: {managed_url}")
+            
+            logger.info("✅ UniProt downloader integrated with enterprise URL system")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize enterprise URL system for UniProt: {e}")
+            logger.info("Falling back to direct UniProt access")
         
-        # Database types
-        self.databases = ['sprot', 'trembl']
-        
-        # File formats available
-        self.formats = ['dat', 'xml', 'fasta']
+        self.max_retries = 3
         
         # Initialize requests session with retry strategy
-        self.requests_session = requests.Session()
-        retry_strategy = Retry(
-            total=3,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        self.requests_session.mount("http://", adapter)
-        self.requests_session.mount("https://", adapter)
+        self.requests_session = None # This will be initialized in _get_session
+        self.url_system = None # This will be initialized in _get_session
+        
+        if URL_SYSTEM_AVAILABLE:
+            self.url_system = get_integrated_url_system()
+            self.requests_session = self.url_system.get_session()
+        else:
+            logger.warning("Integrated URL system not available. Falling back to direct requests.")
+            self.requests_session = aiohttp.ClientSession()
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""

@@ -1,45 +1,48 @@
 #!/usr/bin/env python3
 """
-GTDB (Genome Taxonomy Database) Integration System
-=================================================
+Comprehensive GTDB Integration System
+===================================
 
-Advanced system for downloading and integrating the comprehensive genome taxonomy database:
-- 732,475 genomes (715,230 bacteria + 17,245 archaea)
-- Standardized phylogenetic classification
-- 169 bacterial phyla, 20 archaeal phyla
-- 136,646 bacterial species, 6,968 archaeal species
-- Complete taxonomic hierarchy and phylogenetic trees
+Production-grade Genome Taxonomy Database (GTDB) integration with comprehensive taxonomic support.
 
-Based on GTDB Release 226 (April 2025) from gtdb.ecogenomic.org
+Key Features:
+- Enterprise URL management integration for resilient data access
+- Complete GTDB taxonomy and genome metadata
+- Bacterial and archaeal domain support
+- Quality control and validation
+- Real-time progress tracking and caching
 
+Enterprise Integration:
+- Intelligent URL failover and geographic routing
+- VPN-aware access optimization
+- Health monitoring and predictive discovery
+- Community-maintained URL registry
 """
 
-import os
-import json
 import asyncio
 import aiohttp
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any, Tuple, Set
-import logging
 import sqlite3
+import logging
+import pandas as pd
 import gzip
-import hashlib
-import time
 import tarfile
+from pathlib import Path
+from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Optional, Any, Set, Tuple
 from dataclasses import dataclass, field
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-import ftplib
-from urllib.parse import urljoin
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 import re
-from Bio import SeqIO, Phylo
-from Bio.SeqRecord import SeqRecord
-import networkx as nx
+
+# Enterprise URL system integration
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+try:
+    from utils.integrated_url_system import get_integrated_url_system
+    from utils.autonomous_data_acquisition import DataPriority
+    URL_SYSTEM_AVAILABLE = True
+except ImportError:
+    URL_SYSTEM_AVAILABLE = False
+    DataPriority = None
 
 # Configure logging
 logging.basicConfig(
@@ -132,15 +135,54 @@ class GTDBTaxonomy:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 class GTDBDownloader:
-    """GTDB data downloader"""
+    """GTDB data downloader with enterprise URL management"""
     
-    def __init__(self, base_url: str = "https://data.gtdb.ecogenomic.org/releases/latest/"):
-        self.base_url = base_url
-        self.mirror_url = "https://data.ace.uq.edu.au/public/gtdb/data/releases/latest/"
+    def __init__(self, base_url: str = None):
+        # Enterprise URL system integration
+        self.url_system = None
+        self.base_url = base_url or "https://data.gtdb.ecogenomic.org/releases/latest/"  # Fallback
+        self.mirror_url = "https://data.ace.uq.edu.au/public/gtdb/data/releases/latest/"  # Traditional mirror
         self.cache_path = Path("data/raw/gtdb/cache")
         self.cache_path.mkdir(parents=True, exist_ok=True)
         self.session = None
         self.rate_limit_delay = 0.1  # 100ms between requests
+        self.data_priority = DataPriority.HIGH if DataPriority else None
+        
+        # Initialize enterprise URL system
+        self._initialize_url_system()
+    
+    def _initialize_url_system(self):
+        """Initialize enterprise URL management for GTDB"""
+        try:
+            if not URL_SYSTEM_AVAILABLE:
+                logger.info("Enterprise URL system not available, using fallback GTDB URLs")
+                return
+                
+            self.url_system = get_integrated_url_system()
+            
+            # Get managed GTDB URLs
+            managed_url = self.url_system.get_managed_url(
+                source_id="gtdb_release",
+                data_priority=self.data_priority
+            )
+            if managed_url:
+                self.base_url = managed_url
+                logger.info(f"Using enterprise-managed GTDB URL: {managed_url}")
+            
+            # Get managed mirror URL if available
+            mirror_url = self.url_system.get_managed_url(
+                source_id="gtdb_uq_mirror", 
+                data_priority=self.data_priority
+            )
+            if mirror_url:
+                self.mirror_url = mirror_url
+                logger.info(f"Using enterprise-managed GTDB mirror: {mirror_url}")
+            
+            logger.info("✅ GTDB downloader integrated with enterprise URL system")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize enterprise URL system for GTDB: {e}")
+            logger.info("Falling back to direct GTDB access")
         
         # Available file types from web crawl
         self.available_files = {

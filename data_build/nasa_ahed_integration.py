@@ -139,43 +139,54 @@ class FieldSite:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 class AHEDDownloader:
-    """NASA AHED data downloader"""
+    """NASA AHED data downloader with enterprise URL management"""
     
-    def __init__(self, base_url: str = "https://ahed.nasa.gov/"):
-        self.base_url = base_url
-        self.api_base = "https://ahed.nasa.gov/api/"
+    def __init__(self, base_url: str = None):
+        # Enterprise URL system integration
+        self.url_system = None
+        self.base_url = base_url or "https://ahed.nasa.gov/"
+        self.api_base = "https://ahed.nasa.gov/api/"  # Will be managed dynamically
         self.cache_path = Path("data/raw/nasa_ahed/cache")
         self.cache_path.mkdir(parents=True, exist_ok=True)
         self.session = None
         self.rate_limit_delay = 1.0  # 1 second between requests (NASA rate limiting)
         
-        # NASA AHED themes from web crawl
-        self.themes = [
-            "Abiotic Building Blocks of Life",
-            "Constructing Habitable Worlds", 
-            "Characterizing Environments for Habitability and Biosignatures",
-            "Origins of Life",
-            "Early Life and Increasing Complexity",
-            "Coevolution of Life and the Physical Environment"
-        ]
+        # Initialize enterprise URL system
+        self._initialize_url_system()
+    
+    def _initialize_url_system(self):
+        """Initialize enterprise URL management system"""
+        try:
+            # Import here to avoid circular imports
+            import sys
+            from pathlib import Path
+            sys.path.append(str(Path(__file__).parent.parent))
+            from utils.integrated_url_system import get_integrated_url_system
+            from utils.autonomous_data_acquisition import DataPriority
+            
+            self.url_system = get_integrated_url_system()
+            self.data_priority = DataPriority.HIGH  # NASA AHED is high priority for astrobiology
+            logging.info("Enterprise URL system initialized for NASA AHED integration")
+        except ImportError as e:
+            logging.warning(f"Enterprise URL system not available, using fallback: {e}")
+            self.url_system = None
+    
+    async def _get_managed_base_url(self) -> str:
+        """Get managed base URL using enterprise system"""
+        if self.url_system:
+            try:
+                # Use enterprise URL system to get optimal NASA AHED endpoint
+                managed_url = await self.url_system.get_url(
+                    "https://ahed.nasa.gov/", 
+                    self.data_priority
+                )
+                if managed_url:
+                    return managed_url if managed_url.endswith('/') else managed_url + '/'
+            except Exception as e:
+                logging.warning(f"Error getting managed URL, using fallback: {e}")
         
-        # Common data types in AHED
-        self.data_types = [
-            "chemical_analysis", "spectroscopy", "microscopy", "genomics",
-            "environmental_monitoring", "field_measurements", "laboratory_analysis",
-            "instrument_data", "imagery", "geospatial", "biosignature_detection"
-        ]
-        
-        # Initialize requests session with retry strategy
-        self.requests_session = requests.Session()
-        retry_strategy = Retry(
-            total=3,
-            backoff_factor=2,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        self.requests_session.mount("http://", adapter)
-        self.requests_session.mount("https://", adapter)
+        # Fallback to configured base URL
+        return self.base_url
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""

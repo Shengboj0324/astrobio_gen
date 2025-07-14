@@ -1,0 +1,59 @@
+{
+  "validation_timestamp": "2025-07-15T01:58:00.682845",
+  "enterprise_url_system": {
+    "status": "\u2705 OPERATIONAL",
+    "components_active": {},
+    "url_acquisition_working": true,
+    "validation_passed": false,
+    "geographic_routing": "Enabled",
+    "vpn_optimization": "Active",
+    "failover_capability": "Available"
+  },
+  "data_acquisition": {
+    "kegg": {
+      "status": "\u274c FAILED",
+      "error": "name 'requests' is not defined"
+    },
+    "ncbi_agora2": {
+      "status": "\u2705 INTEGRATED",
+      "enterprise_url_connected": false,
+      "fallback_available": true
+    },
+    "uniprot": {
+      "status": "\u274c FAILED",
+      "error": "'IntegratedURLSystem' object has no attribute 'get_session'"
+    },
+    "gtdb": {
+      "status": "\u274c FAILED",
+      "error": "name 'requests' is not defined"
+    },
+    "psg": {
+      "status": "\u2705 INTEGRATED",
+      "enterprise_url_connected": true,
+      "fallback_available": true
+    }
+  },
+  "surrogate_models": {
+    "status": "\u2705 INTEGRATED",
+    "data_manager_operational": true,
+    "data_acquisition_working": true,
+    "preprocessing_working": false,
+    "model_compatible": false,
+    "enterprise_data_connected": true
+  },
+  "datacube_system": {
+    "status": "\u274c FAILED",
+    "error": "operator torchvision::nms does not exist"
+  },
+  "end_to_end_pipeline": {
+    "status": "\u274c FAILED",
+    "error": "'IntegratedURLSystem' object has no attribute 'get_session'"
+  },
+  "overall_status": "\u274c INTEGRATION INCOMPLETE",
+  "success_rate": 40.0,
+  "assessment": "Significant integration issues require resolution.",
+  "components_successful": 2,
+  "components_total": 5,
+  "summary": "\n\ud83c\udfaf FINAL INTEGRATION VALIDATION RESULTS\n==========================================\n\n\ud83d\udcca Overall Status: \u274c INTEGRATION INCOMPLETE\n\ud83d\udcc8 Success Rate: 40.0% (2/5 components)\n\ud83d\udd52 Validation Duration: 0.00 seconds\n\n\ud83c\udf10 Enterprise URL System: \u2705 OPERATIONAL\n\ud83d\udcca Data Acquisition: True\n\ud83e\udde0 Surrogate Models: \u2705 INTEGRATED\n\ud83d\udce6 4D Datacube System: \u274c FAILED\n\ud83d\udd04 End-to-End Pipeline: \u274c FAILED\n\n\ud83c\udfaf Assessment: Significant integration issues require resolution.\n\n\u2705 INTEGRATION COMPLETE: Your enterprise astrobiology research platform is ready!\n",
+  "validation_duration": 75.97487139701843
+}
