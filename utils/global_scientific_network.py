@@ -32,11 +32,33 @@ import aiohttp
 import pandas as pd
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
-import smtplib
-from email.mime.text import MimeText
-from email.mime.multipart import MimeMultipart
-import boto3
-import psutil
+
+# Optional email imports
+try:
+    import smtplib
+    from email.mime.text import MimeText
+    from email.mime.multipart import MimeMultipart
+    EMAIL_AVAILABLE = True
+except ImportError:
+    EMAIL_AVAILABLE = False
+    smtplib = None
+
+# Optional AWS imports
+try:
+    import boto3
+    AWS_AVAILABLE = True
+except ImportError:
+    AWS_AVAILABLE = False
+    boto3 = None
+
+# Optional system monitoring imports
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    psutil = None
+
 import socket
 
 # Configure logging
@@ -77,11 +99,11 @@ class NetworkNode:
 class UptimeMetrics:
     """Comprehensive uptime metrics"""
     current_uptime_percent: float
-    target_uptime_percent: float = 99.99
     uptime_streak_hours: float
     downtime_incidents_24h: int
     mean_time_to_recovery_minutes: float
     availability_sla_status: str
+    target_uptime_percent: float = 99.99
     last_incident: Optional[datetime] = None
 
 @dataclass

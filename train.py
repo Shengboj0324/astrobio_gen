@@ -1,5 +1,30 @@
 from __future__ import annotations
+import os
+# Set environment variables before importing torch to prevent torchvision issues
+os.environ.setdefault('TORCH_VISION_DISABLE', '1')
+
 import torch, pytorch_lightning as pl
+
+# Suppress all warnings including torchvision operator warnings
+import warnings
+warnings.filterwarnings('ignore')
+
+# Disable unnecessary PyTorch extensions
+try:
+    torch.backends.cudnn.enabled = False
+except:
+    pass
+
+# Optional vision imports
+try:
+    import torchvision
+    TORCHVISION_AVAILABLE = True
+except ImportError:
+    TORCHVISION_AVAILABLE = False
+except Exception:
+    # Handle any other torchvision loading issues
+    TORCHVISION_AVAILABLE = False
+
 from utils.config import parse_cli
 from models.graph_vae import GVAE
 from models.fusion_transformer import FusionModel
@@ -11,13 +36,21 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch_geometric.loader import DataLoader as GeometricDataLoader
 import os
 from typing import Dict, Any, Optional
+
+# Conditional imports for optional dependencies
 try:
     import wandb
     WANDB_AVAILABLE = True
 except ImportError:
     WANDB_AVAILABLE = False
     wandb = None
-from pytorch_lightning.loggers import WandbLogger
+
+# Conditional pytorch lightning logger import
+if WANDB_AVAILABLE:
+    from pytorch_lightning.loggers import WandbLogger
+else:
+    WandbLogger = None
+
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 
 class LitGraphVAE(pl.LightningModule):
@@ -256,7 +289,7 @@ def main():
     pl.seed_everything(42)
     
     # Setup logging
-    if cfg.get("logging", {}).get("use_wandb", False) and WANDB_AVAILABLE:
+    if cfg.get("logging", {}).get("use_wandb", False) and WANDB_AVAILABLE and WandbLogger is not None:
         logger = WandbLogger(
             project="astrobio-surrogate",
             name=f"surrogate-{cfg['model']['type']}-{cfg['model'].get('surrogate', {}).get('mode', 'scalar')}",

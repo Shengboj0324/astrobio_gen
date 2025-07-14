@@ -195,12 +195,11 @@ database:
       optimize_interval: "weekly"  # Weekly VACUUM and ANALYZE
       checkpoint_interval: 1000  # WAL checkpoint after 1000 transactions
       
-         # Security settings
-     security:
-       encryption_enabled: false  # Enable for sensitive data
-       access_logging: true  # Log all database access
-       permission_checks: true  # Enforce file permissions
-       backup_encryption: false  # Encrypt backup files
+    security:
+      encryption_enabled: false  # Enable for sensitive data
+      access_logging: true  # Log all database access
+      permission_checks: true  # Enforce file permissions
+      backup_encryption: false  # Encrypt backup files
 
 # AWS Configuration
 aws:

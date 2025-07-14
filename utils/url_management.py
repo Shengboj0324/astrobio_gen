@@ -30,8 +30,16 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Union, Any, Tuple
 from dataclasses import dataclass, field
 from urllib.parse import urljoin, urlparse
-import geoip2.database
-import geoip2.errors
+
+# Optional GeoIP imports
+try:
+    import geoip2.database
+    import geoip2.errors
+    GEOIP_AVAILABLE = True
+except ImportError:
+    GEOIP_AVAILABLE = False
+    geoip2 = None
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 import sqlite3
@@ -233,13 +241,18 @@ class URLManager:
             ip = response.json()['origin'].split(',')[0].strip()
             
             # Try to determine region based on IP geolocation
-            # This is a simplified approach - in production, you'd use a proper GeoIP service
             try:
                 ip_obj = ipaddress.ip_address(ip)
                 if ip_obj.is_private:
                     # Behind NAT/VPN, try alternative detection
                     return self._detect_region_alternative()
-                    
+                
+                # Use GeoIP if available, otherwise use simple heuristic
+                if GEOIP_AVAILABLE:
+                    # Use maxmind GeoIP database if available in production
+                    # For now, fall back to simple heuristic
+                    pass
+                
                 # Use a simple heuristic based on common IP ranges
                 # In production, use maxmind GeoIP database or similar
                 if ip.startswith(('129.', '130.', '131.')):  # Common US ranges

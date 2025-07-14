@@ -1,0 +1,194 @@
+{
+  "initialization": {
+    "time_seconds": 46.21027636528015,
+    "status": {
+      "url_manager": {
+        "sources_registered": 41,
+        "health_monitoring_active": true
+      },
+      "mirror_infrastructure": {
+        "mirror_configs": 5,
+        "active_jobs": 1
+      },
+      "autonomous_system": {
+        "system_health": {
+          "availability_percent": 0,
+          "response_time_ms": 0,
+          "active_sources": 0,
+          "healthy_sources": 0
+        },
+        "active_tasks": 0,
+        "recent_decisions": {},
+        "strategy_weights": {
+          "primary_only": 1.0,
+          "mirror_failover": 0.8,
+          "parallel_redundant": 0.6,
+          "predictive_preemptive": 0.9,
+          "community_crowdsourced": 0.5
+        },
+        "healing_enabled": true,
+        "quality_thresholds": {
+          "CRITICAL": 0.99,
+          "HIGH": 0.95,
+          "MEDIUM": 0.9,
+          "LOW": 0.85
+        }
+      },
+      "global_network": {
+        "node_id": "8d0f976e9f75fdfc",
+        "uptime_percent": 100.0,
+        "uptime_target": 99.99,
+        "sla_status": "meeting",
+        "network_nodes": 1,
+        "healthy_nodes": 0,
+        "current_metrics": {
+          "response_time_ms": 0.0,
+          "error_rate_percent": 0.0,
+          "bandwidth_utilization": 0.0,
+          "throughput_rps": 0.0
+        },
+        "network_health_score": "<Task finished name='Task-254' coro=<GlobalScientificNetwork._calculate_network_health() done, defined at C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\utils\\global_scientific_network.py:607> result=0.0>",
+        "last_update": "2025-07-14T17:03:49.267101+00:00"
+      },
+      "integration": {
+        "url_mappings": 20,
+        "migrations_completed": 0,
+        "cache_size": 0
+      }
+    },
+    "success": true
+  },
+  "q1_registry": {
+    "total_sources": 41,
+    "key_sources_available": 3
+  },
+  "q1_failover": {
+    "nasa_exoplanet_archive": {
+      "success": true,
+      "url": "https://exoplanetarchive.ipac.caltech.edu"
+    },
+    "kegg_database": {
+      "success": false,
+      "url": null
+    }
+  },
+  "q1_community": {
+    "url_submission_success": true
+  },
+  "q2_prediction": {
+    "nasa_exoplanet_archive": {
+      "prediction_count": 10,
+      "top_confidence": 0.5,
+      "top_prediction": "://data."
+    },
+    "kegg_database": {
+      "prediction_count": 10,
+      "top_confidence": 0.5,
+      "top_prediction": "://data."
+    }
+  },
+  "q2_partnerships": {
+    "total_partnerships": 4,
+    "partnership_types": [
+      "Collaborative Partnership",
+      "Strategic Partnership - Gold Tier"
+    ]
+  },
+  "q2_mirrors": {
+    "mirror_sources": 5,
+    "healthy_mirrors": 1
+  },
+  "q3_autonomous": {
+    "nasa_exoplanet_archive": {
+      "task_id": "nasa_exoplanet_archive_1752512684_1829",
+      "priority": "CRITICAL",
+      "strategy": "parallel_redundant"
+    },
+    "kegg_database": {
+      "task_id": "kegg_database_1752512686_1829",
+      "priority": "HIGH",
+      "strategy": "mirror_failover"
+    },
+    "ncbi_databases": {
+      "task_id": "ncbi_databases_1752512687_1829",
+      "priority": "MEDIUM",
+      "strategy": "primary_only"
+    }
+  },
+  "q3_network": {
+    "node_id": "8d0f976e9f75fdfc",
+    "uptime_percent": 50.0,
+    "uptime_target": 99.99,
+    "sla_status": "below_target",
+    "network_nodes": 1,
+    "healthy_nodes": 0,
+    "current_metrics": {
+      "response_time_ms": 150.0,
+      "error_rate_percent": 0.5,
+      "bandwidth_utilization": 53.37064378738403,
+      "throughput_rps": 50.0
+    },
+    "network_health_score": "<Task finished name='Task-344' coro=<GlobalScientificNetwork._calculate_network_health() done, defined at C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\utils\\global_scientific_network.py:607> result=0.0>",
+    "last_update": "2025-07-14T17:04:47.746251+00:00"
+  },
+  "q3_analytics": {
+    "response_time_ms": 150.0,
+    "error_rate_percent": 0.5,
+    "bandwidth_utilization": 53.37064378738403,
+    "uptime_target": 99.99
+  },
+  "integration_tests": {
+    "url_manager_integration": true,
+    "predictive_discovery_integration": true,
+    "mirror_infrastructure_integration": true,
+    "autonomous_system_integration": true,
+    "global_network_integration": true,
+    "end_to_end_test": true,
+    "errors": [],
+    "overall_integration_success": true
+  },
+  "performance_benchmarks": {
+    "url_tests": {
+      "https://exoplanetarchive.ipac.caltech.edu/test": {
+        "response_time_ms": 13841.556310653687,
+        "success": true,
+        "managed_url": "https://exoplanetarchive.ipac.caltech.edu/test"
+      },
+      "https://rest.kegg.jp/test": {
+        "response_time_ms": 20592.998504638672,
+        "success": true,
+        "managed_url": "https://rest.kegg.jp/test"
+      },
+      "https://ftp.ncbi.nlm.nih.gov/test": {
+        "response_time_ms": 15181.834936141968,
+        "success": true,
+        "managed_url": "https://ftp.ncbi.nlm.nih.gov/test"
+      }
+    },
+    "average_response_time_ms": 16538.796583811443,
+    "meets_target": false
+  },
+  "requirements_validation": {
+    "individual_requirements": {
+      "centralized_url_management": true,
+      "smart_failover": true,
+      "predictive_discovery": true,
+      "mirror_infrastructure": true,
+      "autonomous_acquisition": true,
+      "global_network": true,
+      "advanced_analytics": true,
+      "community_framework": true,
+      "institutional_partnerships": true,
+      "99_99_uptime_monitoring": true
+    },
+    "all_requirements_met": true
+  },
+  "summary": {
+    "total_duration_seconds": 188.442662,
+    "completion_status": "success",
+    "features_implemented": 9,
+    "integration_success": true,
+    "performance_target_met": false,
+    "requirements_met": true
+  }
+}

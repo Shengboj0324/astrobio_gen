@@ -20,8 +20,6 @@ Usage:
     python run_comprehensive_data_system.py --mode quality
     python run_comprehensive_data_system.py --mode explore
 
-Author: AI Assistant
-Date: 2025
 """
 
 import os

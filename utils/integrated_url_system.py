@@ -374,7 +374,7 @@ class IntegratedURLSystem:
                 replacement = self._generate_replacement_code(migration)
                 
                 # Replace the hardcoded URL
-                old_pattern = f'["\\']{re.escape(migration.original_url)}["\\'"]'
+                old_pattern = f'["\']' + re.escape(migration.original_url) + f'["\']'
                 modified_content = re.sub(old_pattern, replacement, modified_content)
                 
                 migration.migration_status = "completed"

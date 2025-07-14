@@ -39,6 +39,14 @@ import yaml
 from urllib.parse import urlparse
 import schedule
 
+# Optional scheduling import
+try:
+    import schedule
+    SCHEDULE_AVAILABLE = True
+except ImportError:
+    SCHEDULE_AVAILABLE = False
+    schedule = None
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -941,6 +949,10 @@ class LocalMirrorInfrastructure:
     
     async def start_scheduler(self):
         """Start scheduled synchronization"""
+        if not SCHEDULE_AVAILABLE:
+            logger.warning("Schedule library not available, scheduled sync disabled")
+            return
+            
         # Schedule sync jobs based on frequency
         for source_name, config in self.mirror_configs.items():
             if config.sync_frequency == 'hourly':

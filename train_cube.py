@@ -9,8 +9,6 @@ Integrates with existing training infrastructure and supports mixed precision.
 Usage:
     python train_cube.py fit --data.zarr_root data/processed/gcm_zarr --model.depth 4 --trainer.precision 16 --trainer.strategy ddp
 
-Author: AI Assistant
-Date: 2025
 """
 
 import os

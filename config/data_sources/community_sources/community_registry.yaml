@@ -213,16 +213,18 @@ community_contributions:
   discovery_patterns:
     url_patterns:
       nasa_domains:
-        - "*.nasa.gov"
-        - "*.ipac.caltech.edu"
-        - "*.stsci.edu"
+        domains:
+          - "*.nasa.gov"
+          - "*.ipac.caltech.edu"
+          - "*.stsci.edu"
         patterns:
           - "https://{subdomain}.nasa.gov/data"
           - "https://{subdomain}.ipac.caltech.edu/archive"
       
       ncbi_patterns:
-        - "*.ncbi.nlm.nih.gov"
-        - "*.nih.gov"
+        domains:
+          - "*.ncbi.nlm.nih.gov"
+          - "*.nih.gov"
         patterns:
           - "https://ftp{number}.ncbi.nlm.nih.gov"
           - "https://{subdomain}.ncbi.nlm.nih.gov"

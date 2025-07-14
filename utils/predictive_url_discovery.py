@@ -29,15 +29,41 @@ from dataclasses import dataclass, field
 from urllib.parse import urlparse, urljoin
 import pandas as pd
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import DBSCAN
-from sklearn.ensemble import RandomForestClassifier
-import feedparser
+
+# Optional ML and NLP imports
+try:
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.cluster import DBSCAN
+    from sklearn.ensemble import RandomForestClassifier
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+    
+try:
+    import feedparser
+    FEEDPARSER_AVAILABLE = True
+except ImportError:
+    FEEDPARSER_AVAILABLE = False
+    feedparser = None
+
+try:
+    import tweepy
+    TWEEPY_AVAILABLE = True
+except ImportError:
+    TWEEPY_AVAILABLE = False
+    tweepy = None
+
+try:
+    import nltk
+    from textblob import TextBlob
+    NLP_AVAILABLE = True
+except ImportError:
+    NLP_AVAILABLE = False
+    nltk = None
+    TextBlob = None
+
 import requests
 from bs4 import BeautifulSoup
-import tweepy
-import nltk
-from textblob import TextBlob
 import hashlib
 import time
 
@@ -306,6 +332,10 @@ class PredictiveURLDiscovery:
     def _initialize_ml_models(self):
         """Initialize machine learning models for URL prediction"""
         try:
+            if not SKLEARN_AVAILABLE:
+                logger.info("Scikit-learn not available, ML features disabled")
+                return
+                
             # Load historical data for training
             historical_data = self._load_historical_changes()
             
@@ -338,7 +368,7 @@ class PredictiveURLDiscovery:
     def _train_url_classifier(self, data: pd.DataFrame):
         """Train ML model to classify URL change patterns"""
         try:
-            if len(data) < 5:
+            if not SKLEARN_AVAILABLE or len(data) < 5:
                 return
             
             # Extract features from URLs
@@ -379,7 +409,7 @@ class PredictiveURLDiscovery:
     def _train_change_predictor(self, data: pd.DataFrame):
         """Train model to predict when URLs might change"""
         try:
-            if len(data) < 5:
+            if not SKLEARN_AVAILABLE or len(data) < 5:
                 return
             
             # Create time-based features
@@ -596,7 +626,7 @@ class PredictiveURLDiscovery:
         predictions = []
         
         try:
-            if not self.url_classifier:
+            if not SKLEARN_AVAILABLE or not self.url_classifier:
                 return predictions
             
             # Extract features from current URL

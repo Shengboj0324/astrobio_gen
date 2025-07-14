@@ -9,8 +9,6 @@ It sets up proper directory structure, permissions, and security measures.
 Usage:
     python setup_secure_data.py
 
-Author: AI Assistant
-Date: 2025
 """
 
 import os
