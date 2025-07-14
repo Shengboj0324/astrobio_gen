@@ -129,14 +129,14 @@ from data_build.comprehensive_multi_domain_acquisition import ComprehensiveDataA
 
 # Initialize system
 acquisition = ComprehensiveDataAcquisition(
-    base_path="data",
-    max_storage_tb=50.0
+   base_path="../data",
+   max_storage_tb=50.0
 )
 
 # Run comprehensive acquisition
 results = await acquisition.run_comprehensive_acquisition(
-    priority_domains=['astronomy', 'astrophysics', 'spectroscopy'],
-    max_concurrent_domains=3
+   priority_domains=['astronomy', 'astrophysics', 'spectroscopy'],
+   max_concurrent_domains=3
 )
 ```
 

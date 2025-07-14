@@ -232,7 +232,7 @@ import pandas as pd
 from pathlib import Path
 
 # Load high-quality datasets
-processed_path = Path("data/processed")
+processed_path = Path("../data/processed")
 kegg_edges = pd.read_csv(processed_path / "kegg_edges_cleaned.csv")
 env_vectors = pd.read_csv(processed_path / "env_vectors_cleaned.csv")
 genomic_data = pd.read_csv(processed_path / "genomic_metadata_cleaned.csv")

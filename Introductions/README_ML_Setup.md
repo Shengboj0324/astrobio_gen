@@ -59,13 +59,14 @@ python train.py model=graph_vae trainer=gpu_light
 ```
 
 ### Option 2: Custom training with your data
+
 ```python
 import torch
 import numpy as np
 from pathlib import Path
 
 # Load NPZ data
-npz_files = list(Path("data/kegg_graphs").glob("*.npz"))
+npz_files = list(Path("../data/kegg_graphs").glob("*.npz"))
 data = np.load(npz_files[0])
 print(f"Adjacency matrix: {data['adj'].shape}")
 print(f"Environment vector: {data['env']}")

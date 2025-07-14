@@ -2,13 +2,23 @@
     analytics = false
     autostage = true
     check_update = false
+    remote = aws-primary
 
-['remote "gcm-storage"']
-    url = gs://astro-cubes-storage
+['remote "aws-primary"']
+    url = s3://astrobio-data-primary-20250714
     cache_type = reflink,copy
     
-['remote "backup-storage"']
-    url = s3://astrobio-backup/datacubes
+['remote "aws-backup"']
+    url = s3://astrobio-data-backup-20250714
+    cache_type = reflink,copy
+    
+['remote "aws-zarr"']
+    url = s3://astrobio-zarr-cubes-20250714
+    cache_type = reflink,copy
+
+# Legacy Google Cloud (keep for now)
+['remote "gcm-storage"']
+    url = gs://astro-cubes-storage
     cache_type = reflink,copy
 
 [cache]
