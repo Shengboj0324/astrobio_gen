@@ -1,0 +1,233 @@
+# Climate Science & Geochemistry Data Sources Registry
+# Paleoclimate data, atmospheric models, and geochemical archives
+
+geocarb_paleoclimate:
+  name: "GEOCARB Paleoclimate Data"
+  domain: "geochemistry"
+  
+  # Primary and mirror URLs
+  primary_url: "https://www.geocarb.org"
+  mirror_urls:
+    - "https://data.geocarb.org"
+    - "https://archive.org/details/geocarb_data"
+    - "https://zenodo.org/communities/geocarb"
+    
+  # Data endpoints
+  data_urls:
+    co2_history: "/data/GEOCARB_III_co2.csv"
+    o2_history: "/data/GEOCARB_III_o2.csv"
+    temperature_proxies: "/data/temperature_proxies.csv"
+    
+  # External paleoclimate sources
+  external_sources:
+    earthref: "https://www.earthref.org/data/paleoclimate/"
+    noaa_paleo: "https://www.ncdc.noaa.gov/data-access/paleoclimatology-data"
+    
+  # Reference papers
+  references:
+    berner_2001: "https://www.science.org/doi/10.1126/science.1058574"
+    royer_2004: "https://www.nature.com/articles/nature02317"
+    zachos_2001: "https://www.science.org/doi/10.1126/science.1058288"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 2
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive paleoclimate CO2/O2 records"
+    time_range: "550 million years"
+    data_types: ["co2_histories", "oxygen_records", "paleotemp_proxies"]
+    estimated_size_gb: 200.0
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+noaa_paleoclimate:
+  name: "NOAA Paleoclimatology"
+  domain: "geochemistry"
+  
+  # URLs
+  primary_url: "https://www.ncdc.noaa.gov/data-access/paleoclimatology-data"
+  mirror_urls:
+    - "https://www1.ncdc.noaa.gov/pub/data/paleo"
+    - "https://data.noaa.gov/dataset/paleoclimatology"
+    
+  # Data categories
+  data_types:
+    - "ice_cores"
+    - "tree_rings"
+    - "corals"
+    - "marine_sediments"
+    - "lake_sediments"
+    - "speleothems"
+    - "historical_records"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 4
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive paleoclimatic records"
+    estimated_size_gb: 150.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+ecmwf_era5:
+  name: "ECMWF ERA5 Reanalysis"
+  domain: "climate_science"
+  
+  # URLs
+  primary_url: "https://cds.climate.copernicus.eu"
+  mirror_urls:
+    - "https://climate.copernicus.eu/climate-data-store"
+    - "https://cds-beta.climate.copernicus.eu"
+    
+  # API endpoints
+  endpoints:
+    api: "/api/v2"
+    cdsapi: "/cdsapi"
+    
+  # Dataset collections
+  datasets:
+    era5_single_levels: "reanalysis-era5-single-levels"
+    era5_pressure_levels: "reanalysis-era5-pressure-levels"
+    era5_land: "reanalysis-era5-land"
+    
+  # Variables
+  variables:
+    surface:
+      - "2m_temperature"
+      - "surface_pressure"
+      - "total_precipitation"
+      - "10m_wind_speed"
+    pressure_levels:
+      - "temperature"
+      - "geopotential"
+      - "relative_humidity"
+      - "wind_components"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 5.0
+    max_concurrent: 2
+    chunk_size_mb: 1000
+    
+  # Authentication
+  authentication:
+    required: true
+    method: "api_key"
+    registration_url: "https://cds.climate.copernicus.eu/user/register"
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive atmospheric reanalysis data"
+    temporal_resolution: "hourly"
+    spatial_resolution: "0.25° × 0.25°"
+    time_period: "1979-present"
+    estimated_size_tb: 10.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+nasa_giss_climate:
+  name: "NASA GISS Climate Data"
+  domain: "climate_science"
+  
+  # URLs
+  primary_url: "https://data.giss.nasa.gov"
+  mirror_urls:
+    - "https://giss.nasa.gov/data"
+    - "https://archive.org/details/nasa_giss_climate"
+    
+  # Data products
+  data_products:
+    temperature: "/gistemp/"
+    modelE: "/modelE/"
+    rocke3d: "/rocke3d/"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 3
+    
+  # Metadata
+  metadata:
+    description: "NASA climate models and observational data"
+    estimated_size_gb: 500.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+paleodb_fossil_data:
+  name: "Paleobiology Database"
+  domain: "geochemistry"
+  
+  # URLs
+  primary_url: "https://paleobiodb.org"
+  mirror_urls:
+    - "https://training.paleobiodb.org"
+    - "https://archive.org/details/paleobiodb"
+    
+  # API endpoints
+  endpoints:
+    api: "/data1.2"
+    occs: "/data1.2/occs/list.json"
+    taxa: "/data1.2/taxa/list.json"
+    colls: "/data1.2/colls/list.json"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 3
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive fossil occurrence database"
+    records: "1.5+ million fossil occurrences"
+    time_range: "Precambrian to Recent"
+    estimated_size_gb: 100.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+usgs_earthquake_data:
+  name: "USGS Earthquake Data"
+  domain: "planetary_interior"
+  
+  # URLs
+  primary_url: "https://earthquake.usgs.gov"
+  mirror_urls:
+    - "https://www.usgs.gov/natural-hazards/earthquake-hazards"
+    - "https://earthquake-archive.usgs.gov"
+    
+  # API endpoints
+  endpoints:
+    api: "/fdsnws/event/1"
+    query: "/fdsnws/event/1/query"
+    catalogs: "/earthquakes/search/"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.2
+    max_concurrent: 5
+    
+  # Metadata
+  metadata:
+    description: "Global earthquake monitoring data"
+    real_time: true
+    estimated_size_gb: 50.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active" 

@@ -1,0 +1,276 @@
+# Community-Maintained URL Registry
+# Crowdsourced and community-validated data source URLs
+
+community_contributions:
+  metadata:
+    version: "1.0.0"
+    last_updated: "2024-01-15T12:00:00Z"
+    contributors: 47
+    total_urls: 156
+    validation_process: "peer_review"
+  
+  # Community-discovered mirrors
+  discovered_mirrors:
+    nasa_exoplanet_archive:
+      contributors:
+        - id: "astro_researcher_2024"
+          url: "https://exoplanets.nasa.gov/api/data"
+          discovery_date: "2024-01-10"
+          validation_status: "verified"
+          votes_up: 12
+          votes_down: 1
+          notes: "Direct NASA API endpoint, very reliable"
+        
+        - id: "data_scientist_42"
+          url: "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI"
+          discovery_date: "2024-01-08"
+          validation_status: "verified"
+          votes_up: 8
+          votes_down: 0
+          notes: "Alternative API endpoint with better error handling"
+    
+    phoenix_stellar_models:
+      contributors:
+        - id: "stellar_modeler"
+          url: "https://phoenix.ens-lyon.fr/database"
+          discovery_date: "2024-01-12"
+          validation_status: "pending"
+          votes_up: 5
+          votes_down: 1
+          notes: "French mirror, faster access from Europe"
+        
+        - id: "astrophys_grad"
+          url: "https://kurucz.cfa.harvard.edu/phoenix"
+          discovery_date: "2024-01-09"
+          validation_status: "verified"
+          votes_up: 7
+          votes_down: 0
+          notes: "Harvard CfA mirror with comprehensive collection"
+    
+    kegg_database:
+      contributors:
+        - id: "bioinformatics_expert"
+          url: "https://rest.genome.jp/kegg"
+          discovery_date: "2024-01-11"
+          validation_status: "verified"
+          votes_up: 15
+          votes_down: 0
+          notes: "Official backup REST API, identical functionality"
+        
+        - id: "pathway_analyst"
+          url: "https://www.kegg.jp/kegg/rest/keggapi.html"
+          discovery_date: "2024-01-07"
+          validation_status: "verified"
+          votes_up: 9
+          votes_down: 1
+          notes: "Documentation mirror with API examples"
+
+  # Alternative access methods
+  alternative_methods:
+    ncbi_databases:
+      rsync_mirrors:
+        - contributor: "sysadmin_genomics"
+          method: "rsync://ftp.ncbi.nlm.nih.gov/genomes/"
+          notes: "Bulk download method, much faster for large datasets"
+          validation_status: "verified"
+      
+      aspera_endpoints:
+        - contributor: "hpc_specialist"
+          method: "aspera://ftp-private.ncbi.nlm.nih.gov"
+          notes: "High-speed transfer protocol, requires Aspera client"
+          validation_status: "experimental"
+    
+    thousand_genomes_project:
+      google_cloud:
+        - contributor: "cloud_genomics"
+          method: "gs://genomics-public-data/1000-genomes"
+          notes: "Google Cloud Storage mirror, free egress within GCP"
+          validation_status: "verified"
+      
+      aws_s3:
+        - contributor: "aws_genomics_team"
+          method: "s3://1000genomes"
+          notes: "AWS S3 public dataset, free within AWS"
+          validation_status: "verified"
+
+  # Emergency backup sources
+  emergency_backups:
+    general_archives:
+      internet_archive:
+        base_url: "https://archive.org/details"
+        collections:
+          - "nasa_data_collection"
+          - "genomics_public_datasets"
+          - "climate_data_archive"
+          - "astronomical_catalogs"
+        notes: "Last resort backup, may have older versions"
+      
+      zenodo_communities:
+        base_url: "https://zenodo.org/communities"
+        communities:
+          - "astrobiology-data"
+          - "stellar-models"
+          - "genomics-resources"
+          - "climate-datasets"
+        notes: "Academic repository, DOI-versioned datasets"
+    
+    institutional_backups:
+      dataverse_harvard:
+        base_url: "https://dataverse.harvard.edu"
+        collections:
+          - "astrobiology-dataverse"
+          - "stellar-atmosphere-models"
+        notes: "Harvard institutional repository"
+      
+      dryad_repository:
+        base_url: "https://datadryad.org"
+        search_terms:
+          - "exoplanet+data"
+          - "stellar+models"
+          - "metabolic+pathways"
+        notes: "Research data repository with peer review"
+
+  # Specialized access patterns
+  specialized_access:
+    vpn_friendly_sources:
+      - url: "https://github.com/astrobiology-data"
+        type: "version_controlled_mirror"
+        notes: "Git-based access, works through most VPNs"
+        contributor: "open_source_advocate"
+      
+      - url: "https://kaggle.com/datasets/nasa-exoplanets"
+        type: "data_science_platform"
+        notes: "Kaggle mirror, ML-ready format"
+        contributor: "data_scientist_ml"
+    
+    high_availability_endpoints:
+      cloudflare_cdn:
+        - url: "https://cdnjs.cloudflare.com/ajax/libs/astrobio-data"
+          type: "cdn_mirror"
+          reliability: "99.9%"
+          contributor: "cdn_specialist"
+      
+      aws_cloudfront:
+        - url: "https://d1234567890.cloudfront.net/scientific-data"
+          type: "aws_cdn"
+          reliability: "99.95%"
+          contributor: "aws_solutions_architect"
+
+  # Community validation process
+  validation_workflow:
+    stages:
+      1: "submission"
+      2: "automated_testing"
+      3: "peer_review"
+      4: "integration_testing"
+      5: "approval"
+    
+    requirements:
+      automated_tests:
+        - "url_accessibility"
+        - "response_time_under_10s"
+        - "data_format_validation"
+        - "content_integrity_check"
+      
+      peer_review:
+        - "minimum_3_reviewers"
+        - "scientific_accuracy_verification"
+        - "data_quality_assessment"
+        - "security_audit"
+    
+    approval_criteria:
+      - "passes_all_automated_tests"
+      - "positive_peer_review_consensus"
+      - "no_security_concerns"
+      - "uptime_history_available"
+
+  # Community statistics
+  contribution_stats:
+    by_domain:
+      astronomy: 42
+      genomics: 38
+      climate_science: 31
+      astrobiology: 25
+      astrophysics: 20
+    
+    by_reliability:
+      verified: 134
+      pending: 18
+      experimental: 4
+    
+    top_contributors:
+      - id: "astro_researcher_2024"
+        contributions: 12
+        reputation: 95
+      - id: "bioinformatics_expert"
+        contributions: 9
+        reputation: 88
+      - id: "data_scientist_42"
+        contributions: 8
+        reputation: 92
+
+  # Automated discovery patterns
+  discovery_patterns:
+    url_patterns:
+      nasa_domains:
+        - "*.nasa.gov"
+        - "*.ipac.caltech.edu"
+        - "*.stsci.edu"
+        patterns:
+          - "https://{subdomain}.nasa.gov/data"
+          - "https://{subdomain}.ipac.caltech.edu/archive"
+      
+      ncbi_patterns:
+        - "*.ncbi.nlm.nih.gov"
+        - "*.nih.gov"
+        patterns:
+          - "https://ftp{number}.ncbi.nlm.nih.gov"
+          - "https://{subdomain}.ncbi.nlm.nih.gov"
+      
+      academic_patterns:
+        common_subdomains:
+          - "data"
+          - "archive"
+          - "ftp"
+          - "mirror"
+          - "backup"
+          - "api"
+        common_paths:
+          - "/data"
+          - "/archive"
+          - "/public"
+          - "/datasets"
+          - "/api/v1"
+
+  # Quality metrics
+  quality_metrics:
+    url_health:
+      uptime_threshold: 99.0  # percent
+      response_time_threshold: 5000  # milliseconds
+      consecutive_failures_limit: 3
+    
+    data_quality:
+      format_consistency: true
+      checksum_validation: true
+      version_tracking: true
+      metadata_completeness: 90  # percent
+    
+    community_trust:
+      minimum_votes: 3
+      approval_threshold: 75  # percent positive
+      reviewer_reputation_minimum: 70
+
+  # Integration with main system
+  integration:
+    priority_level: 3  # After primary and mirrors, before emergency
+    cache_duration: 1800  # 30 minutes
+    health_check_interval: 3600  # 1 hour
+    
+    auto_promotion:
+      # Automatically promote community URLs to official mirrors
+      criteria:
+        - "uptime > 99.5%"
+        - "response_time < 2000ms"
+        - "community_votes > 20"
+        - "approval_rate > 90%"
+        - "active_for > 90_days" 

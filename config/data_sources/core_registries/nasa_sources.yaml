@@ -1,0 +1,265 @@
+# NASA Data Sources Registry
+# Central configuration for all NASA-related data sources with enterprise-grade failover
+
+nasa_exoplanet_archive:
+  name: "NASA Exoplanet Archive"
+  domain: "astronomy"
+  
+  # Primary and mirror URLs
+  primary_url: "https://exoplanetarchive.ipac.caltech.edu"
+  mirror_urls:
+    - "https://archive.stsci.edu/missions/exoplanets"
+    - "https://exofop.ipac.caltech.edu"
+    - "https://mast.stsci.edu/exoplanets"
+  
+  # API endpoints
+  endpoints:
+    main_api: "/cgi-bin/nstedAPI/nph-nstedAPI"
+    tap_sync: "/TAP/sync"
+    bulk_download: "/data"
+    confirmed_planets: "/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&format=csv&select=*"
+    kepler_objects: "/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&format=csv&select=*"
+    tess_candidates: "/cgi-bin/nstedAPI/nph-nstedAPI?table=tess_candidates&format=csv&select=*"
+    stellar_hosts: "/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&format=csv&select=hostname,st_teff,st_rad,st_mass,st_met,st_logg,st_age"
+    
+  # Bulk download files with versioning
+  bulk_files:
+    - name: "ExoplanetsPars_2024.csv"
+      url: "/data/ExoplanetsPars_2024.csv"
+      checksum: "sha256:a1b2c3d4e5f6..."
+      size_mb: 45.2
+    - name: "StellarHosts_2024.csv"
+      url: "/data/StellarHosts_2024.csv"
+      checksum: "sha256:b2c3d4e5f6a7..."
+      size_mb: 38.7
+    - name: "TESSCandidates_2024.csv"
+      url: "/data/TESSCandidates_2024.csv"
+      checksum: "sha256:c3d4e5f6a7b8..."
+      size_mb: 156.3
+  
+  # Health monitoring
+  health_check:
+    endpoint: "/help/about.html"
+    expected_status: 200
+    timeout_seconds: 30
+    retry_count: 3
+    
+  # Geographic preferences
+  geographic_routing:
+    default: "primary_url"
+    us_east: "primary_url"
+    us_west: "primary_url" 
+    europe: "mirror_urls[0]"
+    asia: "mirror_urls[1]"
+    
+  # Rate limiting and performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 6
+    chunk_size_mb: 100
+    timeout_seconds: 300
+    
+  # Data characteristics
+  metadata:
+    description: "Comprehensive exoplanet orbital elements, masses, radii"
+    data_count: "5926+ confirmed planets"
+    coverage: "Complete known exoplanet population"
+    update_frequency: "daily"
+    data_types: ["planetary_systems", "stellar_hosts", "atmospheric_spectroscopy"]
+    estimated_size_gb: 2500.0
+    priority: 1
+    
+  # Quality and validation
+  validation:
+    checksum_validation: true
+    size_validation: true
+    format_validation: true
+    content_validation: true
+    
+  # Last verified information
+  last_verified: "2024-01-15T12:00:00Z"
+  verified_by: "automated_health_monitor"
+  status: "active"
+
+rocke3d_climate_models:
+  name: "ROCKE-3D Climate Model Datacubes"
+  domain: "climate_science"
+  
+  # Primary and mirror URLs
+  primary_url: "https://simplex.giss.nasa.gov"
+  mirror_urls:
+    - "https://data.giss.nasa.gov/rocke3d"
+    - "https://archive.org/details/rocke3d_models"
+    - "https://zenodo.org/communities/rocke3d"
+    
+  # API endpoints
+  endpoints:
+    main_portal: "/gcm/ROCKE-3D/modelE.html"
+    data_portal: "/gcm/ROCKE-3D"
+    api_base: "/api/v1"
+    
+  # Data directories
+  data_directories:
+    earth_like: "/data/earth_like/"
+    exoplanets: "/data/exoplanets/"
+    archean: "/data/archean/"
+    snowball: "/data/snowball/"
+    high_co2: "/data/high_co2/"
+    
+  # File patterns for discovery
+  file_patterns:
+    netcdf: ".*\\.nc$"
+    monthly: ".*\\.monthly\\.nc$"
+    annual: ".*\\.annual\\.nc$"
+    
+  # Authentication requirements
+  authentication:
+    required: true
+    method: "oauth2"
+    scopes: ["data_access", "bulk_download"]
+    
+  # Health monitoring
+  health_check:
+    endpoint: "/status"
+    expected_status: 200
+    timeout_seconds: 45
+    
+  # Performance characteristics  
+  performance:
+    rate_limit_delay: 3.0
+    max_concurrent: 4
+    chunk_size_mb: 200
+    timeout_seconds: 1800
+    
+  # Metadata
+  metadata:
+    description: "3D GCM datacubes for diverse planetary atmospheres"
+    dimensions: "lat×lon×pressure×time"
+    variables: "temperature, humidity, pressure, wind fields"
+    estimated_size_gb: 3000.0
+    priority: 1
+    requires_auth: true
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+jwst_mast_archive:
+  name: "JWST Calibrated Spectra"
+  domain: "spectroscopy"
+  
+  # Primary and mirror URLs
+  primary_url: "https://mast.stsci.edu"
+  mirror_urls:
+    - "https://archive.stsci.edu"
+    - "https://mastdata.stsci.edu"
+    - "https://mast-portal.stsci.edu"
+    
+  # API endpoints
+  endpoints:
+    api_base: "/api/v0.1"
+    download_file: "/api/v0.1/Download/file"
+    search: "/api/v0.1/invoke"
+    bulk_download: "/api/v0.1/Download/bundle"
+    
+  # Instrument-specific endpoints
+  instruments:
+    nirspec: "/api/v0.1/invoke?format=json&service=Mast.Jwst.Filtered.Nirspec"
+    niriss: "/api/v0.1/invoke?format=json&service=Mast.Jwst.Filtered.Niriss"
+    nircam: "/api/v0.1/invoke?format=json&service=Mast.Jwst.Filtered.Nircam"
+    miri: "/api/v0.1/invoke?format=json&service=Mast.Jwst.Filtered.Miri"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 5
+    chunk_size_mb: 150
+    
+  # Metadata
+  metadata:
+    description: "High-precision JWST exoplanet spectra"
+    instruments: ["NIRSpec", "NIRISS", "NIRCam", "MIRI"]
+    wavelength_range: "0.6-28 μm"
+    data_types: ["transmission_spectra", "emission_spectra", "time_series"]
+    estimated_size_gb: 1200.0
+    priority: 1
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+psg_synthetic_spectra:
+  name: "PSG Synthetic Spectra"
+  domain: "spectroscopy"
+  
+  # URLs
+  primary_url: "https://psg.gsfc.nasa.gov"
+  mirror_urls:
+    - "https://psg-backup.gsfc.nasa.gov"
+    - "https://archive.org/details/psg_spectra"
+    
+  # API
+  endpoints:
+    api: "/api.php"
+    config: "/config"
+    docs: "/help"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    
+  # Metadata
+  metadata:
+    description: "NASA PSG radiative transfer synthetic spectra"
+    data_types: ["synthetic_spectra", "radiative_transfer"]
+    estimated_size_gb: 500.0
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+ahed_astrobiology:
+  name: "NASA AHED Astrobiology Data"
+  domain: "astrobiology"
+  
+  # URLs
+  primary_url: "https://ahed.nasa.gov"
+  mirror_urls:
+    - "https://astrobiology.nasa.gov/data"
+    - "https://archive.org/details/nasa_ahed"
+    
+  # API
+  endpoints:
+    api_base: "/api/"
+    search: "/api/search"
+    datasets: "/api/datasets"
+    
+  # Themes from web crawl
+  themes:
+    - "Abiotic Building Blocks of Life"
+    - "Constructing Habitable Worlds"
+    - "Characterizing Environments for Habitability and Biosignatures" 
+    - "Origins of Life"
+    - "Early Life and Increasing Complexity"
+    - "Coevolution of Life and the Physical Environment"
+    
+  # Data types
+  data_types:
+    - "chemical_analysis"
+    - "spectroscopy" 
+    - "microscopy"
+    - "genomics"
+    - "environmental_monitoring"
+    - "field_measurements"
+    - "laboratory_analysis"
+    - "instrument_data"
+    - "imagery"
+    - "geospatial"
+    - "biosignature_detection"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 4
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active" 

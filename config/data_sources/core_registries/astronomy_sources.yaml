@@ -1,0 +1,204 @@
+# Astronomy & Astrophysics Data Sources Registry
+# Comprehensive stellar models, observational data, and astronomical archives
+
+phoenix_stellar_models:
+  name: "Phoenix Stellar Atmosphere Models"
+  domain: "astrophysics"
+  
+  # Primary and mirror URLs
+  primary_url: "https://phoenix.astro.physik.uni-goettingen.de"
+  mirror_urls:
+    - "https://phoenix.ens-lyon.fr"
+    - "https://archive.org/details/phoenix_stellar_models"
+    - "https://zenodo.org/communities/stellar_models"
+    
+  # FTP server information
+  ftp_server: "phoenix.astro.physik.uni-goettingen.de"
+  
+  # Data directories
+  directories:
+    hires: "/HiRes/"
+    lores: "/LoRes/"
+    bt_settl: "/BT-Settl/"
+    agss: "/AGSS/"
+    opacity: "/Opacity/"
+    
+  # File naming patterns
+  file_patterns:
+    hires: "lte(\\d+)-(\\d+\\.\\d+)([+-]\\d+\\.\\d+)\\.PHOENIX.*\\.fits"
+    lores: "lte(\\d+)-(\\d+\\.\\d+)([+-]\\d+\\.\\d+)\\.PHOENIX.*\\.txt"
+    bt_settl: "lte(\\d+)-(\\d+\\.\\d+)([+-]\\d+\\.\\d+)\\.BT-Settl.*\\.fits"
+    
+  # Parameter ranges
+  parameter_ranges:
+    teff: [2300, 25000]
+    logg: [0.0, 6.0]
+    metallicity: [-4.0, 1.0]
+    
+  # Priority parameters for Sun-like stars
+  priority_params:
+    teff_priority: [3000, 4000, 5000, 5778, 6000, 7000, 8000]
+    logg_priority: [4.0, 4.5, 5.0]
+    met_priority: [0.0, -0.5, -1.0, 0.5]
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 4
+    chunk_size_mb: 100
+    
+  # Health monitoring
+  health_check:
+    endpoint: "/index.html"
+    expected_status: 200
+    timeout_seconds: 30
+    
+  # Metadata
+  metadata:
+    description: "High-resolution stellar spectra and atmosphere models"
+    temperature_range: "2300K-25000K"
+    resolution: "R=500,000 optical, R=100,000 IR"
+    estimated_size_gb: 1500.0
+    priority: 1
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+kurucz_stellar_models:
+  name: "Kurucz Stellar Models"
+  domain: "astrophysics"
+  
+  # Primary and mirror URLs
+  primary_url: "http://kurucz.harvard.edu"
+  mirror_urls:
+    - "https://kurucz.cfa.harvard.edu"
+    - "https://archive.org/details/kurucz_models"
+    - "https://zenodo.org/communities/kurucz_stellar_models"
+    
+  # Data directories
+  directories:
+    grids: "/grids/"
+    atoms: "/atoms/"
+    molecules: "/molecules/"
+    linelists: "/linelists/"
+    opacity: "/opacity/"
+    
+  # File patterns
+  file_patterns:
+    atmosphere: "([a-z]+)(\\d+)\\.(\\d+)"
+    flux: "f(\\d+)g(\\d+)k(\\d+)\\.(\\d+)"
+    opacity: "op(\\d+)\\.(\\d+)"
+    
+  # Performance  
+  performance:
+    rate_limit_delay: 1.5
+    max_concurrent: 3
+    chunk_size_mb: 50
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive stellar atmosphere models and opacity data"
+    estimated_size_gb: 800.0
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+planetary_interior_models:
+  name: "Planetary Interior Models" 
+  domain: "planetary_interior"
+  
+  # Primary and mirror URLs
+  primary_url: "https://www.earthref.org"
+  mirror_urls:
+    - "https://data.earthref.org"
+    - "https://archive.org/details/planetary_interior"
+    
+  # Data endpoints
+  endpoints:
+    seismic_models: "/data/seismic_models/"
+    gravity_grids: "/data/gravity/"
+    
+  # External data sources
+  external_sources:
+    usgs: "https://www.usgs.gov/natural-hazards/earthquake-hazards/data-tools"
+    iris: "https://ds.iris.edu/ds/products/emc/"
+    gravity_field: "https://www.gravityfield.org/data/"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 2
+    
+  # Metadata
+  metadata:
+    description: "Seismic models, gravity fields, and planetary interior structure"
+    data_types: ["seismic_models", "gravity_grids", "density_profiles"]
+    estimated_size_gb: 300.0
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+simbad_astronomical_database:
+  name: "SIMBAD Astronomical Database"
+  domain: "astronomy"
+  
+  # URLs
+  primary_url: "http://simbad.u-strasbg.fr"
+  mirror_urls:
+    - "http://simbad.cfa.harvard.edu"
+    - "http://simbad.iucaa.in"
+    
+  # API endpoints
+  endpoints:
+    tap: "/simbad/sim-tap/sync"
+    script: "/simbad/sim-script"
+    query: "/simbad/sim-id"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 3
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive astronomical object database"
+    objects: "10+ million astronomical objects"
+    references: "500,000+ bibliographic references"
+    estimated_size_gb: 50.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z" 
+  status: "active"
+
+vizier_catalog_service:
+  name: "VizieR Catalog Service"
+  domain: "astronomy"
+  
+  # URLs
+  primary_url: "http://vizier.u-strasbg.fr"
+  mirror_urls:
+    - "http://vizier.cfa.harvard.edu"
+    - "http://vizier.iucaa.in"
+    - "http://vizier.nao.ac.jp"
+    
+  # API endpoints
+  endpoints:
+    tap: "/viz-bin/votable"
+    asu: "/viz-bin/asu-tsv"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 4
+    
+  # Metadata
+  metadata:
+    description: "Astronomical catalogs and data tables"
+    catalogs: "20,000+ astronomical catalogs"
+    estimated_size_gb: 200.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active" 

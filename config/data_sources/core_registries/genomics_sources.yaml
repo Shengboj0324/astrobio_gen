@@ -1,0 +1,368 @@
+# Genomics & Biological Data Sources Registry
+# Comprehensive biological databases for astrobiology research
+
+kegg_database:
+  name: "KEGG Database"
+  domain: "astrobiology"
+  
+  # Primary and mirror URLs
+  primary_url: "https://rest.kegg.jp"
+  mirror_urls:
+    - "https://www.genome.jp/kegg-bin"
+    - "https://www.kegg.jp/kegg/rest"
+    - "https://rest.genome.jp"
+    
+  # API endpoints for different data types
+  endpoints:
+    list_pathways: "/list/pathway"
+    list_organisms: "/list/organism"
+    list_compounds: "/list/compound"
+    list_reactions: "/list/reaction"
+    list_enzymes: "/list/enzyme"
+    get_pathway: "/get/{pathway_id}/kgml"
+    get_compound: "/get/{compound_id}"
+    get_reaction: "/get/{reaction_id}"
+    find_pathway: "/find/pathway/{query}"
+    link_pathway: "/link/pathway/{db}:{entry_id}"
+    
+  # Organism-specific pathways
+  model_organisms:
+    human: "hsa"
+    mouse: "mmu" 
+    rat: "rno"
+    drosophila: "dme"
+    c_elegans: "cel"
+    yeast: "sce"
+    e_coli: "eco"
+    
+  # Pathway categories discovered from web crawl
+  pathway_categories:
+    metabolism:
+      - "Carbohydrate metabolism"
+      - "Energy metabolism"
+      - "Lipid metabolism"
+      - "Nucleotide metabolism"
+      - "Amino acid metabolism"
+      - "Metabolism of cofactors and vitamins"
+      - "Metabolism of terpenoids and polyketides"
+      - "Biosynthesis of other secondary metabolites"
+      - "Xenobiotics biodegradation and metabolism"
+    genetic_information:
+      - "Transcription"
+      - "Translation"
+      - "Folding, sorting and degradation"
+      - "Replication and repair"
+    environmental_information:
+      - "Membrane transport"
+      - "Signal transduction"
+    cellular_processes:
+      - "Transport and catabolism"
+      - "Cell motility"
+      - "Cell growth and death"
+      - "Cell communication"
+    human_diseases:
+      - "Cancer"
+      - "Immune diseases"
+      - "Neurodegenerative diseases"
+      - "Metabolic diseases"
+      - "Infectious diseases"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.1
+    max_concurrent: 5
+    chunk_size_mb: 10
+    timeout_seconds: 30
+    
+  # Health monitoring
+  health_check:
+    endpoint: "/info/kegg"
+    expected_status: 200
+    timeout_seconds: 10
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive metabolic pathway database"
+    pathways: "7302+ metabolic pathways"
+    reactions: "12000+ biochemical reactions"
+    compounds: "18000+ chemical compounds"
+    organisms: "8000+ organisms"
+    update_frequency: "weekly"
+    priority: 1
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+ncbi_databases:
+  name: "NCBI Databases"
+  domain: "genomics"
+  
+  # Primary and mirror URLs
+  primary_url: "https://ftp.ncbi.nlm.nih.gov"
+  mirror_urls:
+    - "https://ftp.ncbi.nih.gov"
+    - "https://ftp-private.ncbi.nlm.nih.gov"
+    - "rsync://ftp.ncbi.nlm.nih.gov"
+    
+  # FTP directory structure from web crawl
+  directories:
+    genomes: "/genomes/"
+    refseq: "/genomes/refseq/"
+    genbank: "/genomes/genbank/"
+    annotation: "/genomes/annotation_releases/"
+    assembly_summary: "/genomes/ASSEMBLY_REPORTS/"
+    
+  # Organism categories from comprehensive crawl
+  organism_categories:
+    - "archaea"
+    - "bacteria" 
+    - "fungi"
+    - "invertebrate"
+    - "metagenomes"
+    - "mitochondrion"
+    - "plant"
+    - "plasmid"
+    - "plastid"
+    - "protozoa"
+    - "unknown"
+    - "vertebrate_mammalian"
+    - "vertebrate_other"
+    - "viral"
+    
+  # Complete file types from web crawl  
+  file_types:
+    sequence:
+      - "_genomic.fna.gz"      # Genomic sequence
+      - "_genomic.gbff.gz"     # GenBank flat file
+      - "_protein.faa.gz"      # Protein sequences
+      - "_cds_from_genomic.fna.gz"  # CDS sequences
+      - "_rna_from_genomic.fna.gz"  # RNA sequences
+    annotation:
+      - "_genomic.gff.gz"      # Gene annotations
+      - "_genomic.gtf.gz"      # Gene transfer format
+      - "_feature_table.txt.gz"  # Feature table
+    quality_control:
+      - "_fcs_report.txt"      # Foreign contamination screening
+      - "_ani_report.txt"      # Average nucleotide identity
+      - "_ani_contam_ranges.tsv"  # Contamination ranges
+    assembly:
+      - "_assembly_report.txt"  # Assembly summary
+      - "_assembly_stats.txt"   # Assembly statistics
+      - "_assembly_regions.txt" # Assembly regions
+    expression:
+      - "_rna_counts.tsv"      # RNA-seq raw counts
+      - "_tpm_normalized.tsv"  # TPM normalized expression
+      - "_alignment_summary.txt"  # Alignment statistics
+    analysis:
+      - "_busco_results.txt"   # BUSCO completeness
+      - "_checkm_results.txt"  # CheckM quality
+      - "_repeatmasker.out"    # Repeat annotations
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 8
+    chunk_size_mb: 200
+    timeout_seconds: 1800
+    
+  # Health monitoring
+  health_check:
+    endpoint: "/genomes/README.txt"
+    expected_status: 200
+    timeout_seconds: 30
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive genomic databases"
+    genomes: "100000+ genome assemblies"
+    update_frequency: "daily"
+    priority: 1
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+agora2_metabolic_models:
+  name: "AGORA2 Metabolic Models"
+  domain: "astrobiology"
+  
+  # Primary and mirror URLs
+  primary_url: "https://www.vmh.life/files/reconstructions/AGORA2"
+  mirror_urls:
+    - "https://vmh.life/agora2"
+    - "https://archive.org/details/agora2_models"
+    - "https://zenodo.org/communities/agora2"
+    
+  # File structure
+  files:
+    info_file: "AGORA2_infoFile.xlsx"
+    model_directory: "/Individual_reconstruction_files/"
+    combined_models: "/Combined_models/"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 4
+    timeout_seconds: 600
+    
+  # Metadata
+  metadata:
+    description: "Human microbiome metabolic reconstructions"
+    models: "7302 genome-scale models"
+    format: "SBML"
+    priority: 1
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+uniprot_databases:
+  name: "UniProt Databases"
+  domain: "genomics"
+  
+  # Primary and mirror URLs
+  primary_url: "https://ftp.uniprot.org/pub/databases/uniprot"
+  mirror_urls:
+    - "https://ftp.ebi.ac.uk/pub/databases/uniprot"
+    - "https://ftp.expasy.org/databases/uniprot"
+    - "rsync://ftp.uniprot.org/pub/databases/uniprot"
+    
+  # Database divisions
+  taxonomic_divisions:
+    - "archaea"
+    - "bacteria"
+    - "fungi"
+    - "human"
+    - "invertebrates"
+    - "mammals"
+    - "plants"
+    - "rodents"
+    - "vertebrates"
+    - "viruses"
+    
+  # Database types
+  databases:
+    - "sprot"    # Swiss-Prot (reviewed)
+    - "trembl"   # TrEMBL (unreviewed)
+    
+  # File formats
+  formats:
+    - "dat"      # UniProt flat file
+    - "xml"      # UniProt XML
+    - "fasta"    # FASTA sequences
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.1
+    max_concurrent: 6
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive protein sequence and annotation database"
+    proteins: "200+ million protein sequences"
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+gtdb_taxonomy:
+  name: "GTDB Taxonomy"
+  domain: "genomics"
+  
+  # Primary and mirror URLs (existing mirror support)
+  primary_url: "https://data.gtdb.ecogenomic.org/releases/latest"
+  mirror_urls:
+    - "https://data.ace.uq.edu.au/public/gtdb/data/releases/latest"
+    - "https://zenodo.org/communities/gtdb"
+    
+  # Available files from web crawl
+  available_files:
+    bacterial_data:
+      - "bac120_metadata.tsv.gz"
+      - "bac120_taxonomy.tsv"
+      - "bac120.tree"
+      - "bac120.tree.gz"
+      - "bac120_msa_mask.txt"
+    archaeal_data:
+      - "ar53_metadata.tsv.gz"
+      - "ar53_taxonomy.tsv"
+      - "ar53.tree"
+      - "ar53.tree.gz"
+      - "ar53_msa_mask.txt"
+    metadata:
+      - "VERSION.txt"
+      - "METHODS.txt"
+      - "FILE_DESCRIPTIONS.txt"
+      - "MD5SUM.txt"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.1
+    max_concurrent: 4
+    
+  # Metadata
+  metadata:
+    description: "Genome-based taxonomy database"
+    bacterial_genomes: "715230+ genomes"
+    archaeal_genomes: "17245+ genomes"
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+thousand_genomes_project:
+  name: "1000 Genomes Project"
+  domain: "genomics"
+  
+  # Primary and mirror URLs
+  primary_url: "https://ftp.ncbi.nlm.nih.gov/1000genomes"
+  mirror_urls:
+    - "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp"
+    - "https://ftp-trace.ncbi.nlm.nih.gov/1000genomes"
+    
+  # Data categories
+  data_categories:
+    high_coverage: "/1000G_2504_high_coverage/"
+    additional_samples: "/additional_698_related/"
+    complete_genomics: "/complete_genomics_indices/"
+    alignment_indices: "/alignment_indices/"
+    sequence_indices: "/sequence_indices/"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 8
+    chunk_size_mb: 500
+    
+  # Metadata
+  metadata:
+    description: "Comprehensive human population genomics"
+    samples: "2504 individuals + 698 related"
+    populations: "Global population structure"
+    estimated_size_gb: 4000.0
+    priority: 2
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active"
+
+jgi_gems_genomes:
+  name: "JGI GEMS Genomes"
+  domain: "genomics"
+  
+  # URLs
+  primary_url: "https://portal.nersc.gov/GEM"
+  mirror_urls:
+    - "https://img.jgi.doe.gov"
+    - "https://genome.jgi.doe.gov"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 3
+    
+  # Metadata
+  metadata:
+    description: "JGI genome annotation and functional analysis"
+    estimated_size_gb: 500.0
+    priority: 3
+    
+  last_verified: "2024-01-15T12:00:00Z"
+  status: "active" 

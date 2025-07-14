@@ -1,0 +1,194 @@
+# Geographic Mirror Configuration
+# Optimized mirrors for different geographic regions to handle VPN issues and improve performance
+
+# North America (US East Coast)
+us_east_mirrors:
+  nasa_exoplanet_archive:
+    - "https://archive.stsci.edu/missions/exoplanets"
+    - "https://mast.stsci.edu/exoplanets"
+  ncbi_databases:
+    - "https://ftp.ncbi.nih.gov"
+    - "https://ftp-private.ncbi.nlm.nih.gov"
+  jwst_mast_archive:
+    - "https://archive.stsci.edu"
+    - "https://mastdata.stsci.edu"
+
+# North America (US West Coast)  
+us_west_mirrors:
+  nasa_exoplanet_archive:
+    - "https://exofop.ipac.caltech.edu"
+    - "https://archive.stsci.edu/missions/exoplanets"
+  phoenix_stellar_models:
+    - "https://phoenix.ens-lyon.fr"
+    - "https://archive.org/details/phoenix_stellar_models"
+
+# Europe
+europe_mirrors:
+  thousand_genomes_project:
+    - "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp"
+  uniprot_databases:
+    - "https://ftp.ebi.ac.uk/pub/databases/uniprot"
+    - "https://ftp.expasy.org/databases/uniprot"
+  gtdb_taxonomy:
+    - "https://data.ace.uq.edu.au/public/gtdb/data/releases/latest"
+  ecmwf_era5:
+    - "https://climate.copernicus.eu/climate-data-store"
+    - "https://cds-beta.climate.copernicus.eu"
+
+# Asia Pacific
+asia_mirrors:
+  vizier_catalog_service:
+    - "http://vizier.nao.ac.jp"
+    - "http://vizier.iucaa.in"
+  simbad_astronomical_database:
+    - "http://simbad.iucaa.in"
+
+# Global/Archive Mirrors (for maximum availability)
+global_mirrors:
+  nasa_sources:
+    - "https://archive.org/details/nasa_data"
+    - "https://zenodo.org/communities/nasa"
+  genomics_sources:
+    - "https://archive.org/details/genomics_data"
+    - "https://zenodo.org/communities/genomics"
+  climate_sources:
+    - "https://archive.org/details/climate_data"
+    - "https://zenodo.org/communities/climate"
+  astronomy_sources:
+    - "https://archive.org/details/astronomy_data"
+    - "https://zenodo.org/communities/astronomy"
+
+# CDN and Content Delivery Networks
+cdn_mirrors:
+  cloudflare:
+    base_url: "https://cdnjs.cloudflare.com/ajax/libs/scientific-data"
+    sources:
+      - "kegg_pathways"
+      - "stellar_models"
+  jsdelivr:
+    base_url: "https://cdn.jsdelivr.net/gh/scientific-data"
+    sources:
+      - "genomics_annotations"
+      - "climate_models"
+
+# Institution-Specific Mirrors
+institutional_mirrors:
+  university_mirrors:
+    mit:
+      base_url: "https://data.mit.edu/scientific"
+      specialties: ["astronomy", "climate_science"]
+    stanford:
+      base_url: "https://data.stanford.edu/astrobio"
+      specialties: ["genomics", "astrobiology"]
+    harvard:
+      base_url: "https://dataverse.harvard.edu/astrobio"
+      specialties: ["stellar_models", "paleoclimate"]
+  
+  government_mirrors:
+    nist:
+      base_url: "https://data.nist.gov/od/ds"
+      specialties: ["reference_data", "standards"]
+    noaa:
+      base_url: "https://data.noaa.gov/dataset"
+      specialties: ["climate_data", "paleoclimate"]
+
+# High-Performance Computing Centers
+hpc_mirrors:
+  nersc:
+    base_url: "https://portal.nersc.gov/project/cosmo/data"
+    specialties: ["climate_models", "simulations"]
+  tacc:
+    base_url: "https://data.tacc.utexas.edu/public"
+    specialties: ["genomics", "large_datasets"]
+  alcf:
+    base_url: "https://www.alcf.anl.gov/public-datasets"
+    specialties: ["physics_models", "simulations"]
+
+# Commercial Cloud Mirrors  
+cloud_mirrors:
+  aws_public_datasets:
+    base_url: "https://registry.opendata.aws"
+    available_sources:
+      - "1000genomes"
+      - "nasa_earthdata"
+      - "noaa_nexrad"
+  google_public_data:
+    base_url: "https://console.cloud.google.com/marketplace/browse?filter=solution-type:dataset"
+    available_sources:
+      - "genomics_public_data"
+      - "nasa_public_data"
+  azure_open_datasets:
+    base_url: "https://azure.microsoft.com/en-us/services/open-datasets"
+    available_sources:
+      - "genomics_data_lake"
+      - "climate_data_lake"
+
+# Regional Performance Optimization
+performance_routing:
+  low_latency_regions:
+    us_east:
+      - "nasa_exoplanet_archive"
+      - "jwst_mast_archive"
+      - "ncbi_databases"
+    europe:
+      - "uniprot_databases"
+      - "thousand_genomes_project"
+      - "ecmwf_era5"
+    asia:
+      - "vizier_catalog_service"
+      - "simbad_astronomical_database"
+  
+  high_bandwidth_sources:
+    - "rocke3d_climate_models"
+    - "phoenix_stellar_models"
+    - "thousand_genomes_project"
+    
+  vpn_optimized:
+    # Sources that work well through VPNs
+    reliable_through_vpn:
+      - "archive.org" # Generally VPN-friendly
+      - "zenodo.org"  # Academic repository
+      - "github.com"  # Version control friendly
+    
+    # Sources that often block VPNs
+    vpn_problematic:
+      - "ftp.ncbi.nlm.nih.gov"  # Government FTP
+      - "exoplanetarchive.ipac.caltech.edu"  # NASA institutional
+      - "mast.stsci.edu"  # STScI institutional
+
+# Mirror Selection Strategy
+selection_strategy:
+  criteria:
+    - geographic_proximity
+    - vpn_compatibility  
+    - bandwidth_availability
+    - historical_reliability
+    - authentication_requirements
+  
+  fallback_order:
+    1: "geographic_mirrors"
+    2: "institutional_mirrors"
+    3: "global_mirrors"
+    4: "cloud_mirrors"
+    5: "community_contributed"
+
+# Mirror Health Monitoring
+health_monitoring:
+  check_interval_minutes: 15
+  timeout_seconds: 30
+  retry_attempts: 3
+  
+  # Geographic-specific health checks
+  regional_checks:
+    us_east:
+      test_endpoints:
+        - "https://archive.stsci.edu/missions/exoplanets/help"
+        - "https://ftp.ncbi.nih.gov/README.txt"
+    europe:
+      test_endpoints:
+        - "https://ftp.ebi.ac.uk/pub/databases/uniprot/README"
+        - "https://climate.copernicus.eu/api/health"
+    asia:
+      test_endpoints:
+        - "http://vizier.nao.ac.jp/viz-bin/VizieR"
+        - "http://simbad.iucaa.in/simbad/" 
