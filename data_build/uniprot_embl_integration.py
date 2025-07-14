@@ -119,38 +119,31 @@ class UniProtDownloader:
         """Initialize enterprise URL management for UniProt"""
         try:
             if not URL_SYSTEM_AVAILABLE:
-                logger.info("Enterprise URL system not available, using fallback UniProt URL")
+                logger.warning("Integrated URL system not available. Falling back to direct requests.")
                 return
                 
             self.url_system = get_integrated_url_system()
-            
-            # Get managed UniProt URL
-            managed_url = self.url_system.get_managed_url(
-                source_id="uniprot_ftp",
-                data_priority=self.data_priority
-            )
-            if managed_url:
-                self.base_url = managed_url
-                logger.info(f"Using enterprise-managed UniProt URL: {managed_url}")
-            
-            logger.info("✅ UniProt downloader integrated with enterprise URL system")
+            # URL acquisition will be done when needed in async methods
+            logger.info("✅ UniProt integrated with enterprise URL system")
             
         except Exception as e:
-            logger.warning(f"Failed to initialize enterprise URL system for UniProt: {e}")
-            logger.info("Falling back to direct UniProt access")
+            logger.warning(f"Failed to initialize enterprise URL system: {e}")
+            self.url_system = None
+    
+    async def _get_managed_url(self, test_url: str) -> str:
+        """Get managed URL using enterprise system"""
+        try:
+            if self.url_system:
+                managed_url = await self.url_system.get_url(
+                    test_url,
+                    priority=DataPriority.MEDIUM
+                )
+                if managed_url:
+                    return managed_url
+        except Exception as e:
+            logger.warning(f"Failed to get managed URL: {e}")
         
-        self.max_retries = 3
-        
-        # Initialize requests session with retry strategy
-        self.requests_session = None # This will be initialized in _get_session
-        self.url_system = None # This will be initialized in _get_session
-        
-        if URL_SYSTEM_AVAILABLE:
-            self.url_system = get_integrated_url_system()
-            self.requests_session = self.url_system.get_session()
-        else:
-            logger.warning("Integrated URL system not available. Falling back to direct requests.")
-            self.requests_session = aiohttp.ClientSession()
+        return test_url  # Fallback to original URL
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""

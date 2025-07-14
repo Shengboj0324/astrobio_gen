@@ -255,14 +255,13 @@ class BaseModelWrapper(ABC):
                     'targets': data['targets'].numpy() if isinstance(data['targets'], torch.Tensor) else data['targets'],
                     'metadata': data.get('metadata', {})
                 }
-                
     else:
                 logger.error(f"Unsupported validation data format: {file_path.suffix}")
-                return None
-                
+        return None
+
         except Exception as e:
             logger.error(f"Failed to load validation data: {e}")
-        return None
+            return None
 
     def _run_validation(self, validation_data: Dict[str, Any]) -> Dict[str, Any]:
         """Run validation on loaded data"""

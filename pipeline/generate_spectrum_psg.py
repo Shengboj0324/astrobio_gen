@@ -13,10 +13,15 @@ import numpy as np
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 from utils.cache import get as cache_get, put as cache_put
+import asyncio
+import xml.etree.ElementTree as ET
+import tempfile
+from pathlib import Path
+from typing import Optional, Dict, Any
 
 # Enterprise URL system integration
 import sys
-sys.path.append(str(pathlib.Path(__file__).parent.parent))
+sys.path.append(str(Path(__file__).parent.parent))
 try:
     from utils.integrated_url_system import get_integrated_url_system
     from utils.autonomous_data_acquisition import DataPriority
@@ -26,6 +31,9 @@ except ImportError:
     DataPriority = None
 
 _LOG = logging.getLogger(__name__)
+
+# PSG API Configuration
+_PSG_BASE_URL = "https://psg.gsfc.nasa.gov/api.php"  # Primary URL
 _FALLBACK_API = "https://psg.gsfc.nasa.gov/api.php"  # Fallback URL
 
 class PSGInterface:
@@ -56,63 +64,33 @@ class PSGInterface:
             _LOG.info("Falling back to direct PSG API access")
     
     def _register_psg_source(self):
-        """Register PSG API in enterprise URL system"""
+        """Register PSG as a managed data source"""
         try:
-            # Check if PSG is already registered
-            managed_url = self.url_system.get_managed_url(
-                source_id="nasa_psg_api",
-                data_priority=self.data_priority
-            )
+            # Check if PSG is already registered in the URL system
+            # If not, this will be handled by the URL registry
+            test_url = "https://psg.gsfc.nasa.gov/api.php"
+            managed_url = asyncio.run(self.url_system.get_url(test_url, self.data_priority))
             if managed_url:
                 self.current_api_url = managed_url
-                _LOG.info(f"Using enterprise-managed PSG URL: {managed_url}")
-                return
-                
-            # If not registered, add it to the system
-            if hasattr(self.url_system, 'url_manager'):
-                # Register PSG as a NASA source
-                psg_config = {
-                    'source_id': 'nasa_psg_api',
-                    'primary_url': 'https://psg.gsfc.nasa.gov/api.php',
-                    'mirrors': [
-                        'https://psg.gsfc.nasa.gov/api.php',  # Primary
-                    ],
-                    'health_check_endpoint': 'https://psg.gsfc.nasa.gov/',
-                    'geographic_routing': True,
-                    'priority': 'HIGH',
-                    'institution': 'NASA GSFC',
-                    'data_type': 'spectrum_generation'
-                }
-                
-                # Use enterprise URL system to get best available URL
-                self.current_api_url = self.url_system.get_managed_url(
-                    source_id="nasa_psg_api",
-                    data_priority=self.data_priority
-                ) or _FALLBACK_API
-                
+                _LOG.info(f"PSG registered with managed URL: {managed_url}")
         except Exception as e:
-            _LOG.warning(f"Could not register PSG in enterprise system: {e}")
-            self.current_api_url = _FALLBACK_API
-
-    async def get_managed_psg_url(self) -> str:
-        """Get the current best PSG API URL from enterprise system"""
+            _LOG.warning(f"Could not register PSG source: {e}")
+    
+    async def get_psg_api_url(self) -> str:
+        """Get the optimal PSG API URL using enterprise routing"""
         try:
             if self.url_system:
-                managed_url = await self.url_system.get_managed_url_async(
-                    source_id="nasa_psg_api",
-                    data_priority=self.data_priority
-                )
+                # Get managed URL for PSG API
+                test_url = "https://psg.gsfc.nasa.gov/api.php"
+                managed_url = await self.url_system.get_url(test_url, self.data_priority)
                 if managed_url:
-                    self.current_api_url = managed_url
                     return managed_url
-                    
+        
         except Exception as e:
             _LOG.warning(f"Failed to get managed PSG URL: {e}")
-            
+        
+        # Fallback to configured URL
         return self.current_api_url
-
-# Global PSG interface instance
-_psg_interface = PSGInterface()
 
 def _cfg_xml(atmos: dict[str, float], planet: dict, instrument: str, R: int) -> str:
     gases_xml = "\n".join(f"<{g}>{mix}</{g}>" for g, mix in atmos.items())
@@ -144,7 +122,7 @@ def _call_psg(cfg: str) -> str:
                 # Try to get updated URL
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                api_url = loop.run_until_complete(_psg_interface.get_managed_psg_url())
+                api_url = loop.run_until_complete(_psg_interface.get_psg_api_url())
                 loop.close()
             except:
                 pass  # Use current URL if async fails

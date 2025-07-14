@@ -218,12 +218,14 @@ class AGORA2Downloader:
         """Get managed URL from enterprise system"""
         try:
             if self.url_system:
-                # Use the correct method name: get_url()
-                managed_url = await self.url_system.get_url(url, priority=self.data_priority)
+                managed_url = await self.url_system.get_url(
+                    url,
+                    priority=self.data_priority
+                )
                 if managed_url:
                     return managed_url
         except Exception as e:
-            logger.warning(f"Failed to get managed URL for {url}: {e}")
+            logger.warning(f"Failed to get managed URL: {e}")
         
         return url  # Fallback to original URL
     
@@ -434,25 +436,12 @@ class NCBIGenomeDownloader:
                 return
                 
             self.url_system = get_integrated_url_system()
-            
-            # Get managed NCBI FTP host
-            managed_url = self.url_system.get_managed_url(
-                source_id="ncbi_ftp",
-                data_priority=self.data_priority
-            )
-            if managed_url:
-                # Extract host from URL if it's a full URL
-                from urllib.parse import urlparse
-                parsed = urlparse(managed_url)
-                if parsed.hostname:
-                    self.ftp_host = parsed.hostname
-                    logger.info(f"Using enterprise-managed NCBI FTP host: {self.ftp_host}")
-            
-            logger.info("✅ NCBI genome downloader integrated with enterprise URL system")
+            # URL acquisition will be done when needed in async methods
+            logger.info("✅ NCBI integrated with enterprise URL system")
             
         except Exception as e:
             logger.warning(f"Failed to initialize enterprise URL system for NCBI: {e}")
-            logger.info("Falling back to direct NCBI FTP access")
+            self.url_system = None
         
         # Comprehensive organism categories discovered in NCBI FTP crawl
         self.organism_categories = [

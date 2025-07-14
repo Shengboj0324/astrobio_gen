@@ -26,6 +26,7 @@ import logging
 import pandas as pd
 import gzip
 import tarfile
+import requests
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any, Set, Tuple
@@ -159,62 +160,27 @@ class GTDBDownloader:
                 return
                 
             self.url_system = get_integrated_url_system()
-            
-            # Get managed GTDB URLs
-            managed_url = self.url_system.get_managed_url(
-                source_id="gtdb_release",
-                data_priority=self.data_priority
-            )
-            if managed_url:
-                self.base_url = managed_url
-                logger.info(f"Using enterprise-managed GTDB URL: {managed_url}")
-            
-            # Get managed mirror URL if available
-            mirror_url = self.url_system.get_managed_url(
-                source_id="gtdb_uq_mirror", 
-                data_priority=self.data_priority
-            )
-            if mirror_url:
-                self.mirror_url = mirror_url
-                logger.info(f"Using enterprise-managed GTDB mirror: {mirror_url}")
-            
-            logger.info("✅ GTDB downloader integrated with enterprise URL system")
+            # URL acquisition will be done when needed in async methods
+            logger.info("✅ GTDB integrated with enterprise URL system")
             
         except Exception as e:
-            logger.warning(f"Failed to initialize enterprise URL system for GTDB: {e}")
-            logger.info("Falling back to direct GTDB access")
+            logger.warning(f"Failed to initialize enterprise URL system: {e}")
+            self.url_system = None
+    
+    async def _get_managed_url(self, test_url: str) -> str:
+        """Get managed URL using enterprise system"""
+        try:
+            if self.url_system:
+                managed_url = await self.url_system.get_url(
+                    test_url,
+                    priority=self.data_priority
+                )
+                if managed_url:
+                    return managed_url
+        except Exception as e:
+            logger.warning(f"Failed to get managed URL: {e}")
         
-        # Available file types from web crawl
-        self.available_files = {
-            # Bacterial data (715,230 genomes)
-            'bac120_metadata': 'bac120_metadata.tsv.gz',
-            'bac120_taxonomy': 'bac120_taxonomy.tsv',
-            'bac120_tree': 'bac120.tree',
-            'bac120_tree_gz': 'bac120.tree.gz',
-            'bac120_msa_mask': 'bac120_msa_mask.txt',
-            # Archaeal data (17,245 genomes)
-            'ar53_metadata': 'ar53_metadata.tsv.gz',
-            'ar53_taxonomy': 'ar53_taxonomy.tsv',
-            'ar53_tree': 'ar53.tree',
-            'ar53_tree_gz': 'ar53.tree.gz',
-            'ar53_msa_mask': 'ar53_msa_mask.txt',
-            # Additional files
-            'version': 'VERSION.txt',
-            'methods': 'METHODS.txt',
-            'file_descriptions': 'FILE_DESCRIPTIONS.txt',
-            'md5sums': 'MD5SUM.txt'
-        }
-        
-        # Initialize requests session with retry strategy
-        self.requests_session = requests.Session()
-        retry_strategy = Retry(
-            total=3,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        self.requests_session.mount("http://", adapter)
-        self.requests_session.mount("https://", adapter)
+        return test_url  # Fallback to original URL
     
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session"""
@@ -258,7 +224,7 @@ class GTDBDownloader:
         base_url = self.mirror_url if use_mirror else self.base_url
         
         try:
-            url = urljoin(base_url, filename)
+            url = requests.compat.urljoin(base_url, filename)
             
             logger.info(f"Downloading {filename}")
             

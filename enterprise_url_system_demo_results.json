@@ -1,6 +1,6 @@
 {
   "initialization": {
-    "time_seconds": 26.205170392990112,
+    "time_seconds": 25.653605937957764,
     "status": {
       "url_manager": {
         "sources_registered": 41,
@@ -12,14 +12,14 @@
       },
       "autonomous_system": {
         "system_health": {
-          "availability_percent": "2025-07-14 17:04:14.854561+00:00",
+          "availability_percent": "2025-07-14 18:01:04.796245+00:00",
           "response_time_ms": 0.0,
-          "active_sources": 0,
+          "active_sources": 7,
           "healthy_sources": 24
         },
-        "active_tasks": 0,
+        "active_tasks": 1,
         "recent_decisions": {
-          "strategy_selection": 10
+          "strategy_selection": 39
         },
         "strategy_weights": {
           "primary_only": 1.0,
@@ -37,7 +37,7 @@
         }
       },
       "global_network": {
-        "node_id": "450d67ac5c8e0771",
+        "node_id": "d42d071760c48588",
         "uptime_percent": 100.0,
         "uptime_target": 99.99,
         "sla_status": "meeting",
@@ -49,8 +49,8 @@
           "bandwidth_utilization": 0.0,
           "throughput_rps": 0.0
         },
-        "network_health_score": "<Task finished name='Task-252' coro=<GlobalScientificNetwork._calculate_network_health() done, defined at C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\utils\\global_scientific_network.py:607> result=0.0>",
-        "last_update": "2025-07-14T18:00:55.020146+00:00"
+        "network_health_score": "<Task finished name='Task-254' coro=<GlobalScientificNetwork._calculate_network_health() done, defined at C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\utils\\global_scientific_network.py:607> result=0.0>",
+        "last_update": "2025-07-14T18:27:17.925304+00:00"
       },
       "integration": {
         "url_mappings": 20,
@@ -92,8 +92,8 @@
   "q2_partnerships": {
     "total_partnerships": 4,
     "partnership_types": [
-      "Strategic Partnership - Gold Tier",
-      "Collaborative Partnership"
+      "Collaborative Partnership",
+      "Strategic Partnership - Gold Tier"
     ]
   },
   "q2_mirrors": {
@@ -102,23 +102,23 @@
   },
   "q3_autonomous": {
     "nasa_exoplanet_archive": {
-      "task_id": "nasa_exoplanet_archive_1752516085_7620",
+      "task_id": "nasa_exoplanet_archive_1752517666_2883",
       "priority": "CRITICAL",
       "strategy": "parallel_redundant"
     },
     "kegg_database": {
-      "task_id": "kegg_database_1752516087_7620",
+      "task_id": "kegg_database_1752517667_2883",
       "priority": "HIGH",
       "strategy": "mirror_failover"
     },
     "ncbi_databases": {
-      "task_id": "ncbi_databases_1752516090_7620",
+      "task_id": "ncbi_databases_1752517671_2883",
       "priority": "MEDIUM",
       "strategy": "primary_only"
     }
   },
   "q3_network": {
-    "node_id": "450d67ac5c8e0771",
+    "node_id": "d42d071760c48588",
     "uptime_percent": 50.0,
     "uptime_target": 99.99,
     "sla_status": "below_target",
@@ -127,16 +127,16 @@
     "current_metrics": {
       "response_time_ms": 150.0,
       "error_rate_percent": 0.5,
-      "bandwidth_utilization": 32.758983058929445,
+      "bandwidth_utilization": 33.59246989250183,
       "throughput_rps": 50.0
     },
     "network_health_score": "<Task finished name='Task-341' coro=<GlobalScientificNetwork._calculate_network_health() done, defined at C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\utils\\global_scientific_network.py:607> result=0.0>",
-    "last_update": "2025-07-14T18:01:30.842783+00:00"
+    "last_update": "2025-07-14T18:27:51.639758+00:00"
   },
   "q3_analytics": {
     "response_time_ms": 150.0,
     "error_rate_percent": 0.5,
-    "bandwidth_utilization": 32.758983058929445,
+    "bandwidth_utilization": 33.59246989250183,
     "uptime_target": 99.99
   },
   "integration_tests": {
@@ -152,22 +152,22 @@
   "performance_benchmarks": {
     "url_tests": {
       "https://exoplanetarchive.ipac.caltech.edu/test": {
-        "response_time_ms": 8429.474592208862,
+        "response_time_ms": 7897.349834442139,
         "success": true,
         "managed_url": "https://exoplanetarchive.ipac.caltech.edu/test"
       },
       "https://rest.kegg.jp/test": {
-        "response_time_ms": 23126.370191574097,
+        "response_time_ms": 23091.551542282104,
         "success": true,
         "managed_url": "https://rest.kegg.jp/test"
       },
       "https://ftp.ncbi.nlm.nih.gov/test": {
-        "response_time_ms": 14071.390390396118,
+        "response_time_ms": 11967.581033706665,
         "success": true,
         "managed_url": "https://ftp.ncbi.nlm.nih.gov/test"
       }
     },
-    "average_response_time_ms": 15209.078391393026,
+    "average_response_time_ms": 14318.827470143637,
     "meets_target": false
   },
   "requirements_validation": {
@@ -186,7 +186,7 @@
     "all_requirements_met": true
   },
   "summary": {
-    "total_duration_seconds": 138.486833,
+    "total_duration_seconds": 131.425938,
     "completion_status": "success",
     "features_implemented": 9,
     "integration_success": true,

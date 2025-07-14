@@ -203,9 +203,10 @@ class SurrogateDataManager:
         try:
             if self.url_system:
                 # Use enterprise URL system to get NASA exoplanet data
-                nasa_url = self.url_system.get_managed_url(
-                    source_id="nasa_exoplanet_archive",
-                    data_priority=DataPriority.HIGH
+                test_url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI"
+                nasa_url = await self.url_system.get_url(
+                    test_url,
+                    priority=DataPriority.HIGH
                 )
                 
                 if nasa_url:
