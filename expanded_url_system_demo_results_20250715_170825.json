@@ -1,0 +1,309 @@
+{
+  "demo_metadata": {
+    "timestamp": "2025-07-15T09:08:25.807122+00:00",
+    "duration_seconds": 0.013515,
+    "system_version": "2.0.0",
+    "total_domains": 5,
+    "total_sources": 10
+  },
+  "results": {
+    "domain_coverage": {
+      "astronomy": {
+        "source_count": 2,
+        "total_size_gb": 515.2,
+        "priority_1_count": 2,
+        "sources": [
+          {
+            "name": "BOSZ Synthetic Stellar Spectral Library",
+            "size_gb": 500.0,
+            "priority": 1,
+            "url": "https://archive.stsci.edu/hlsps/bosz"
+          },
+          {
+            "name": "Exoplanet.eu Database",
+            "size_gb": 15.2,
+            "priority": 1,
+            "url": "https://exoplanet.eu"
+          }
+        ]
+      },
+      "climate": {
+        "source_count": 2,
+        "total_size_gb": 80000.0,
+        "priority_1_count": 2,
+        "sources": [
+          {
+            "name": "ERA5 Complete Global Atmospheric Reanalysis",
+            "size_gb": 50000.0,
+            "priority": 1,
+            "url": "https://cds.climate.copernicus.eu"
+          },
+          {
+            "name": "MERRA-2 NASA Global Reanalysis",
+            "size_gb": 30000.0,
+            "priority": 1,
+            "url": "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2"
+          }
+        ]
+      },
+      "genomics": {
+        "source_count": 2,
+        "total_size_gb": 10100.0,
+        "priority_1_count": 2,
+        "sources": [
+          {
+            "name": "BioCyc Pathway/Genome Database Collection",
+            "size_gb": 100.0,
+            "priority": 1,
+            "url": "https://biocyc.org"
+          },
+          {
+            "name": "Ensembl Genome Browser",
+            "size_gb": 10000.0,
+            "priority": 1,
+            "url": "https://www.ensembl.org"
+          }
+        ]
+      },
+      "planetary_geochemistry": {
+        "source_count": 2,
+        "total_size_gb": 50010.0,
+        "priority_1_count": 2,
+        "sources": [
+          {
+            "name": "NASA Planetary Data System (PDS)",
+            "size_gb": 50000.0,
+            "priority": 1,
+            "url": "https://pds.nasa.gov"
+          },
+          {
+            "name": "USGS Earthquake Hazards Program",
+            "size_gb": 10.0,
+            "priority": 1,
+            "url": "https://earthquake.usgs.gov"
+          }
+        ]
+      },
+      "spectroscopy": {
+        "source_count": 2,
+        "total_size_gb": 70.0,
+        "priority_1_count": 2,
+        "sources": [
+          {
+            "name": "HITRAN Molecular Spectroscopic Database",
+            "size_gb": 20.0,
+            "priority": 1,
+            "url": "https://hitran.org"
+          },
+          {
+            "name": "SSHADE Solid Spectroscopy Database",
+            "size_gb": 50.0,
+            "priority": 1,
+            "url": "https://www.sshade.eu"
+          }
+        ]
+      }
+    },
+    "priority_sources": [
+      {
+        "name": "ERA5 Complete Global Atmospheric Reanalysis",
+        "domain": "climate",
+        "url": "https://cds.climate.copernicus.eu",
+        "size_gb": 50000.0,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "NASA Planetary Data System (PDS)",
+        "domain": "planetary_geochemistry",
+        "url": "https://pds.nasa.gov",
+        "size_gb": 50000.0,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "MERRA-2 NASA Global Reanalysis",
+        "domain": "climate",
+        "url": "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2",
+        "size_gb": 30000.0,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "Ensembl Genome Browser",
+        "domain": "genomics",
+        "url": "https://www.ensembl.org",
+        "size_gb": 10000.0,
+        "description": "",
+        "mirrors": 2
+      },
+      {
+        "name": "BOSZ Synthetic Stellar Spectral Library",
+        "domain": "astronomy",
+        "url": "https://archive.stsci.edu/hlsps/bosz",
+        "size_gb": 500.0,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "BioCyc Pathway/Genome Database Collection",
+        "domain": "genomics",
+        "url": "https://biocyc.org",
+        "size_gb": 100.0,
+        "description": "",
+        "mirrors": 2
+      },
+      {
+        "name": "SSHADE Solid Spectroscopy Database",
+        "domain": "spectroscopy",
+        "url": "https://www.sshade.eu",
+        "size_gb": 50.0,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "HITRAN Molecular Spectroscopic Database",
+        "domain": "spectroscopy",
+        "url": "https://hitran.org",
+        "size_gb": 20.0,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "Exoplanet.eu Database",
+        "domain": "astronomy",
+        "url": "https://exoplanet.eu",
+        "size_gb": 15.2,
+        "description": "",
+        "mirrors": 1
+      },
+      {
+        "name": "USGS Earthquake Hazards Program",
+        "domain": "planetary_geochemistry",
+        "url": "https://earthquake.usgs.gov",
+        "size_gb": 10.0,
+        "description": "",
+        "mirrors": 1
+      }
+    ],
+    "geographic_distribution": {
+      "sources_with_mirrors": 10,
+      "total_mirror_urls": 12,
+      "sources_with_geographic_routing": 0,
+      "authentication_required": 0,
+      "regional_sources": {
+        "US": [
+          "merra2_reanalysis",
+          "pds_planetary",
+          "usgs_earthquake"
+        ],
+        "Europe": [
+          "exoplanet_eu",
+          "era5_complete",
+          "sshade_spectroscopy"
+        ],
+        "Global": [
+          "bosz_stellar_library",
+          "biocyc_collection",
+          "ensembl_genome",
+          "hitran_database"
+        ],
+        "Asia": []
+      }
+    },
+    "access_patterns": {
+      "api_enabled": [
+        {
+          "name": "Exoplanet.eu Database",
+          "domain": "astronomy",
+          "url": "https://exoplanet.eu"
+        },
+        {
+          "name": "BioCyc Pathway/Genome Database Collection",
+          "domain": "genomics",
+          "url": "https://biocyc.org"
+        },
+        {
+          "name": "Ensembl Genome Browser",
+          "domain": "genomics",
+          "url": "https://www.ensembl.org"
+        },
+        {
+          "name": "USGS Earthquake Hazards Program",
+          "domain": "planetary_geochemistry",
+          "url": "https://earthquake.usgs.gov"
+        },
+        {
+          "name": "SSHADE Solid Spectroscopy Database",
+          "domain": "spectroscopy",
+          "url": "https://www.sshade.eu"
+        }
+      ],
+      "bulk_download": [
+        {
+          "name": "BOSZ Synthetic Stellar Spectral Library",
+          "domain": "astronomy",
+          "url": "https://archive.stsci.edu/hlsps/bosz"
+        }
+      ],
+      "real_time_feeds": [
+        {
+          "name": "USGS Earthquake Hazards Program",
+          "domain": "planetary_geochemistry",
+          "url": "https://earthquake.usgs.gov"
+        }
+      ],
+      "search_interfaces": [
+        {
+          "name": "BOSZ Synthetic Stellar Spectral Library",
+          "domain": "astronomy",
+          "url": "https://archive.stsci.edu/hlsps/bosz"
+        },
+        {
+          "name": "Exoplanet.eu Database",
+          "domain": "astronomy",
+          "url": "https://exoplanet.eu"
+        },
+        {
+          "name": "MERRA-2 NASA Global Reanalysis",
+          "domain": "climate",
+          "url": "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2"
+        },
+        {
+          "name": "BioCyc Pathway/Genome Database Collection",
+          "domain": "genomics",
+          "url": "https://biocyc.org"
+        },
+        {
+          "name": "NASA Planetary Data System (PDS)",
+          "domain": "planetary_geochemistry",
+          "url": "https://pds.nasa.gov"
+        },
+        {
+          "name": "HITRAN Molecular Spectroscopic Database",
+          "domain": "spectroscopy",
+          "url": "https://hitran.org"
+        },
+        {
+          "name": "SSHADE Solid Spectroscopy Database",
+          "domain": "spectroscopy",
+          "url": "https://www.sshade.eu"
+        }
+      ],
+      "authentication_required": []
+    },
+    "quality_metrics": {
+      "total_estimated_size_gb": 140695.2,
+      "sources_by_priority": {
+        "1": 10,
+        "2": 0,
+        "3": 0
+      },
+      "sources_by_status": {
+        "active": 10
+      },
+      "maintenance_schedule": [],
+      "reliability_score": 100.0
+    }
+  }
+}
