@@ -1,0 +1,310 @@
+# Expanded Astronomy Data Sources Registry
+# Additional high-quality exoplanet, stellar, and astronomical databases
+
+exoplanet_eu:
+  name: "Exoplanet.eu Database"
+  domain: "astronomy"
+  
+  # Primary and mirror URLs
+  primary_url: "https://exoplanet.eu"
+  mirror_urls:
+    - "https://archive.org/web/exoplanet.eu"
+    - "https://web.archive.org/web/*/exoplanet.eu"
+  
+  # API endpoints
+  endpoints:
+    catalog_api: "/catalog"
+    plots_api: "/plots"
+    search_api: "/home/"
+    csv_export: "/catalog/csv"
+    
+  # Bulk download files
+  bulk_files:
+    - name: "exoplanet_catalog_2024.csv"
+      url: "/catalog/csv"
+      estimated_size_mb: 15.2
+      description: "Complete exoplanet catalog with 7554+ planets"
+  
+  # Performance optimization
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 3
+    timeout_seconds: 30
+    
+  # Metadata
+  metadata:
+    description: "Encyclopedia of exoplanetary systems - 7554 planets"
+    maintainer: "Exoplanet TEAM"
+    established: "February 1995"
+    update_frequency: "daily"
+    data_types: ["exoplanets", "stellar_hosts", "orbital_parameters"]
+    estimated_size_gb: 0.5
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+open_exoplanet_catalogue:
+  name: "Open Exoplanet Catalogue"
+  domain: "astronomy"
+  
+  # GitHub-based repository
+  primary_url: "https://github.com/OpenExoplanetCatalogue"
+  mirror_urls:
+    - "https://raw.githubusercontent.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/master"
+    - "https://api.github.com/repos/OpenExoplanetCatalogue"
+    
+  # Repository endpoints
+  endpoints:
+    main_catalog: "/open_exoplanet_catalogue"
+    compressed: "/oec_gzip"
+    web_interface: "/oec_web"
+    plots: "/oec_plots"
+    tables: "/oec_tables"
+    
+  # Data files
+  bulk_files:
+    - name: "systems.xml"
+      url: "/open_exoplanet_catalogue/systems.xml"
+      format: "XML"
+    - name: "systems_kepler.xml" 
+      url: "/open_exoplanet_catalogue/systems_kepler.xml"
+      format: "XML"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 5
+    timeout_seconds: 45
+    
+  # Metadata
+  metadata:
+    description: "Open source database of all discovered extrasolar planets"
+    data_types: ["exoplanets", "binaries", "multiple_systems"]
+    format: "XML, JSON, ASCII"
+    estimated_size_gb: 0.1
+    priority: 2
+    license: "MIT"
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+bosz_stellar_library:
+  name: "BOSZ Synthetic Stellar Spectral Library"
+  domain: "astrophysics"
+  
+  # STScI archive location
+  primary_url: "https://archive.stsci.edu/hlsps/bosz"
+  mirror_urls:
+    - "https://mast.stsci.edu/hlsp/bosz"
+    - "https://doi.org/10.17909/T95G68"
+    
+  # Data organization
+  endpoints:
+    bosz_2024: "/bosz2024"
+    bosz_2017: "/bosz2017" 
+    wavelength_grids: "/bosz2024/wavelength_grids"
+    download_scripts: "/bosz2024/download_scripts"
+    
+  # Bulk download capabilities
+  bulk_files:
+    - name: "bosz2024_wave_r500.txt"
+      url: "/bosz2024/wavelength_grids/bosz2024_wave_r500.txt"
+    - name: "bosz2024_complete_r2000_solar.tar.gz" 
+      estimated_size_gb: 50.0
+      description: "Complete R=2000 solar metallicity grid"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 2
+    timeout_seconds: 300
+    
+  # Metadata  
+  metadata:
+    description: "ATLAS9/MARCS synthetic stellar spectra (50nm-32μm)"
+    temperature_range: "2800K-16000K"
+    resolution_range: "R=500-50000"
+    metallicity_range: "-2.5 to +0.75 dex"
+    total_spectra: "628,620"
+    estimated_size_gb: 500.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+newera_stellar_models:
+  name: "NewEra PHOENIX Model Grid"
+  domain: "astrophysics"
+  
+  # University source
+  primary_url: "https://phoenix.astro.physik.uni-goettingen.de"
+  mirror_urls:
+    - "https://www.hs.uni-hamburg.de/EN/Ins/Per/Hauschildt/phoenix"
+    - "https://doi.org/10.1051/0004-6361/202554171"
+    
+  # Model access
+  endpoints:
+    model_grid: "/newera"
+    documentation: "/newera/README"
+    hdf5_files: "/newera/models"
+    
+  # Metadata
+  metadata:
+    description: "NewEra LTE model grid with 37438 models"
+    temperature_range: "2300K-12000K"
+    gravity_range: "0.0-6.0 dex"
+    metallicity_range: "-4.0 to +0.5 dex"
+    format: "HDF5"
+    line_database: "851M atomic + 834B molecular lines"
+    estimated_size_gb: 200.0
+    priority: 2
+    
+  # Performance
+  performance:
+    rate_limit_delay: 3.0
+    max_concurrent: 2
+    timeout_seconds: 600
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+msg_stellar_models:
+  name: "MSG (MARCS-StaticWeather-GGchem) Models"
+  domain: "astrophysics"
+  
+  # Academic source
+  primary_url: "https://www.astro.ku.dk/~kg/MSG"
+  mirror_urls:
+    - "https://zenodo.org/communities/msg-models"
+    - "https://doi.org/10.1051/0004-6361/202450108"
+    
+  # Model organization
+  endpoints:
+    model_grid: "/models"
+    documentation: "/docs"
+    tools: "/tools"
+    
+  # Metadata
+  metadata:
+    description: "Self-consistent 1D stellar/sub-stellar/exoplanet atmospheres"
+    temperature_range: "300K-3000K"
+    includes: "cloud_formation, chemical_non_equilibrium, stellar_irradiation"
+    coupling: "MARCS + StaticWeather + GGchem"
+    estimated_size_gb: 100.0
+    priority: 2
+    
+  # Performance  
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    timeout_seconds: 300
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+stagger_grid:
+  name: "STAGGER 3D Stellar Atmosphere Grid"
+  domain: "astrophysics"
+  
+  # Project website
+  primary_url: "https://staggergrid.wordpress.com"
+  mirror_urls:
+    - "https://www.astro.ku.dk/~kg/STAGGER"
+    - "https://zenodo.org/communities/stagger-grid"
+    
+  # Data access
+  endpoints:
+    mean_3d: "/mean-3d"
+    download: "/download"
+    documentation: "/howto-use-idl-repository"
+    
+  # Metadata
+  metadata:
+    description: "3D time-dependent hydrodynamic stellar atmosphere models"
+    spectral_types: "F, G, K, M"
+    temperature_range: "4000K-7000K"
+    gravity_range: "1.5-5.0 dex"
+    metallicity_range: "-4.0 to +0.5 dex"
+    dimensions: "240x240 horizontal mesh, time-dependent"
+    estimated_size_gb: 1000.0
+    priority: 2
+    
+  # Performance
+  performance:
+    rate_limit_delay: 5.0
+    max_concurrent: 1
+    timeout_seconds: 600
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+astral_hst_library:
+  name: "ASTRAL HST STIS Spectral Library"
+  domain: "astrophysics"
+  
+  # University of Colorado source
+  primary_url: "https://casa.colorado.edu/~ayres/ASTRAL"
+  mirror_urls:
+    - "https://archive.stsci.edu/hst/stis"
+    - "https://mast.stsci.edu"
+    
+  # Data organization
+  endpoints:
+    cool_stars: "/html-pages"
+    hot_stars: "/html-pages" 
+    fits_data: "/fits-files"
+    documentation: "/README"
+    
+  # Metadata
+  metadata:
+    description: "HST STIS high-resolution UV spectral atlases"
+    wavelength_range: "1150-3100 Angstroms"
+    targets: "representative bright stars (cool + hot)"
+    resolution: "R~30000-100000"
+    coverage: "UV spectral atlases with broad uninterrupted coverage"
+    estimated_size_gb: 50.0
+    priority: 3
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    timeout_seconds: 180
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+pollux_database:
+  name: "POLLUX Stellar Spectra Database"
+  domain: "astrophysics"
+  
+  # French observatory source
+  primary_url: "https://pollux.oreme.org"
+  mirror_urls:
+    - "https://pollux.graal.univ-montp2.fr"
+    
+  # Access points
+  endpoints:
+    collections: "/collections"
+    parameters: "/parameters"
+    tools: "/tools"
+    
+  # Metadata
+  metadata:
+    description: "Theoretical stellar spectra database"
+    codes: "ATLAS, CMFGEN, MARCS, PHOENIX, STAGGER"
+    spectral_range: "optical, infrared, ultraviolet"
+    spectral_types: "O to M"
+    resolution: "high resolution synthetic spectra"
+    estimated_size_gb: 25.0
+    priority: 3
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.5
+    max_concurrent: 3
+    timeout_seconds: 120
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active" 

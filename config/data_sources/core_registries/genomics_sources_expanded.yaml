@@ -1,0 +1,351 @@
+# Expanded Genomics & Biology Data Sources Registry
+# Additional pathway databases, genomics resources, and biological data beyond existing sources
+
+biocyc_collection:
+  name: "BioCyc Pathway/Genome Database Collection"
+  domain: "genomics"
+  
+  # SRI International BioCyc
+  primary_url: "https://biocyc.org"
+  mirror_urls:
+    - "https://metacyc.org"
+    - "https://ecocyc.org"
+    - "https://humancyc.org"
+    
+  # Database access points
+  endpoints:
+    main_search: "/search"
+    pathway_tools: "/pathway-tools"
+    database_list: "/biocyc-pgdb-list.shtml"
+    api: "/xmlquery"
+    bulk_download: "/download.shtml"
+    
+  # Major databases
+  major_databases:
+    - name: "MetaCyc"
+      url: "https://metacyc.org"
+      description: "Metabolic pathways and enzymes"
+    - name: "EcoCyc" 
+      url: "https://ecocyc.org"
+      description: "E. coli K-12 genome and metabolism"
+    - name: "HumanCyc"
+      url: "https://humancyc.org"
+      description: "Human metabolic pathways"
+    - name: "YeastCyc"
+      url: "https://yeastcyc.org"
+      description: "S. cerevisiae pathways"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "Collection of 20,079 Pathway/Genome Databases"
+    total_databases: 20079
+    organisms: "Model eukaryotes and thousands of microbes"
+    data_types: ["pathways", "genomes", "proteins", "metabolites", "reactions"]
+    curated_publications: "153,000+ publications"
+    estimated_size_gb: 100.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+humancyc_database:
+  name: "HumanCyc Human Metabolism Database"
+  domain: "genomics"
+  
+  # Dedicated human database
+  primary_url: "https://humancyc.org"
+  mirror_urls:
+    - "https://biocyc.org/HUMAN"
+    
+  # Database sections
+  endpoints:
+    pathways: "/search-pathways"
+    genes: "/search-genes"
+    compounds: "/search-compounds" 
+    reactions: "/search-reactions"
+    cellular_overview: "/cellular-overview"
+    omics_tools: "/omics-data-analysis"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.5
+    max_concurrent: 4
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Encyclopedia of human genes and metabolism"
+    focus: "Human metabolic pathways and genome"
+    features: ["metabolic_networks", "gene_regulation", "omics_analysis"]
+    estimated_size_gb: 5.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+reactome_pathways:
+  name: "Reactome Pathway Database"
+  domain: "genomics"
+  
+  # Reactome project
+  primary_url: "https://reactome.org"
+  mirror_urls:
+    - "https://www.ebi.ac.uk/reactome"
+    - "https://reactome.ncgr.org"
+    
+  # Database access
+  endpoints:
+    pathway_browser: "/PathwayBrowser"
+    analysis_tools: "/AnalysisTools"
+    download: "/download"
+    api: "/ContentService"
+    search: "/content/query"
+    
+  # Data downloads
+  bulk_files:
+    - name: "Homo_sapiens.owl"
+      url: "/download/current/Homo_sapiens.owl"
+      format: "OWL"
+    - name: "UniProt2Reactome_All_Levels.txt"
+      url: "/download/current/UniProt2Reactome_All_Levels.txt"
+      format: "TSV"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 5
+    timeout_seconds: 120
+    
+  # Metadata
+  metadata:
+    description: "Open-source, manually curated pathway database"
+    organisms: "Homo sapiens and 23 other species"
+    pathways: "2500+ human pathways"
+    data_types: ["pathways", "reactions", "proteins", "complexes"]
+    estimated_size_gb: 2.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+string_protein_networks:
+  name: "STRING Protein-Protein Interaction Networks"
+  domain: "genomics"
+  
+  # STRING database
+  primary_url: "https://string-db.org"
+  mirror_urls:
+    - "https://version-11-5.string-db.org"
+    - "https://stringdb-static.org"
+    
+  # Database features
+  endpoints:
+    search: "/cgi/input.pl"
+    api: "/api"
+    download: "/cgi/download.pl"
+    bulk_download: "/download"
+    
+  # Bulk data
+  bulk_files:
+    - name: "protein.links.v11.5.txt.gz"
+      estimated_size_gb: 15.0
+      description: "All protein-protein interactions"
+    - name: "protein.sequences.v11.5.fa.gz"
+      estimated_size_gb: 8.0
+      description: "All protein sequences"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 4
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Protein-protein interaction networks and functional associations"
+    version: "11.5"
+    organisms: "5090 organisms"
+    proteins: "24+ million proteins"
+    interactions: "3+ billion interactions"
+    estimated_size_gb: 50.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+uniprot_protein_database:
+  name: "UniProt Protein Knowledge Base"
+  domain: "genomics"
+  
+  # UniProt Consortium
+  primary_url: "https://www.uniprot.org"
+  mirror_urls:
+    - "https://ftp.uniprot.org"
+    - "https://rest.uniprot.org"
+    - "https://sparql.uniprot.org"
+    
+  # Database sections
+  endpoints:
+    search: "/uniprotkb"
+    api: "/uniprot"
+    ftp: "ftp://ftp.uniprot.org/pub/databases/uniprot"
+    sparql: "/sparql"
+    
+  # Major datasets
+  bulk_files:
+    - name: "uniprot_sprot.dat.gz"
+      url: "/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz"
+      description: "Swiss-Prot reviewed entries"
+      estimated_size_gb: 5.0
+    - name: "uniprot_trembl.dat.gz"
+      url: "/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz"
+      description: "TrEMBL unreviewed entries"
+      estimated_size_gb: 100.0
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 6
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "Universal Protein Resource"
+    swiss_prot_entries: "570,000+ reviewed"
+    trembl_entries: "250+ million unreviewed"
+    organisms: "All domains of life"
+    features: ["sequences", "functional_annotation", "literature", "cross_references"]
+    estimated_size_gb: 200.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+ensembl_genome_browser:
+  name: "Ensembl Genome Browser"
+  domain: "genomics"
+  
+  # EMBL-EBI and Wellcome Sanger Institute
+  primary_url: "https://www.ensembl.org"
+  mirror_urls:
+    - "https://useast.ensembl.org"
+    - "https://uswest.ensembl.org"
+    - "https://asia.ensembl.org"
+    
+  # Database access
+  endpoints:
+    rest_api: "/rest"
+    biomart: "/biomart/martview"
+    ftp: "ftp://ftp.ensembl.org/pub"
+    grch37: "https://grch37.ensembl.org"
+    
+  # Data downloads
+  bulk_files:
+    - name: "Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
+      estimated_size_gb: 3.0
+      description: "Human genome primary assembly"
+    - name: "Homo_sapiens.GRCh38.110.gtf.gz"
+      estimated_size_mb: 50.0
+      description: "Human gene annotations"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.3
+    max_concurrent: 8
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "Genome browser for vertebrate genomes"
+    genomes: "270+ genomes"
+    species: "Vertebrates, with some model organisms"
+    data_types: ["genomes", "genes", "transcripts", "proteins", "variations"]
+    estimated_size_gb: 10000.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+gene_ontology:
+  name: "Gene Ontology (GO) Database"
+  domain: "genomics"
+  
+  # Gene Ontology Consortium
+  primary_url: "http://geneontology.org"
+  mirror_urls:
+    - "https://www.ebi.ac.uk/QuickGO"
+    - "https://amigo.geneontology.org"
+    
+  # Database access
+  endpoints:
+    amigo: "/amigo"
+    api: "/api"
+    downloads: "/page/downloads"
+    quickgo: "https://www.ebi.ac.uk/QuickGO"
+    
+  # Data files
+  bulk_files:
+    - name: "go-basic.obo"
+      url: "/ontology/go-basic.obo"
+      description: "Basic GO ontology"
+    - name: "goa_human.gaf.gz"
+      url: "/gene-associations/goa_human.gaf.gz"
+      description: "Human gene associations"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 5
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Controlled vocabulary for gene and gene product attributes"
+    ontologies: "Biological Process, Molecular Function, Cellular Component"
+    annotations: "Millions of gene product annotations"
+    species: "All domains of life"
+    estimated_size_gb: 5.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+planmtdb_plant_pathways:
+  name: "PlantCyc Plant Metabolic Network"
+  domain: "genomics"
+  
+  # Plant Metabolic Network (PMN)
+  primary_url: "https://plantcyc.org"
+  mirror_urls:
+    - "https://pmn.plantcyc.org"
+    
+  # Database organization
+  endpoints:
+    plant_list: "/organism-summary"
+    pathways: "/search-pathways"
+    compounds: "/search-compounds"
+    tools: "/tools"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    timeout_seconds: 240
+    
+  # Metadata
+  metadata:
+    description: "Plant metabolic pathway database collection"
+    plant_species: "101 plant species"
+    pathways: "Thousands of metabolic pathways"
+    focus: "Plant-specific metabolism and pathways"
+    estimated_size_gb: 15.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active" 

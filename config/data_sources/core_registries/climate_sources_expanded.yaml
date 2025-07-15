@@ -1,0 +1,303 @@
+# Expanded Climate Science & Atmospheric Data Sources Registry
+# Additional reanalysis, atmospheric models, and climate data beyond existing sources
+
+era5_complete:
+  name: "ERA5 Complete Global Atmospheric Reanalysis"
+  domain: "climate_science"
+  
+  # Copernicus Climate Data Store
+  primary_url: "https://cds.climate.copernicus.eu"
+  mirror_urls:
+    - "https://climate.copernicus.eu/climate-data-store"
+    - "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"
+    
+  # Dataset endpoints  
+  endpoints:
+    single_levels: "/datasets/reanalysis-era5-single-levels"
+    pressure_levels: "/datasets/reanalysis-era5-pressure-levels"
+    land_data: "/datasets/reanalysis-era5-land"
+    complete: "/datasets/reanalysis-era5-complete"
+    api: "/api/v2"
+    
+  # Data collections
+  datasets:
+    hourly_single: "reanalysis-era5-single-levels"
+    hourly_pressure: "reanalysis-era5-pressure-levels"
+    monthly_single: "reanalysis-era5-single-levels-monthly-means"
+    monthly_pressure: "reanalysis-era5-pressure-levels-monthly-means"
+    land_hourly: "reanalysis-era5-land"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 10.0
+    max_concurrent: 1
+    timeout_seconds: 3600
+    chunk_size_mb: 1000
+    
+  # Authentication required
+  authentication:
+    required: true
+    method: "api_key"
+    registration_url: "https://cds.climate.copernicus.eu/user/register"
+    
+  # Metadata
+  metadata:
+    description: "ERA5 fifth generation ECMWF atmospheric reanalysis"
+    temporal_coverage: "January 1940 to present"
+    temporal_resolution: "hourly, 3-hourly, monthly"
+    spatial_resolution: "31km (0.25°), 137 vertical levels"
+    variables: "200+ atmospheric, land, ocean wave parameters"
+    estimated_size_gb: 50000.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+cerra_european_reanalysis:
+  name: "CERRA European Regional Reanalysis"
+  domain: "climate_science"
+  
+  # Copernicus source
+  primary_url: "https://cds.climate.copernicus.eu"
+  mirror_urls:
+    - "https://climate.copernicus.eu/regional-reanalysis-europe"
+    
+  # CERRA datasets
+  endpoints:
+    single_levels: "/datasets/reanalysis-cerra-single-levels"
+    pressure_levels: "/datasets/reanalysis-cerra-pressure-levels"
+    height_levels: "/datasets/reanalysis-cerra-height-levels"
+    model_levels: "/datasets/reanalysis-cerra-model-levels"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 8.0
+    max_concurrent: 2
+    timeout_seconds: 1800
+    
+  # Metadata
+  metadata:
+    description: "European regional reanalysis with HARMONIE-ALADIN system"
+    temporal_coverage: "September 1984 to June 2021"
+    spatial_resolution: "5.5km over Europe"
+    domain: "European region"
+    system: "HARMONIE-ALADIN limited-area NWP"
+    estimated_size_gb: 5000.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+carra_arctic_reanalysis:
+  name: "CARRA Arctic Regional Reanalysis"
+  domain: "climate_science"
+  
+  # Copernicus Climate Data Store
+  primary_url: "https://cds.climate.copernicus.eu"
+  mirror_urls:
+    - "https://climate.copernicus.eu/arctic-regional-reanalysis"
+    
+  # CARRA datasets
+  endpoints:
+    single_levels: "/datasets/reanalysis-carra-single-levels"
+    pressure_levels: "/datasets/reanalysis-carra-pressure-levels"
+    height_levels: "/datasets/reanalysis-carra-height-levels"
+    model_levels: "/datasets/reanalysis-carra-model-levels"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 8.0
+    max_concurrent: 2
+    timeout_seconds: 1800
+    
+  # Metadata
+  metadata:
+    description: "Arctic regional reanalysis at 2.5km resolution"
+    temporal_coverage: "September 1990 to present"
+    spatial_resolution: "2.5km horizontal resolution"
+    domains: "Two Arctic subdomains"
+    system: "HARMONIE-AROME numerical weather prediction"
+    estimated_size_gb: 3000.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+merra2_nasa_reanalysis:
+  name: "MERRA-2 NASA Global Reanalysis"
+  domain: "climate_science"
+  
+  # NASA GMAO source
+  primary_url: "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2"
+  mirror_urls:
+    - "https://disc.gsfc.nasa.gov/datasets/M2"
+    - "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2"
+    
+  # Data collections
+  endpoints:
+    atmospheric: "/MERRA2/M2I1NXASM.5.12.4/"
+    surface: "/MERRA2/M2T1NXFLX.5.12.4/"
+    aerosols: "/MERRA2/M2I1NXADG.5.12.4/"
+    ocean: "/MERRA2/M2O1NXOCN.5.12.4/"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 5.0
+    max_concurrent: 3
+    timeout_seconds: 900
+    
+  # Metadata
+  metadata:
+    description: "Modern-Era Retrospective analysis for Research and Applications v2"
+    temporal_coverage: "1980 to present (few weeks behind real time)"
+    spatial_resolution: "0.5° × 0.625°, 72 vertical levels"
+    features: "interactive aerosols, NASA observations, cryogenic processes"
+    estimated_size_gb: 30000.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+jra55_japanese_reanalysis:
+  name: "JRA-55 Japanese Reanalysis"
+  domain: "climate_science"
+  
+  # Japan Meteorological Agency
+  primary_url: "https://jra.kishou.go.jp/JRA-55"
+  mirror_urls:
+    - "https://rda.ucar.edu/datasets/ds628.0"
+    - "https://esgf-data.dkrz.de/search/?project=obs4MIPs&source_id=JRA-55"
+    
+  # Data access
+  endpoints:
+    main_data: "/index_en.html"
+    download: "/download_en.html"
+    catalog: "/catalog_en.html"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 3.0
+    max_concurrent: 2
+    timeout_seconds: 600
+    
+  # Metadata
+  metadata:
+    description: "Japanese 55-year Reanalysis"
+    temporal_coverage: "1958 to present"
+    spatial_resolution: "TL319 (~55km), 60 vertical levels"
+    system: "4D-Var data assimilation"
+    estimated_size_gb: 15000.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+cfsr_ncep_reanalysis:
+  name: "CFSR/CFSv2 NCEP Climate Forecast System"
+  domain: "climate_science"
+  
+  # NOAA/NCEP source
+  primary_url: "https://cfs.ncep.noaa.gov"
+  mirror_urls:
+    - "https://rda.ucar.edu/datasets/ds093.0"
+    - "https://nomads.ncdc.noaa.gov/data/cfsr"
+    
+  # Data organization
+  endpoints:
+    cfsr: "/cfsr"
+    cfsv2: "/cfsv2"
+    products: "/products"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 4.0
+    max_concurrent: 3
+    timeout_seconds: 450
+    
+  # Metadata
+  metadata:
+    description: "Climate Forecast System Reanalysis and version 2"
+    temporal_coverage: "1979-2010 (CFSR), 2011-present (CFSv2)"
+    spatial_resolution: "T382 (~38km), 64 vertical levels"
+    coupled_system: "atmosphere-ocean-land-ice"
+    estimated_size_gb: 8000.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+ecmwf_seasonal_forecasts:
+  name: "ECMWF SEAS5 Seasonal Forecasts"
+  domain: "climate_science"
+  
+  # Copernicus Climate Data Store
+  primary_url: "https://cds.climate.copernicus.eu"
+  mirror_urls:
+    - "https://www.ecmwf.int/en/forecasts/datasets"
+    
+  # Seasonal forecast data
+  endpoints:
+    monthly_single: "/datasets/seasonal-monthly-single-levels"
+    monthly_pressure: "/datasets/seasonal-monthly-pressure-levels"
+    original_single: "/datasets/seasonal-original-single-levels"
+    original_pressure: "/datasets/seasonal-original-pressure-levels"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 12.0
+    max_concurrent: 1
+    timeout_seconds: 1800
+    
+  # Metadata
+  metadata:
+    description: "ECMWF SEAS5 seasonal forecast system"
+    forecast_range: "up to 7 months ahead"
+    spatial_resolution: "36km (TCo319), 91 vertical levels"
+    ensemble_size: "25 members"
+    initialization: "monthly (1981-present)"
+    estimated_size_gb: 12000.0
+    priority: 3
+    
+  # Authentication required
+  authentication:
+    required: true
+    method: "api_key"
+    registration_url: "https://cds.climate.copernicus.eu/user/register"
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+hadcrut5_temperature:
+  name: "HadCRUT5 Global Temperature Dataset"
+  domain: "climate_science"
+  
+  # UK Met Office Hadley Centre
+  primary_url: "https://www.metoffice.gov.uk/hadobs/hadcrut5"
+  mirror_urls:
+    - "https://crudata.uea.ac.uk/cru/data/temperature/"
+    - "https://www.metoffice.gov.uk/hadobs/hadcrut5/data/download.html"
+    
+  # Data access
+  endpoints:
+    analysis: "/data/hadcrut.5.0.1.0/analysis"
+    ensemble: "/data/hadcrut.5.0.1.0/ensemble"
+    diagnostics: "/data/hadcrut.5.0.1.0/diagnostics"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 4
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Global surface temperature anomaly dataset"
+    temporal_coverage: "1850 to present"
+    spatial_resolution: "5° × 5° grid"
+    methodology: "analysis of land and marine temperature observations"
+    ensemble_size: "200 realizations"
+    estimated_size_gb: 5.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active" 

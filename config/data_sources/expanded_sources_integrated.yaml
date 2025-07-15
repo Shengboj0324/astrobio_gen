@@ -1,0 +1,161 @@
+expanded_sources:
+  astronomy:
+    bosz_stellar_library:
+      domain: astrophysics
+      endpoints:
+        download: /download
+        search: /search
+      metadata:
+        estimated_size_gb: 500.0
+        priority: 1
+      mirror_urls:
+      - https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+      name: BOSZ Synthetic Stellar Spectral Library
+      primary_url: https://archive.stsci.edu/hlsps/bosz
+      status: active
+    exoplanet_eu:
+      domain: astronomy
+      endpoints:
+        catalog_api: /catalog
+        search_api: /home/
+      metadata:
+        estimated_size_gb: 15.2
+        priority: 1
+      mirror_urls:
+      - https://archive.org/web/exoplanet.eu
+      name: Exoplanet.eu Database
+      primary_url: https://exoplanet.eu
+      status: active
+  climate:
+    era5_complete:
+      domain: climate_science
+      endpoints:
+        single_levels: /datasets/reanalysis-era5-single-levels
+      metadata:
+        estimated_size_gb: 50000.0
+        priority: 1
+      mirror_urls:
+      - https://climate.copernicus.eu/climate-data-store
+      name: ERA5 Complete Global Atmospheric Reanalysis
+      primary_url: https://cds.climate.copernicus.eu
+      status: active
+    merra2_reanalysis:
+      domain: climate_science
+      endpoints:
+        data_access: /data
+        search: /search
+      metadata:
+        estimated_size_gb: 30000.0
+        priority: 1
+      mirror_urls:
+      - https://disc.gsfc.nasa.gov/datasets
+      name: MERRA-2 NASA Global Reanalysis
+      primary_url: https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2
+      status: active
+  genomics:
+    biocyc_collection:
+      domain: genomics
+      endpoints:
+        api: /xmlquery
+        main_search: /search
+      metadata:
+        estimated_size_gb: 100.0
+        priority: 1
+      mirror_urls:
+      - https://metacyc.org
+      - https://ecocyc.org
+      name: BioCyc Pathway/Genome Database Collection
+      primary_url: https://biocyc.org
+      status: active
+    ensembl_genome:
+      domain: genomics
+      endpoints:
+        biomart: /biomart
+        rest_api: /info/rest
+      metadata:
+        estimated_size_gb: 10000.0
+        priority: 1
+      mirror_urls:
+      - https://useast.ensembl.org
+      - https://asia.ensembl.org
+      name: Ensembl Genome Browser
+      primary_url: https://www.ensembl.org
+      status: active
+  planetary_geochemistry:
+    pds_planetary:
+      domain: planetary_interior
+      endpoints:
+        imaging: https://pds-imaging.jpl.nasa.gov
+        search: /search
+      metadata:
+        estimated_size_gb: 50000.0
+        priority: 1
+      mirror_urls:
+      - https://pds-imaging.jpl.nasa.gov
+      name: NASA Planetary Data System (PDS)
+      primary_url: https://pds.nasa.gov
+      status: active
+    usgs_earthquake:
+      domain: planetary_interior
+      endpoints:
+        api: /fdsnws
+        real_time: /earthquakes/feed
+      metadata:
+        estimated_size_gb: 10.0
+        priority: 1
+      mirror_urls:
+      - https://www.usgs.gov/natural-hazards/earthquake-hazards
+      name: USGS Earthquake Hazards Program
+      primary_url: https://earthquake.usgs.gov
+      status: active
+  spectroscopy:
+    hitran_database:
+      domain: spectroscopy
+      endpoints:
+        data: /data
+        search: /search
+      metadata:
+        estimated_size_gb: 20.0
+        priority: 1
+      mirror_urls:
+      - https://www.cfa.harvard.edu/hitran
+      name: HITRAN Molecular Spectroscopic Database
+      primary_url: https://hitran.org
+      status: active
+    sshade_spectroscopy:
+      domain: spectroscopy
+      endpoints:
+        api: /rest
+        search_spectra: /search/spectra
+      metadata:
+        estimated_size_gb: 50.0
+        priority: 1
+      mirror_urls:
+      - https://sshade.osug.fr
+      name: SSHADE Solid Spectroscopy Database
+      primary_url: https://www.sshade.eu
+      status: active
+integration_summary:
+  authentication_required: 3
+  estimated_total_size_gb: 191118.6
+  priority_breakdown:
+    priority_1: 15
+    priority_2: 16
+    priority_3: 10
+  sources_by_status:
+    active: 41
+    maintenance: 0
+    pending: 0
+  total_domains: 5
+  total_sources_added: 41
+metadata:
+  description: Expanded enterprise URL management configuration
+  domains:
+  - astronomy
+  - climate
+  - genomics
+  - spectroscopy
+  - planetary_geochemistry
+  generated: '2024-07-15T15:30:00Z'
+  total_sources: 41
+  version: 2.0.0

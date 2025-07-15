@@ -1,0 +1,333 @@
+# Expanded Spectroscopy Data Sources Registry  
+# Additional spectroscopy databases, opacity data, and spectral archives beyond existing sources
+
+sshade_spectroscopy:
+  name: "SSHADE Solid Spectroscopy Database"
+  domain: "spectroscopy"
+  
+  # European solid spectroscopy infrastructure
+  primary_url: "https://www.sshade.eu"
+  mirror_urls:
+    - "https://sshade.osug.fr"
+    - "https://doi.org/10.26302/SSHADE"
+    
+  # Database access
+  endpoints:
+    search_spectra: "/search/spectra"
+    search_bands: "/search/bands"
+    search_publications: "/search/publications"
+    database_list: "/databases"
+    api: "/rest"
+    
+  # Hosted databases (major ones)
+  hosted_databases:
+    - name: "GhoSST"
+      spectra_count: 1931
+      focus: "Meteorites and extraterrestrial samples"
+    - name: "BYPASS"
+      spectra_count: 2407
+      focus: "Ice and organic compounds"
+    - name: "CSS"
+      spectra_count: 813
+      focus: "Carbonaceous samples"
+    - name: "SSTONE"
+      spectra_count: 497
+      focus: "Silicate stones"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 1.5
+    max_concurrent: 4
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Solid spectroscopy hosting architecture of databases and expertise"
+    total_databases: 31
+    total_spectra: "8000+"
+    wavelength_range: "gamma to radio (X, UV, Vis, IR, mm)"
+    samples: ["ices", "minerals", "rocks", "organics", "meteorites", "lunar_soils"]
+    techniques: "Various spectroscopic techniques"
+    estimated_size_gb: 100.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+nasa_maestro_opacities:
+  name: "NASA MAESTRO Exoplanet Opacity Database"
+  domain: "spectroscopy"
+  
+  # NASA opacity database
+  primary_url: "https://science.data.nasa.gov/opacities"
+  mirror_urls:
+    - "https://maestro.space"
+    
+  # Database features
+  endpoints:
+    search: "/search"
+    visualize: "/visualize"
+    download: "/download"
+    api: "/api"
+    
+  # Opacity collections
+  molecules:
+    - "H2O (water)"
+    - "CO2 (carbon dioxide)"
+    - "CH4 (methane)"
+    - "NH3 (ammonia)"
+    - "CO (carbon monoxide)"
+    - "H2S (hydrogen sulfide)"
+    - "SO2 (sulfur dioxide)"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "Molecules and Atoms in (Exo)planet Science: Tools and Resources for Opacities"
+    focus: "Exoplanet atmosphere opacity data"
+    resolution: "High-resolution (R>10,000) and low-resolution data"
+    temperature_pressure: "Various temperature and pressure ranges"
+    features: ["visualization", "comparison", "download", "citation_builders"]
+    estimated_size_gb: 50.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+hitran_molecular_spectroscopy:
+  name: "HITRAN Molecular Spectroscopic Database"
+  domain: "spectroscopy"
+  
+  # Harvard-Smithsonian CfA
+  primary_url: "https://hitran.org"
+  mirror_urls:
+    - "https://www.cfa.harvard.edu/hitran"
+    - "https://hitran.iao.ru"
+    
+  # Database access
+  endpoints:
+    online_access: "/lbl"
+    downloads: "/suppl"
+    api: "/docs/api"
+    applications: "/applications"
+    
+  # Data products
+  line_lists:
+    - "H2O (water vapor)"
+    - "CO2 (carbon dioxide)"
+    - "O3 (ozone)"
+    - "N2O (nitrous oxide)"
+    - "CO (carbon monoxide)"
+    - "CH4 (methane)"
+    - "O2 (oxygen)"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 5
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "High-resolution transmission molecular absorption database"
+    molecules: "49 molecular species"
+    transitions: "Millions of spectral lines"
+    wavelength_range: "Microwave to ultraviolet"
+    applications: ["atmospheric_science", "astrophysics", "combustion", "environmental"]
+    estimated_size_gb: 10.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+exomol_molecular_linelists:
+  name: "ExoMol Molecular Line Lists"
+  domain: "spectroscopy"
+  
+  # University College London
+  primary_url: "https://www.exomol.com"
+  mirror_urls:
+    - "https://exomol.phase4.org"
+    - "https://github.com/ExoMol"
+    
+  # Database sections
+  endpoints:
+    database: "/database"
+    species: "/species"
+    downloads: "/data"
+    api: "/api"
+    tools: "/software"
+    
+  # Molecular species (major ones)
+  major_species:
+    - "H2O (water)"
+    - "CO (carbon monoxide)" 
+    - "NH3 (ammonia)"
+    - "CH4 (methane)"
+    - "CO2 (carbon dioxide)"
+    - "TiO (titanium oxide)"
+    - "VO (vanadium oxide)"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 4
+    timeout_seconds: 240
+    
+  # Metadata
+  metadata:
+    description: "Molecular line lists for exoplanet and other atmospheres"
+    molecules: "80+ molecular species"
+    transitions: "Billions of spectral transitions"
+    temperature_range: "Up to 5000K"
+    applications: ["exoplanet_atmospheres", "stellar_atmospheres", "cool_stars"]
+    estimated_size_gb: 500.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+vald_atomic_molecular:
+  name: "VALD (Vienna Atomic Line Database)"
+  domain: "spectroscopy"
+  
+  # Austrian Academy of Sciences
+  primary_url: "http://vald.astro.uu.se"
+  mirror_urls:
+    - "http://vald.inasan.ru"
+    - "http://vald.astro.univie.ac.at"
+    
+  # Database access
+  endpoints:
+    extract_all: "/~vald/php/vald.php"
+    extract_stellar: "/~vald/php/vald.php?vald=stellar"
+    extract_element: "/~vald/php/vald.php?vald=element"
+    solar_atlas: "/~vald/php/vald.php?vald=solar"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 2
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "Vienna Atomic Line Database for stellar spectroscopy"
+    line_data: "Atomic and molecular line data"
+    wavelength_range: "1650 Å to 20 μm"
+    applications: ["stellar_spectroscopy", "abundance_analysis", "model_atmospheres"]
+    estimated_size_gb: 5.0
+    priority: 2
+    
+  # Registration required
+  authentication:
+    required: true
+    method: "user_registration"
+    registration_url: "http://vald.astro.uu.se/~vald/php/vald.php?vald=register"
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+nist_atomic_spectra:
+  name: "NIST Atomic Spectra Database"
+  domain: "spectroscopy"
+  
+  # National Institute of Standards and Technology
+  primary_url: "https://physics.nist.gov/asd"
+  mirror_urls:
+    - "https://www.nist.gov/pml/atomic-spectra-database"
+    
+  # Database sections
+  endpoints:
+    levels_form: "/cgi-bin/ASD/levels_form.cgi"
+    lines_form: "/cgi-bin/ASD/lines_form.cgi"
+    energy_form: "/cgi-bin/ASD/energy_form.cgi"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 6
+    timeout_seconds: 120
+    
+  # Metadata
+  metadata:
+    description: "NIST Atomic Spectra Database"
+    data_types: ["energy_levels", "wavelengths", "transition_probabilities", "oscillator_strengths"]
+    elements: "All elements in periodic table"
+    ionization_stages: "Multiple ionization stages"
+    estimated_size_gb: 1.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+throes_spire_spectroscopy:
+  name: "THROES SPIRE Spectroscopy Catalogue"
+  domain: "spectroscopy"
+  
+  # Centro de Astrobiología (CAB-CSIC)
+  primary_url: "https://throes-spire.cab.inta-csic.es"
+  mirror_urls:
+    - "http://svo.cab.inta-csic.es"
+    
+  # Database access
+  endpoints:
+    data_retrieval: "/index.php?action=search"
+    documentation: "/index.php?action=documentation"
+    change_log: "/index.php?action=news"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.5
+    max_concurrent: 3
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "THROES SPIRE spectroscopy catalogue v1.0"
+    focus: "Herschel SPIRE spectrometer data"
+    collaboration: "CAB-CSIC and Spanish Virtual Observatory"
+    estimated_size_gb: 2.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+splatalogue_molecular:
+  name: "Splatalogue Molecular Line Database"
+  domain: "spectroscopy"
+  
+  # National Radio Astronomy Observatory
+  primary_url: "https://splatalogue.online"
+  mirror_urls:
+    - "https://www.cv.nrao.edu/php/splat"
+    
+  # Database features
+  endpoints:
+    search: "/search"
+    advanced: "/advanced.php"
+    species: "/species_metadata.php"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 4
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Spectral line database for astronomical applications"
+    frequency_range: "0 to 10,000 GHz"
+    molecules: "1000+ molecular and atomic species"
+    transitions: "Millions of spectral lines"
+    focus: "Radio and millimeter-wave spectroscopy"
+    estimated_size_gb: 2.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active" 

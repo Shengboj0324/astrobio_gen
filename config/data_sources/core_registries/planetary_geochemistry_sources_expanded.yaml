@@ -1,0 +1,320 @@
+# Expanded Planetary Interior & Geochemistry Data Sources Registry
+# Additional planetary science, geochemistry, and Earth system databases
+
+usgs_earthquake_data:
+  name: "USGS Earthquake Hazards Program"
+  domain: "planetary_interior"
+  
+  # United States Geological Survey
+  primary_url: "https://earthquake.usgs.gov"
+  mirror_urls:
+    - "https://www.usgs.gov/natural-hazards/earthquake-hazards"
+    - "https://earthquake.usgs.gov/data"
+    
+  # Data access endpoints
+  endpoints:
+    real_time: "/earthquakes/feed"
+    search: "/fdsnws/event/1"
+    catalog: "/earthquakes/search"
+    api: "/fdsnws"
+    
+  # Real-time feeds
+  earthquake_feeds:
+    - name: "M2.5+ Past Day"
+      url: "/earthquakes/feed/v1.0/summary/2.5_day.geojson"
+      format: "GeoJSON"
+    - name: "M4.5+ Past Month"
+      url: "/earthquakes/feed/v1.0/summary/4.5_month.geojson"
+      format: "GeoJSON"
+      
+  # Performance
+  performance:
+    rate_limit_delay: 0.5
+    max_concurrent: 8
+    timeout_seconds: 60
+    
+  # Metadata
+  metadata:
+    description: "Global earthquake monitoring and seismic data"
+    coverage: "Global seismic activity"
+    real_time: "Real-time earthquake feeds"
+    historical: "Historical earthquake catalog"
+    estimated_size_gb: 10.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+iris_seismic_data:
+  name: "IRIS Seismic Data Portal"
+  domain: "planetary_interior"
+  
+  # Incorporated Research Institutions for Seismology
+  primary_url: "https://www.iris.edu"
+  mirror_urls:
+    - "https://service.iris.edu"
+    - "https://ds.iris.edu"
+    
+  # Data services
+  endpoints:
+    wilber: "/wilber3"
+    data_services: "/ds"
+    web_services: "/ws"
+    gmap: "/gmap"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 5
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Seismological data collection and distribution"
+    networks: "Global seismographic networks"
+    data_types: ["waveforms", "metadata", "earthquake_catalogs"]
+    instruments: "Seismometers, accelerometers, infrasound"
+    estimated_size_gb: 5000.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+pds_planetary_data:
+  name: "NASA Planetary Data System (PDS)"
+  domain: "planetary_interior"
+  
+  # NASA Planetary Data System
+  primary_url: "https://pds.nasa.gov"
+  mirror_urls:
+    - "https://pds-imaging.jpl.nasa.gov"
+    - "https://pds-geosciences.wustl.edu"
+    - "https://pds-atmospheres.nmsu.edu"
+    
+  # Data nodes
+  endpoints:
+    imaging: "https://pds-imaging.jpl.nasa.gov"
+    geosciences: "https://pds-geosciences.wustl.edu"
+    atmospheres: "https://pds-atmospheres.nmsu.edu"
+    search: "/search"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 4
+    timeout_seconds: 300
+    
+  # Metadata
+  metadata:
+    description: "NASA planetary mission data archive"
+    missions: "All NASA planetary missions"
+    data_types: ["images", "spectra", "geophysics", "atmospheres"]
+    planets: "All solar system bodies"
+    estimated_size_gb: 50000.0
+    priority: 1
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+earthref_geochemistry:
+  name: "EarthRef.org Geochemical Database"
+  domain: "geochemistry"
+  
+  # EarthRef.org consortium
+  primary_url: "https://earthref.org"
+  mirror_urls:
+    - "https://www.earthref.org"
+    
+  # Database sections
+  endpoints:
+    petdb: "/PETDB"
+    geochronology: "/GEOCHRONOLOGY"
+    paleomag: "/PALEOMAG"
+    geochemistry: "/GEOCHEMISTRY"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.5
+    max_concurrent: 4
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Geochemical and geochronological database"
+    focus: "Rock and mineral geochemistry"
+    data_types: ["petrology", "geochronology", "paleomagnetism"]
+    estimated_size_gb: 5.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+mineralogy_database:
+  name: "Mindat.org Mineralogy Database"
+  domain: "geochemistry"
+  
+  # Hudson Institute of Mineralogy
+  primary_url: "https://www.mindat.org"
+  mirror_urls:
+    - "https://mindat.org"
+    
+  # Database features
+  endpoints:
+    search: "/search.php"
+    api: "/api"
+    localities: "/loc.php"
+    photos: "/photos.php"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 5
+    timeout_seconds: 120
+    
+  # Metadata
+  metadata:
+    description: "World's largest mineral database"
+    minerals: "5000+ mineral species"
+    localities: "450,000+ mineral localities"
+    photos: "1+ million mineral photos"
+    estimated_size_gb: 50.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+rruff_mineral_database:
+  name: "RRUFF Mineral Database"
+  domain: "geochemistry"
+  
+  # University of Arizona
+  primary_url: "https://rruff.info"
+  mirror_urls:
+    - "http://rruff.geo.arizona.edu"
+    
+  # Database sections
+  endpoints:
+    search: "/search"
+    downloads: "/downloads"
+    repository: "/repository"
+    
+  # Spectral data
+  spectral_techniques:
+    - "Raman spectroscopy"
+    - "X-ray diffraction"
+    - "Infrared spectroscopy"
+    - "X-ray photoelectron spectroscopy"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 4
+    timeout_seconds: 120
+    
+  # Metadata
+  metadata:
+    description: "Mineral spectral and crystallographic database"
+    minerals: "Complete Raman and X-ray diffraction database"
+    spectra: "High-quality mineral spectra"
+    crystallography: "Crystal structure data"
+    estimated_size_gb: 20.0
+    priority: 2
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+meteorite_database:
+  name: "Meteoritical Society Database"
+  domain: "planetary_interior"
+  
+  # Meteoritical Society
+  primary_url: "https://www.lpi.usra.edu/meteor"
+  mirror_urls:
+    - "https://meteoriticalsociety.org"
+    
+  # Database access
+  endpoints:
+    search: "/metbull.php"
+    statistics: "/metbullstat.php"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 4
+    timeout_seconds: 120
+    
+  # Metadata
+  metadata:
+    description: "Official meteorite database"
+    meteorites: "60,000+ meteorite records"
+    classification: "Official meteorite classifications"
+    estimated_size_gb: 1.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+paleodb_fossil_data:
+  name: "Paleobiology Database (PBDB)"
+  domain: "geochemistry"
+  
+  # International paleobiology consortium
+  primary_url: "https://paleobiodb.org"
+  mirror_urls:
+    - "https://www.paleobiodb.org"
+    
+  # Database features
+  endpoints:
+    navigator: "/navigator"
+    api: "/data1.2"
+    classic: "/classic"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 1.0
+    max_concurrent: 5
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Global fossil occurrence and taxonomy database"
+    fossils: "1.5+ million fossil occurrences"
+    time_range: "Entire Phanerozoic Eon"
+    geographic_scope: "Global"
+    estimated_size_gb: 5.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active"
+
+agu_data_portal:
+  name: "AGU Data Portal"
+  domain: "geochemistry"
+  
+  # American Geophysical Union
+  primary_url: "https://data.agu.org"
+  mirror_urls:
+    - "https://www.agu.org/data"
+    
+  # Portal sections
+  endpoints:
+    browse: "/browse"
+    search: "/search"
+    collections: "/collections"
+    
+  # Performance
+  performance:
+    rate_limit_delay: 2.0
+    max_concurrent: 3
+    timeout_seconds: 180
+    
+  # Metadata
+  metadata:
+    description: "Earth and space science data portal"
+    scope: "Geophysics, atmospheric, space sciences"
+    data_types: ["research_datasets", "supplementary_data"]
+    estimated_size_gb: 100.0
+    priority: 3
+    
+  last_verified: "2024-07-15T15:30:00Z"
+  status: "active" 
