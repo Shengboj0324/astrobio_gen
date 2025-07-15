@@ -1,0 +1,46 @@
+# PEFT LLM Integration Requirements
+# Parameter-Efficient Fine-tuning dependencies
+
+# Core transformers and PEFT
+transformers>=4.35.0
+peft>=0.7.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+
+# PyTorch (if not already installed)
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Text processing and embeddings
+sentence-transformers>=2.2.2
+tokenizers>=0.15.0
+
+# Knowledge retrieval and vector search
+faiss-cpu>=1.7.4
+# faiss-gpu>=1.7.4  # Uncomment for GPU acceleration
+
+# TTS and audio processing
+pyttsx3>=2.90
+gTTS>=2.4.0
+SpeechRecognition>=3.10.0
+
+# Additional ML utilities
+scikit-learn>=1.3.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Data processing
+pandas>=2.0.0
+datasets>=2.14.0
+
+# Configuration and utilities
+omegaconf>=2.3.0
+hydra-core>=1.3.0
+wandb>=0.16.0  # For experiment tracking
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0 

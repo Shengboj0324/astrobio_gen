@@ -1,0 +1,145 @@
+{
+  "function_1_rationale": {
+    "test_count": 3,
+    "results": [
+      {
+        "planet": "Earth-like Planet",
+        "rationale": "This planet shows excellent habitability potential with a score of 0.83. Surface temperatures of 21.4\u00b0C support liquid water stability. The substantial atmosphere (1.15 bar) can retain heat and support weather systems. Strong oxygen detection (SNR: 7.5) suggests potential photosynthetic activity. These results have high confidence with low model uncertainty.",
+        "generation_time_ms": 0.0,
+        "word_count": 49,
+        "input_data": {
+          "habitability_score": 0.83,
+          "surface_temperature": 294.5,
+          "atmospheric_pressure": 1.15,
+          "o2_snr": 7.5,
+          "ch4_snr": 3.2,
+          "uncertainty_sigma": 0.08
+        }
+      },
+      {
+        "planet": "TRAPPIST-1e Analog",
+        "rationale": "The planet demonstrates promising habitability indicators (score: 0.65). Cold surface conditions (-22.1\u00b0C) limit liquid water availability. The substantial atmosphere (0.80 bar) can retain heat and support weather systems. Moderate oxygen signal (SNR: 2.1) warrants further investigation. Significant methane detection (SNR: 6.8) indicates atmospheric disequilibrium. Moderate confidence in predictions with 0.2 uncertainty.",
+        "generation_time_ms": 0.0,
+        "word_count": 51,
+        "input_data": {
+          "habitability_score": 0.65,
+          "surface_temperature": 251.0,
+          "atmospheric_pressure": 0.8,
+          "o2_snr": 2.1,
+          "ch4_snr": 6.8,
+          "uncertainty_sigma": 0.18
+        }
+      },
+      {
+        "planet": "Hot Super-Earth",
+        "rationale": "The planet presents challenging habitability conditions (score: 0.25). Elevated surface temperatures (151.9\u00b0C) may challenge habitability. The substantial atmosphere (3.20 bar) can retain heat and support weather systems. Results are preliminary with significant uncertainty (\u00b10.2).",
+        "generation_time_ms": 0.0,
+        "word_count": 34,
+        "input_data": {
+          "habitability_score": 0.25,
+          "surface_temperature": 425.0,
+          "atmospheric_pressure": 3.2,
+          "o2_snr": 0.8,
+          "ch4_snr": 0.5,
+          "uncertainty_sigma": 0.25
+        }
+      }
+    ],
+    "avg_generation_time_ms": 0.0
+  },
+  "function_2_qa": {
+    "test_count": 5,
+    "results": [
+      {
+        "question": "What does an oxygen signal-to-noise ratio of 6.2 indicate for this planet?",
+        "answer": "Oxygen (O\u2082) in planetary atmospheres is primarily produced through oxygenic photosynthesis. High O\u2082 levels (>0.1% atmospheric content) typically indicate biological activity. Your detected oxygen signal (SNR: 6.2) exceeds the confidence threshold, indicating likely biological oxygen production. This is a strong biosignature, especially when atmospheric modeling rules out non-biological sources.",
+        "response_time_ms": 0.0,
+        "answer_length": 49,
+        "context_used": true
+      },
+      {
+        "question": "How does a habitability score of 0.76 compare to Earth-like conditions?",
+        "answer": "Habitability assessment integrates surface temperature (optimal 280-320K), atmospheric pressure (optimal 0.1-10 bar), and stellar irradiation factors. Your planet's habitability score of 0.76 indicates promising conditions for life as we know it. This assessment considers the integrated effects of stellar irradiation, atmospheric retention, and surface conditions.",
+        "response_time_ms": 0.0,
+        "answer_length": 45,
+        "context_used": true
+      },
+      {
+        "question": "What are the implications of detecting both oxygen and methane?",
+        "answer": "Based on current astrobiology knowledge: Oxygen (O\u2082) in planetary atmospheres is primarily produced through oxygenic photosynthesis. High O\u2082 levels (>0.1% atmospheric content) typically indicate biological activity. For more specific analysis, please provide additional context about your observations or measurements.",
+        "response_time_ms": 0.0,
+        "answer_length": 39,
+        "context_used": true
+      },
+      {
+        "question": "How should we interpret the uncertainty level of 0.12 in our analysis?",
+        "answer": "Uncertainty quantification in habitability assessments accounts for both measurement errors and model limitations. Your current uncertainty (\u00b10.12) is moderate, suggesting caution in interpretation. Bayesian approaches help distinguish between natural variability and model uncertainty.",
+        "response_time_ms": 0.0,
+        "answer_length": 33,
+        "context_used": true
+      },
+      {
+        "question": "What additional observations would strengthen these habitability conclusions?",
+        "answer": "Habitability assessment integrates surface temperature (optimal 280-320K), atmospheric pressure (optimal 0.1-10 bar), and stellar irradiation factors. Your planet's habitability score of 0.76 indicates promising conditions for life as we know it. This assessment considers the integrated effects of stellar irradiation, atmospheric retention, and surface conditions.",
+        "response_time_ms": 0.0,
+        "answer_length": 45,
+        "context_used": true
+      }
+    ],
+    "avg_response_time_ms": 0.0,
+    "context_data": {
+      "habitability_score": 0.76,
+      "surface_temperature": 289.0,
+      "atmospheric_pressure": 1.3,
+      "o2_snr": 6.2,
+      "ch4_snr": 4.1,
+      "uncertainty_sigma": 0.12
+    }
+  },
+  "function_3_voice_over": {
+    "test_count": 2,
+    "results": [
+      {
+        "scenario": "60-second Conference Poster",
+        "target_duration": 60,
+        "estimated_duration": 36.4,
+        "script": "Welcome to our exoplanet habitability analysis. Our advanced climate models reveal a remarkable discovery: this planet shows exceptional habitability potential with a score of 0.87. Surface temperatures of 18.9 degrees Celsius fall within the liquid water range, a crucial requirement for life as we know it. The planet's substantial atmosphere, with 1.1 bar of pressure, can regulate surface conditions and support complex weather systems. Our models show high confidence in these predictions, with minimal uncertainty. This analysis contributes to our growing catalog of potentially habitable worlds and guides future observational priorities.",
+        "word_count": 91,
+        "generation_time_ms": 0.0,
+        "duration_accuracy": 0.39333333333333337
+      },
+      {
+        "scenario": "45-second Research Brief",
+        "target_duration": 45,
+        "estimated_duration": 32.400000000000006,
+        "script": "Welcome to our exoplanet habitability analysis. While challenging, this planet presents intriguing characteristics with a habitability score of 0.42. Surface temperatures of -68.1 degrees Celsius suggest a cold environment requiring greenhouse warming for habitability. The planet's substantial atmosphere, with 0.3 bar of pressure, can regulate surface conditions and support complex weather systems. While preliminary with 0.2 uncertainty, these findings advance our understanding of planetary habitability. This analysis contributes to our growing catalog of potentially habitable worlds and guides future observational priorities.",
+        "word_count": 81,
+        "generation_time_ms": 0.0,
+        "duration_accuracy": 0.27999999999999986
+      }
+    ],
+    "avg_generation_time_ms": 0.0
+  },
+  "integration_test": {
+    "planet_parameters": {
+      "radius_earth": 1.1,
+      "mass_earth": 1.2,
+      "insolation": 0.95,
+      "stellar_teff": 5650
+    },
+    "surrogate_outputs": {
+      "habitability_score": 0.7996714153011233,
+      "surface_temperature": 250.64481454049616,
+      "atmospheric_pressure": 1.6789201694525584,
+      "o2_snr": 2.9361118426546193,
+      "ch4_snr": 1.7799726016810133,
+      "uncertainty_sigma": 0.08580836121681995
+    },
+    "llm_rationale": "The planet demonstrates promising habitability indicators (score: 0.80). Cold surface conditions (-22.5\u00b0C) limit liquid water availability. The substantial atmosphere (1.68 bar) can retain heat and support weather systems. Moderate oxygen signal (SNR: 2.9) warrants further investigation. These results have high confidence with low model uncertainty.",
+    "llm_voice_over": "Welcome to our exoplanet habitability analysis. Our analysis uncovers promising signs of habitability with a score of 0.80, placing this world among potentially life-supporting exoplanets. Surface temperatures of -22.5 degrees Celsius suggest a cold environment requiring greenhouse warming for habitability. The planet's substantial atmosphere, with 1.7 bar of pressure, can regulate surface conditions and support complex weather systems. Our models show high confidence in these predictions, with minimal uncertainty. This analysis contributes to our growing catalog of potentially habitable worlds and guides future observational priorities.",
+    "llm_qa_example": "I can help with questions about exoplanet habitability, biosignature detection, atmospheric analysis, and climate modeling. Please feel free to ask about specific aspects of planetary characterization or habitability assessment.",
+    "total_generation_time_ms": 0.0,
+    "integration_successful": true
+  },
+  "total_time": 0.0060002803802490234
+}

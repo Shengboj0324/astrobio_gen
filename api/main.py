@@ -71,6 +71,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Import and setup LLM endpoints
+try:
+    from .llm_endpoints import setup_llm_routes
+    setup_llm_routes(app)
+    logger.info("✅ LLM endpoints integrated successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ LLM endpoints not available: {e}")
+except Exception as e:
+    logger.error(f"❌ Failed to setup LLM endpoints: {e}")
+
 
 # Pydantic models for request/response validation
 class PlanetParameters(BaseModel):
