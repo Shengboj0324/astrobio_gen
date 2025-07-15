@@ -35,7 +35,9 @@ from omegaconf import OmegaConf
 
 # Import model classes
 from models.datacube_unet import CubeUNet
+from models.enhanced_datacube_unet import EnhancedCubeUNet
 from models.surrogate_transformer import SurrogateTransformer
+from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration, MultiModalConfig
 from models.graph_vae import GVAE
 from models.fusion_transformer import FusionModel
 
@@ -51,716 +53,540 @@ class ModelFormat(Enum):
     PYTORCH = "pytorch"
     ONNX = "onnx"
     TENSORRT = "tensorrt"
-    TORCHSCRIPT = "torchscript"
+    ENHANCED = "enhanced"  # New format for enhanced models
 
-class SurrogateMode(Enum):
-    """Surrogate operation modes"""
-    SCALAR = "scalar"
-    DATACUBE = "datacube"
-    JOINT = "joint"
-    SPECTRAL = "spectral"
-    ENSEMBLE = "ensemble"
+class ModelType(Enum):
+    """Supported model types"""
+    DATACUBE_UNET = "datacube_unet"
+    ENHANCED_DATACUBE_UNET = "enhanced_datacube_unet"
+    SURROGATE_TRANSFORMER = "surrogate_transformer"
+    ENHANCED_SURROGATE_INTEGRATION = "enhanced_surrogate_integration"
+    GRAPH_VAE = "graph_vae"
+    FUSION_TRANSFORMER = "fusion_transformer"
+
+class PerformanceLevel(Enum):
+    """Performance optimization levels"""
+    BASIC = "basic"
+    OPTIMIZED = "optimized"
+    PEAK = "peak"  # Maximum performance with all enhancements
 
 @dataclass
 class ModelConfig:
-    """Configuration for a single model"""
-    name: str
-    format: ModelFormat
-    path: Path
-    mode: SurrogateMode
-    priority: int = 1
+    """Configuration for surrogate models"""
+    model_type: ModelType
+    model_format: ModelFormat
+    performance_level: PerformanceLevel = PerformanceLevel.OPTIMIZED
+    checkpoint_path: Optional[str] = None
+    config_path: Optional[str] = None
     device: str = "auto"
     precision: str = "float32"
-    batch_size: int = 4
+    batch_size: int = 1
+    use_attention: bool = True
+    use_transformer: bool = False
+    use_physics_constraints: bool = True
+    use_uncertainty: bool = False
+    multimodal_config: Optional[Dict[str, Any]] = None
     
-    # Model-specific parameters
-    model_params: Dict[str, Any] = field(default_factory=dict)
+    # Enhanced features
+    use_separable_conv: bool = True
+    use_gradient_checkpointing: bool = False
+    model_scaling: str = "efficient"
     
-    # Performance parameters
-    warmup_samples: int = 10
-    max_memory_gb: float = 2.0
-    
-    # Validation parameters
-    validation_data: Optional[Path] = None
-    accuracy_threshold: float = 0.95
+    # Performance optimizations
+    use_mixed_precision: bool = True
+    compile_model: bool = False
+    use_dynamic_selection: bool = False
 
-class PerformanceMonitor:
-    """Monitor model performance and resource usage"""
+class EnhancedModelLoader:
+    """Enhanced model loader with support for all advanced features"""
     
-    def __init__(self, model_name: str):
-        self.model_name = model_name
-        self.inference_times = []
-        self.memory_usage = []
-        self.batch_sizes = []
-        self.error_count = 0
-        self.total_inferences = 0
-        self._lock = threading.Lock()
+    def __init__(self, base_path: str = "models"):
+        self.base_path = Path(base_path)
+        self.loaded_models = {}
+        self.model_configs = {}
+        self.performance_cache = {}
         
-    def record_inference(self, batch_size: int, inference_time: float, memory_mb: float):
-        """Record inference metrics"""
-        with self._lock:
-            self.inference_times.append(inference_time)
-            self.memory_usage.append(memory_mb)
-            self.batch_sizes.append(batch_size)
-            self.total_inferences += 1
-            
-    def record_error(self):
-        """Record inference error"""
-        with self._lock:
-            self.error_count += 1
-            
-    def get_stats(self) -> Dict[str, Any]:
-        """Get performance statistics"""
-        with self._lock:
-            if not self.inference_times:
-                return {'model': self.model_name, 'status': 'no_data'}
-                
-            return {
-                'model': self.model_name,
-                'avg_inference_time': np.mean(self.inference_times),
-                'p95_inference_time': np.percentile(self.inference_times, 95),
-                'avg_memory_mb': np.mean(self.memory_usage),
-                'max_memory_mb': np.max(self.memory_usage),
-                'error_rate': self.error_count / max(1, self.total_inferences),
-                'total_inferences': self.total_inferences,
-                'throughput_samples_per_sec': sum(self.batch_sizes) / sum(self.inference_times)
-            }
-    
-    def is_healthy(self) -> bool:
-        """Check if model is performing within acceptable bounds"""
-        stats = self.get_stats()
-        
-        if stats.get('status') == 'no_data':
-            return True  # No data yet, assume healthy
-            
-        # Check error rate
-        if stats['error_rate'] > 0.05:  # 5% error rate threshold
-            return False
-            
-        # Check if inference times are reasonable
-        if stats['avg_inference_time'] > 10.0:  # 10 second threshold
-            return False
-            
-        return True
-
-class BaseModelWrapper(ABC):
-    """Abstract base class for model wrappers"""
-    
-    def __init__(self, config: ModelConfig, monitor: PerformanceMonitor):
-        self.config = config
-        self.monitor = monitor
-        self.model = None
-        self.device = self._resolve_device()
-        self.is_loaded = False
-        
-    def _resolve_device(self) -> torch.device:
-        """Resolve device for model execution"""
-        if self.config.device == "auto":
-            return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        return torch.device(self.config.device)
-    
-    @abstractmethod
-    def load_model(self) -> bool:
-        """Load the model from file"""
-        pass
-    
-    @abstractmethod
-    def predict(self, inputs: Union[torch.Tensor, np.ndarray]) -> Union[torch.Tensor, np.ndarray]:
-        """Make prediction"""
-        pass
-    
-    @abstractmethod
-    def export_onnx(self, export_path: Path, sample_input: torch.Tensor) -> bool:
-        """Export model to ONNX format"""
-        pass
-    
-    def warmup(self, sample_input: Union[torch.Tensor, np.ndarray]):
-        """Warmup model with sample inputs"""
-        logger.info(f"Warming up model: {self.config.name}")
-        
-        for _ in range(self.config.warmup_samples):
-            try:
-                self.predict(sample_input)
-            except Exception as e:
-                logger.warning(f"Warmup failed for {self.config.name}: {e}")
-                break
-    
-    def validate(self) -> Dict[str, Any]:
-        """Validate model performance"""
-        if not self.config.validation_data or not self.config.validation_data.exists():
-            return {'status': 'no_validation_data'}
-        
-        try:
-            # Load validation data
-            validation_data = self._load_validation_data()
-            if not validation_data:
-                return {'status': 'failed_to_load_validation_data'}
-            
-            # Run validation
-            results = self._run_validation(validation_data)
-    
-            # Check if accuracy meets threshold
-            accuracy = results.get('accuracy', 0.0)
-            rmse = results.get('rmse', float('inf'))
-            
-            if accuracy >= self.config.accuracy_threshold:
-                status = 'validation_passed'
-            else:
-                status = 'validation_failed'
-            
-            return {
-                'status': status,
-                'accuracy': accuracy,
-                'rmse': rmse,
-                'r2_score': results.get('r2_score', 0.0),
-                'mae': results.get('mae', float('inf')),
-                'num_samples': results.get('num_samples', 0),
-                'inference_time_ms': results.get('inference_time_ms', 0.0),
-                'passed_threshold': accuracy >= self.config.accuracy_threshold
-            }
-            
-        except Exception as e:
-            logger.error(f"Validation failed for {self.config.name}: {e}")
-            return {'status': 'validation_error', 'error': str(e)}
-    
-    def _load_validation_data(self) -> Optional[Dict[str, Any]]:
-        """Load validation data from file"""
-        try:
-            file_path = self.config.validation_data
-            
-            if file_path.suffix == '.npz':
-                # NumPy archive
-                data = np.load(file_path)
-                return {
-                    'inputs': data['inputs'],
-                    'targets': data['targets'],
-                    'metadata': data.get('metadata', {})
-                }
-            
-            elif file_path.suffix == '.json':
-                # JSON format
-                with open(file_path, 'r') as f:
-                    data = json.load(f)
-                return {
-                    'inputs': np.array(data['inputs']),
-                    'targets': np.array(data['targets']),
-                    'metadata': data.get('metadata', {})
-                }
-                
-            elif file_path.suffix in ['.pt', '.pth']:
-                # PyTorch format
-                data = torch.load(file_path, map_location='cpu')
-                return {
-                    'inputs': data['inputs'].numpy() if isinstance(data['inputs'], torch.Tensor) else data['inputs'],
-                    'targets': data['targets'].numpy() if isinstance(data['targets'], torch.Tensor) else data['targets'],
-                    'metadata': data.get('metadata', {})
-                }
-    else:
-                logger.error(f"Unsupported validation data format: {file_path.suffix}")
-        return None
-
-        except Exception as e:
-            logger.error(f"Failed to load validation data: {e}")
-            return None
-
-    def _run_validation(self, validation_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Run validation on loaded data"""
-        inputs = validation_data['inputs']
-        targets = validation_data['targets']
-        
-        # Ensure inputs are properly shaped
-        if len(inputs.shape) == 3:  # Add batch dimension if needed
-            inputs = inputs[np.newaxis, ...]
-        
-        # Run inference
-        start_time = time.time()
-        predictions = self.predict(inputs)
-        inference_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-        
-        # Convert predictions to numpy if needed
-        if isinstance(predictions, torch.Tensor):
-            predictions = predictions.cpu().numpy()
-        
-        # Reshape predictions and targets to match if needed
-        if predictions.shape != targets.shape:
-            if len(predictions.shape) == 4 and len(targets.shape) == 3:
-                predictions = predictions.squeeze(0)
-            elif len(predictions.shape) == 3 and len(targets.shape) == 4:
-                targets = targets.squeeze(0)
-        
-        # Calculate metrics
-        metrics = self._calculate_metrics(predictions, targets)
-        metrics['inference_time_ms'] = inference_time
-        metrics['num_samples'] = inputs.shape[0]
-        
-        return metrics
-    
-    def _calculate_metrics(self, predictions: np.ndarray, targets: np.ndarray) -> Dict[str, float]:
-        """Calculate validation metrics"""
-        # Flatten arrays for metric calculation
-        pred_flat = predictions.flatten()
-        target_flat = targets.flatten()
-        
-        # Remove NaN values
-        valid_mask = ~(np.isnan(pred_flat) | np.isnan(target_flat))
-        pred_flat = pred_flat[valid_mask]
-        target_flat = target_flat[valid_mask]
-        
-        if len(pred_flat) == 0:
-    return {
-                'accuracy': 0.0,
-                'rmse': float('inf'),
-                'mae': float('inf'),
-                'r2_score': 0.0
-            }
-        
-        # Mean Squared Error and RMSE
-        mse = np.mean((pred_flat - target_flat) ** 2)
-        rmse = np.sqrt(mse)
-        
-        # Mean Absolute Error
-        mae = np.mean(np.abs(pred_flat - target_flat))
-        
-        # R² Score
-        ss_res = np.sum((target_flat - pred_flat) ** 2)
-        ss_tot = np.sum((target_flat - np.mean(target_flat)) ** 2)
-        r2_score = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0.0
-        
-        # Accuracy based on relative error threshold
-        relative_errors = np.abs(pred_flat - target_flat) / (np.abs(target_flat) + 1e-8)
-        accuracy = np.mean(relative_errors < 0.1)  # Within 10% relative error
-        
-        return {
-            'accuracy': float(accuracy),
-            'rmse': float(rmse),
-            'mae': float(mae),
-            'r2_score': float(r2_score),
-            'mse': float(mse)
-        }
-
-class PyTorchModelWrapper(BaseModelWrapper):
-    """Wrapper for PyTorch models"""
-    
-    def load_model(self) -> bool:
-        """Load PyTorch model"""
-        try:
-            # Determine model class based on mode
-            if self.config.mode == SurrogateMode.DATACUBE:
-                model_class = CubeUNet
-            elif self.config.mode == SurrogateMode.SCALAR:
-                model_class = SurrogateTransformer
-            elif self.config.mode == SurrogateMode.JOINT:
-                model_class = FusionModel
-            else:
-                raise ValueError(f"Unsupported mode: {self.config.mode}")
-            
-            # Load model
-            if self.config.path.suffix == '.ckpt':
-                # Lightning checkpoint
-                self.model = model_class.load_from_checkpoint(
-                    str(self.config.path),
-                    **self.config.model_params
-                )
-            else:
-                # Regular PyTorch checkpoint
-                self.model = model_class(**self.config.model_params)
-                checkpoint = torch.load(self.config.path, map_location=self.device)
-                self.model.load_state_dict(checkpoint['state_dict'] if 'state_dict' in checkpoint else checkpoint)
-            
-            self.model.to(self.device)
-            self.model.eval()
-            self.is_loaded = True
-            
-            logger.info(f"Loaded PyTorch model: {self.config.name}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Failed to load PyTorch model {self.config.name}: {e}")
-            return False
-    
-    def predict(self, inputs: Union[torch.Tensor, np.ndarray]) -> torch.Tensor:
-        """Make prediction with PyTorch model"""
-        if not self.is_loaded:
-            raise RuntimeError("Model not loaded")
-        
-        start_time = time.time()
-        
-        try:
-            # Convert inputs to torch tensor if needed
-            if isinstance(inputs, np.ndarray):
-                inputs = torch.from_numpy(inputs).float()
-            
-            inputs = inputs.to(self.device)
-            
-            # Get memory usage before inference
-            if torch.cuda.is_available():
-                memory_mb = torch.cuda.memory_allocated() / (1024**2)
-            else:
-                memory_mb = 0
-            
-            with torch.no_grad():
-                outputs = self.model(inputs)
-            
-            # Record performance
-            inference_time = time.time() - start_time
-            self.monitor.record_inference(inputs.size(0), inference_time, memory_mb)
-            
-            return outputs
-            
-        except Exception as e:
-            self.monitor.record_error()
-            raise e
-    
-    def export_onnx(self, export_path: Path, sample_input: torch.Tensor) -> bool:
-        """Export PyTorch model to ONNX"""
-        if not self.is_loaded:
-            return False
-        
-        try:
-            export_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            torch.onnx.export(
-                self.model,
-                sample_input.to(self.device),
-                str(export_path),
-                export_params=True,
-                opset_version=11,
-                do_constant_folding=True,
-                input_names=['input'],
-                output_names=['output'],
-                dynamic_axes={
-                    'input': {0: 'batch_size'},
-                    'output': {0: 'batch_size'}
-                }
-            )
-            
-            logger.info(f"Exported ONNX model to: {export_path}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Failed to export ONNX model: {e}")
-            return False
-
-class ONNXModelWrapper(BaseModelWrapper):
-    """Wrapper for ONNX models"""
-    
-    def load_model(self) -> bool:
-        """Load ONNX model"""
-        try:
-            # Setup ONNX runtime providers
-            providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if torch.cuda.is_available() else ['CPUExecutionProvider']
-            
-            # Create inference session
-            self.session = ort.InferenceSession(str(self.config.path), providers=providers)
-            
-            # Get input/output info
-            self.input_names = [input.name for input in self.session.get_inputs()]
-            self.output_names = [output.name for output in self.session.get_outputs()]
-            
-            self.is_loaded = True
-            logger.info(f"Loaded ONNX model: {self.config.name}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Failed to load ONNX model {self.config.name}: {e}")
-            return False
-    
-    def predict(self, inputs: Union[torch.Tensor, np.ndarray]) -> np.ndarray:
-        """Make prediction with ONNX model"""
-        if not self.is_loaded:
-            raise RuntimeError("Model not loaded")
-        
-        start_time = time.time()
-        
-        try:
-            # Convert inputs to numpy if needed
-            if isinstance(inputs, torch.Tensor):
-                inputs = inputs.cpu().numpy()
-            
-            # Run inference
-            outputs = self.session.run(self.output_names, {self.input_names[0]: inputs})
-            
-            # Record performance
-            inference_time = time.time() - start_time
-            memory_mb = 0  # ONNX runtime doesn't expose memory usage easily
-            self.monitor.record_inference(inputs.shape[0], inference_time, memory_mb)
-            
-            return outputs[0]
-            
-        except Exception as e:
-            self.monitor.record_error()
-            raise e
-    
-    def export_onnx(self, export_path: Path, sample_input: torch.Tensor) -> bool:
-        """ONNX model is already in ONNX format"""
-        if export_path != self.config.path:
-            import shutil
-            shutil.copy2(self.config.path, export_path)
-        return True
-
-class SurrogateManager:
-    """Manager for multiple surrogate models"""
-    
-    def __init__(self, config_path: Optional[str] = "config/config.yaml"):
-        self.config = self._load_config(config_path)
-        self.models: Dict[str, BaseModelWrapper] = {}
-        self.monitors: Dict[str, PerformanceMonitor] = {}
-        self.current_mode = SurrogateMode.SCALAR
-        self.fallback_chain = []
-
-        # Initialize SHAP explainer manager
-        self.shap_manager = None
-        self.explanation_cache = {}
-        
-        logger.info("Surrogate manager initialized with SHAP explanation support")
-    
-    def initialize_shap_explainer(self, metadata_manager):
-        """Initialize SHAP explainer manager"""
-        self.shap_manager = create_shap_explainer_manager(self, metadata_manager)
-        logger.info("SHAP explainer manager initialized")
-    
-    def explain_prediction(self, inputs: Union[torch.Tensor, np.ndarray], 
-                          domain: str, mode: SurrogateMode = None, 
-                          feature_names: List[str] = None,
-                          config: ExplanationConfig = None) -> Dict[str, Any]:
-        """Generate SHAP explanations for predictions"""
-        
-        if self.shap_manager is None:
-            raise ValueError("SHAP explainer not initialized. Call initialize_shap_explainer() first.")
-        
-        # Convert domain string to DataDomain enum
-        from data_build.metadata_db import DataDomain
-        domain_enum = DataDomain(domain)
-        
-        # Convert inputs to numpy if needed
-        if isinstance(inputs, torch.Tensor):
-            inputs = inputs.cpu().numpy()
-        
-        # Generate explanations
-        explanations = self.shap_manager.explain_prediction(
-            domain_enum, inputs, feature_names=feature_names
-        )
-        
-        # Cache explanations
-        cache_key = f"{domain}_{hash(inputs.tobytes())}"
-        self.explanation_cache[cache_key] = explanations
-        
-        return explanations
-    
-    def predict_with_explanation(self, inputs: Union[torch.Tensor, np.ndarray], 
-                               domain: str, mode: SurrogateMode = None,
-                               feature_names: List[str] = None,
-                               include_explanation: bool = True) -> Dict[str, Any]:
-        """Make prediction with optional SHAP explanation"""
-        
-        # Get regular prediction
-        prediction = self.predict(inputs, mode)
-        
-        result = {
-            'prediction': prediction,
-            'domain': domain,
-            'mode': mode.value if mode else self.current_mode.value,
-            'timestamp': datetime.now().isoformat()
+        # Enhanced model registry
+        self.enhanced_registry = {
+            ModelType.ENHANCED_DATACUBE_UNET: EnhancedCubeUNet,
+            ModelType.ENHANCED_SURROGATE_INTEGRATION: EnhancedSurrogateIntegration,
+            ModelType.DATACUBE_UNET: CubeUNet,
+            ModelType.SURROGATE_TRANSFORMER: SurrogateTransformer,
+            ModelType.GRAPH_VAE: GVAE,
+            ModelType.FUSION_TRANSFORMER: FusionModel
         }
         
-        # Add explanation if requested
-        if include_explanation and self.shap_manager is not None:
-            try:
-                explanation = self.explain_prediction(inputs, domain, mode, feature_names)
-                result['explanation'] = explanation
-            except Exception as e:
-                logger.warning(f"Failed to generate explanation: {e}")
-                result['explanation_error'] = str(e)
-        
-        return result
+        logger.info("Enhanced Model Loader initialized with advanced CNN features")
     
-    def get_explanation_stats(self) -> Dict[str, Any]:
-        """Get explanation statistics"""
+    def load_enhanced_model(self, config: ModelConfig) -> nn.Module:
+        """Load enhanced model with all optimizations"""
+        model_key = f"{config.model_type.value}_{config.performance_level.value}"
         
-        if not self.explanation_cache:
-            return {'total_explanations': 0}
+        if model_key in self.loaded_models:
+            logger.info(f"Returning cached enhanced model: {model_key}")
+            return self.loaded_models[model_key]
         
-        stats = {
-            'total_explanations': len(self.explanation_cache),
-            'cache_size_mb': sum(len(str(exp)) for exp in self.explanation_cache.values()) / (1024*1024),
-            'domains_explained': len(set(key.split('_')[0] for key in self.explanation_cache.keys()))
-        }
+        logger.info(f"Loading enhanced model: {config.model_type.value} at {config.performance_level.value} performance")
         
-        return stats
-    
-    def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
-        """Load configuration"""
-        if not config_path or not Path(config_path).exists():
-            logger.warning(f"Config file not found: {config_path}")
-            return {}
+        # Get model class
+        model_class = self.enhanced_registry[config.model_type]
         
-        try:
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-            return config
-        except Exception as e:
-            logger.error(f"Failed to load config: {e}")
-            return {}
-    
-    def discover_models(self, model_dir: Path = Path("models")) -> List[ModelConfig]:
-        """Discover available models"""
-        model_configs = []
-        
-        # Check for model files
-        for model_file in model_dir.glob("*.ckpt"):
-            model_configs.append(ModelConfig(
-                name=model_file.stem,
-                format=ModelFormat.PYTORCH,
-                path=model_file,
-                mode=SurrogateMode.DATACUBE if "cube" in model_file.name else SurrogateMode.SCALAR
-            ))
-        
-        for model_file in model_dir.glob("*.onnx"):
-            model_configs.append(ModelConfig(
-                name=model_file.stem,
-                format=ModelFormat.ONNX,
-                path=model_file,
-                mode=SurrogateMode.DATACUBE if "cube" in model_file.name else SurrogateMode.SCALAR
-            ))
-        
-        logger.info(f"Discovered {len(model_configs)} models")
-        return model_configs
-    
-    def load_model(self, model_config: ModelConfig) -> bool:
-        """Load a specific model"""
-        
-        # Create performance monitor
-        monitor = PerformanceMonitor(model_config.name)
-        self.monitors[model_config.name] = monitor
-        
-        # Create wrapper based on format
-        if model_config.format == ModelFormat.PYTORCH:
-            wrapper = PyTorchModelWrapper(model_config, monitor)
-        elif model_config.format == ModelFormat.ONNX:
-            wrapper = ONNXModelWrapper(model_config, monitor)
-        else:
-            logger.error(f"Unsupported model format: {model_config.format}")
-            return False
+        # Prepare enhanced configuration
+        enhanced_config = self._prepare_enhanced_config(config)
         
         # Load model
-        if wrapper.load_model():
-            self.models[model_config.name] = wrapper
-            logger.info(f"Successfully loaded model: {model_config.name}")
-            return True
+        if config.checkpoint_path and Path(config.checkpoint_path).exists():
+            # Load from checkpoint
+            model = model_class.load_from_checkpoint(
+                config.checkpoint_path,
+                **enhanced_config
+            )
+            logger.info(f"Loaded enhanced model from checkpoint: {config.checkpoint_path}")
         else:
-            logger.error(f"Failed to load model: {model_config.name}")
-            return False
+            # Create new model
+            model = model_class(**enhanced_config)
+            logger.info(f"Created new enhanced model: {config.model_type.value}")
+        
+        # Apply performance optimizations
+        model = self._apply_performance_optimizations(model, config)
+        
+        # Cache model
+        self.loaded_models[model_key] = model
+        self.model_configs[model_key] = config
+        
+        # Log model complexity
+        if hasattr(model, 'get_model_complexity'):
+            complexity = model.get_model_complexity()
+            logger.info(f"Enhanced model complexity: {complexity}")
+        elif hasattr(model, 'get_integration_complexity'):
+            complexity = model.get_integration_complexity()
+            logger.info(f"Enhanced integration complexity: {complexity}")
+        
+        return model
     
-    def load_all_models(self) -> int:
-        """Load all available models"""
-        model_configs = self.discover_models()
-        loaded_count = 0
+    def _prepare_enhanced_config(self, config: ModelConfig) -> Dict[str, Any]:
+        """Prepare enhanced configuration based on performance level"""
+        enhanced_config = {}
         
-        for config in model_configs:
-            if self.load_model(config):
-                loaded_count += 1
+        if config.model_type == ModelType.ENHANCED_DATACUBE_UNET:
+            enhanced_config.update({
+                'use_attention': config.use_attention,
+                'use_transformer': config.use_transformer,
+                'use_separable_conv': config.use_separable_conv,
+                'use_gradient_checkpointing': config.use_gradient_checkpointing,
+                'use_mixed_precision': config.use_mixed_precision,
+                'model_scaling': config.model_scaling,
+                'use_physics_constraints': config.use_physics_constraints
+            })
+            
+            # Performance level adjustments
+            if config.performance_level == PerformanceLevel.PEAK:
+                enhanced_config.update({
+                    'use_transformer': True,
+                    'use_separable_conv': True,
+                    'use_gradient_checkpointing': True,
+                    'base_features': 64,
+                    'depth': 5,
+                    'dropout': 0.1
+                })
+            elif config.performance_level == PerformanceLevel.OPTIMIZED:
+                enhanced_config.update({
+                    'use_transformer': False,
+                    'use_separable_conv': True,
+                    'base_features': 48,
+                    'depth': 4,
+                    'dropout': 0.15
+                })
+            else:  # BASIC
+                enhanced_config.update({
+                    'use_attention': False,
+                    'use_transformer': False,
+                    'use_separable_conv': False,
+                    'base_features': 32,
+                    'depth': 3,
+                    'dropout': 0.2
+                })
         
-        logger.info(f"Loaded {loaded_count}/{len(model_configs)} models")
-        return loaded_count
+        elif config.model_type == ModelType.ENHANCED_SURROGATE_INTEGRATION:
+            # Multi-modal configuration
+            if config.multimodal_config:
+                multimodal_config = MultiModalConfig(**config.multimodal_config)
+            else:
+                multimodal_config = MultiModalConfig()
+            
+            enhanced_config.update({
+                'multimodal_config': multimodal_config,
+                'use_uncertainty': config.use_uncertainty,
+                'use_dynamic_selection': config.use_dynamic_selection,
+                'use_gradient_checkpointing': config.use_gradient_checkpointing,
+                'use_mixed_precision': config.use_mixed_precision
+            })
+            
+            # Datacube model configuration
+            datacube_config = {
+                'use_attention': config.use_attention,
+                'use_transformer': config.use_transformer,
+                'use_separable_conv': config.use_separable_conv,
+                'use_physics_constraints': config.use_physics_constraints,
+                'model_scaling': config.model_scaling
+            }
+            
+            enhanced_config['datacube_config'] = datacube_config
+        
+        return enhanced_config
     
-    def get_model(self, mode: SurrogateMode = None) -> Optional[BaseModelWrapper]:
-        """Get model for specified mode"""
-        if mode is None:
-            mode = self.current_mode
+    def _apply_performance_optimizations(self, model: nn.Module, config: ModelConfig) -> nn.Module:
+        """Apply performance optimizations to the model"""
+        # Move to device
+        device = self._get_device(config.device)
+        model = model.to(device)
         
-        # Find models matching the mode
-        matching_models = [
-            model for model in self.models.values()
-            if model.config.mode == mode and model.is_loaded
-        ]
+        # Set precision
+        if config.precision == "float16" or config.use_mixed_precision:
+            model = model.half()
         
-        if not matching_models:
-            logger.warning(f"No models available for mode: {mode}")
-            return None
+        # Compile model (PyTorch 2.0+)
+        if config.compile_model and hasattr(torch, 'compile'):
+            try:
+                model = torch.compile(model, mode='max-autotune')
+                logger.info("Model compiled with PyTorch 2.0 for maximum performance")
+            except Exception as e:
+                logger.warning(f"Failed to compile model: {e}")
         
-        # Sort by priority and health
-        matching_models.sort(key=lambda m: (
-            -m.config.priority,  # Higher priority first
-            -int(self.monitors[m.config.name].is_healthy())  # Healthy models first
-        ))
+        # Set to evaluation mode for inference
+        model.eval()
         
-        return matching_models[0]
+        # Enable optimizations
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
+        
+        return model
     
-    def predict(self, inputs: Union[torch.Tensor, np.ndarray], mode: SurrogateMode = None) -> Union[torch.Tensor, np.ndarray]:
-        """Make prediction using best available model"""
-        model = self.get_model(mode)
-        
-        if not model:
-            raise RuntimeError(f"No model available for mode: {mode}")
-        
-        return model.predict(inputs)
+    def _get_device(self, device: str) -> torch.device:
+        """Get appropriate device"""
+        if device == "auto":
+            if torch.cuda.is_available():
+                return torch.device("cuda")
+            else:
+                return torch.device("cpu")
+        else:
+            return torch.device(device)
     
-    def export_model(self, model_name: str, export_path: Path, sample_input: torch.Tensor) -> bool:
-        """Export model to ONNX format"""
-        if model_name not in self.models:
-            logger.error(f"Model not found: {model_name}")
-            return False
+    def get_model_performance(self, model_key: str) -> Dict[str, Any]:
+        """Get model performance metrics"""
+        if model_key not in self.performance_cache:
+            model = self.loaded_models.get(model_key)
+            if model is None:
+                return {}
+            
+            # Benchmark model
+            performance = self._benchmark_model(model)
+            self.performance_cache[model_key] = performance
         
-        return self.models[model_name].export_onnx(export_path, sample_input)
+        return self.performance_cache[model_key]
     
-    def get_performance_stats(self) -> Dict[str, Any]:
-        """Get performance statistics for all models"""
-        stats = {}
+    def _benchmark_model(self, model: nn.Module) -> Dict[str, Any]:
+        """Benchmark model performance"""
+        model.eval()
         
-        for model_name, monitor in self.monitors.items():
-            stats[model_name] = monitor.get_stats()
+        # Create dummy input
+        dummy_input = torch.randn(1, 5, 32, 64, 64).to(next(model.parameters()).device)
         
-        return stats
-    
-    def health_check(self) -> Dict[str, bool]:
-        """Check health of all models"""
-        health = {}
+        # Warm up
+        with torch.no_grad():
+            for _ in range(10):
+                _ = model(dummy_input)
         
-        for model_name, monitor in self.monitors.items():
-            health[model_name] = monitor.is_healthy()
+        # Benchmark inference time
+        torch.cuda.synchronize()
+        start_time = time.time()
         
-        return health
-    
-    def set_mode(self, mode: SurrogateMode):
-        """Set current operation mode"""
-        self.current_mode = mode
-        logger.info(f"Set surrogate mode to: {mode}")
+        with torch.no_grad():
+            for _ in range(100):
+                _ = model(dummy_input)
+        
+        torch.cuda.synchronize()
+        end_time = time.time()
+        
+        avg_inference_time = (end_time - start_time) / 100 * 1000  # ms
+        
+        # Memory usage
+        memory_allocated = torch.cuda.memory_allocated() / (1024 ** 2)  # MB
+        memory_reserved = torch.cuda.memory_reserved() / (1024 ** 2)  # MB
+        
+        return {
+            'avg_inference_time_ms': avg_inference_time,
+            'memory_allocated_mb': memory_allocated,
+            'memory_reserved_mb': memory_reserved,
+            'throughput_samples_per_second': 1000 / avg_inference_time
+        }
 
-# Global surrogate manager instance
-_surrogate_manager = None
+class EnhancedSurrogateManager:
+    """Enhanced surrogate manager with all advanced features"""
+    
+    def __init__(self, config_path: str = "config/surrogate_config.yaml"):
+        self.config_path = Path(config_path)
+        self.config = self._load_config()
+        
+        # Initialize enhanced model loader
+        self.model_loader = EnhancedModelLoader()
+        
+        # Active models
+        self.active_models = {}
+        
+        # Performance monitoring
+        self.performance_monitor = self._setup_performance_monitor()
+        
+        # SHAP explainer manager
+        self.shap_manager = create_shap_explainer_manager()
+        
+        logger.info("Enhanced Surrogate Manager initialized with peak performance features")
+    
+    def _load_config(self) -> Dict[str, Any]:
+        """Load enhanced configuration"""
+        if self.config_path.exists():
+            with open(self.config_path, 'r') as f:
+                config = yaml.safe_load(f)
+        else:
+            # Default enhanced configuration
+            config = {
+                'default_performance_level': 'optimized',
+                'models': {
+                    'enhanced_datacube': {
+                        'type': 'enhanced_datacube_unet',
+                        'performance_level': 'peak',
+                        'use_attention': True,
+                        'use_transformer': True,
+                        'use_physics_constraints': True,
+                        'use_mixed_precision': True,
+                        'model_scaling': 'efficient'
+                    },
+                    'enhanced_integration': {
+                        'type': 'enhanced_surrogate_integration',
+                        'performance_level': 'peak',
+                        'multimodal_config': {
+                            'use_datacube': True,
+                            'use_scalar_params': True,
+                            'fusion_strategy': 'cross_attention'
+                        },
+                        'use_uncertainty': True,
+                        'use_dynamic_selection': True
+                    }
+                }
+            }
+        
+        return config
+    
+    def _setup_performance_monitor(self) -> Dict[str, Any]:
+        """Setup performance monitoring"""
+        return {
+            'start_time': time.time(),
+            'total_inferences': 0,
+            'total_time': 0.0,
+            'model_usage': {},
+            'performance_history': []
+        }
+    
+    def get_enhanced_model(self, model_name: str = "enhanced_datacube") -> nn.Module:
+        """Get enhanced model with all optimizations"""
+        if model_name in self.active_models:
+            return self.active_models[model_name]
+        
+        # Get model configuration
+        model_config_dict = self.config['models'].get(model_name, {})
+        
+        # Create model configuration
+        model_config = ModelConfig(
+            model_type=ModelType(model_config_dict.get('type', 'enhanced_datacube_unet')),
+            model_format=ModelFormat.ENHANCED,
+            performance_level=PerformanceLevel(model_config_dict.get('performance_level', 'optimized')),
+            checkpoint_path=model_config_dict.get('checkpoint_path'),
+            use_attention=model_config_dict.get('use_attention', True),
+            use_transformer=model_config_dict.get('use_transformer', False),
+            use_physics_constraints=model_config_dict.get('use_physics_constraints', True),
+            use_mixed_precision=model_config_dict.get('use_mixed_precision', True),
+            model_scaling=model_config_dict.get('model_scaling', 'efficient'),
+            multimodal_config=model_config_dict.get('multimodal_config'),
+            use_uncertainty=model_config_dict.get('use_uncertainty', False),
+            use_dynamic_selection=model_config_dict.get('use_dynamic_selection', False)
+        )
+        
+        # Load enhanced model
+        model = self.model_loader.load_enhanced_model(model_config)
+        
+        # Cache model
+        self.active_models[model_name] = model
+        
+        return model
+    
+    def predict_with_enhancements(self, 
+                                 input_data: Union[torch.Tensor, Dict[str, torch.Tensor]], 
+                                 model_name: str = "enhanced_datacube",
+                                 return_uncertainty: bool = False) -> Dict[str, Any]:
+        """Make predictions with all enhancements"""
+        # Get enhanced model
+        model = self.get_enhanced_model(model_name)
+        
+        # Prepare input
+        if isinstance(input_data, torch.Tensor):
+            # Single tensor input
+            inputs = {'datacube': input_data}
+        else:
+            # Multi-modal input
+            inputs = input_data
+        
+        # Add targets placeholder if needed
+        if 'targets' not in inputs:
+            inputs['targets'] = torch.zeros_like(inputs['datacube'][:, :model.n_output_vars])
+        
+        # Performance monitoring
+        start_time = time.time()
+        
+        # Forward pass
+        with torch.no_grad():
+            if hasattr(model, 'forward') and isinstance(inputs, dict):
+                outputs = model(inputs)
+            else:
+                outputs = model(inputs['datacube'])
+        
+        # Record performance
+        inference_time = time.time() - start_time
+        self.performance_monitor['total_inferences'] += 1
+        self.performance_monitor['total_time'] += inference_time
+        
+        # Update model usage
+        if model_name not in self.performance_monitor['model_usage']:
+            self.performance_monitor['model_usage'][model_name] = {'count': 0, 'total_time': 0.0}
+        
+        self.performance_monitor['model_usage'][model_name]['count'] += 1
+        self.performance_monitor['model_usage'][model_name]['total_time'] += inference_time
+        
+        # Prepare results
+        if isinstance(outputs, dict):
+            results = {
+                'predictions': outputs['predictions'],
+                'inference_time_ms': inference_time * 1000,
+                'model_name': model_name,
+                'performance_level': self.model_loader.model_configs.get(
+                    f"{model_name}_optimized", ModelConfig(ModelType.ENHANCED_DATACUBE_UNET, ModelFormat.ENHANCED)
+                ).performance_level.value
+            }
+            
+            if return_uncertainty and 'uncertainty' in outputs:
+                results['uncertainty'] = outputs['uncertainty']
+            
+            if 'fused_features' in outputs:
+                results['fused_features'] = outputs['fused_features']
+        
+        else:
+            results = {
+                'predictions': outputs,
+                'inference_time_ms': inference_time * 1000,
+                'model_name': model_name
+            }
+        
+        return results
+    
+    def get_performance_summary(self) -> Dict[str, Any]:
+        """Get performance summary"""
+        total_time = self.performance_monitor['total_time']
+        total_inferences = self.performance_monitor['total_inferences']
+        
+        if total_inferences > 0:
+            avg_inference_time = total_time / total_inferences * 1000  # ms
+            throughput = total_inferences / total_time  # inferences/second
+        else:
+            avg_inference_time = 0
+            throughput = 0
+        
+        return {
+            'total_inferences': total_inferences,
+            'total_time_seconds': total_time,
+            'avg_inference_time_ms': avg_inference_time,
+            'throughput_inferences_per_second': throughput,
+            'model_usage': self.performance_monitor['model_usage'],
+            'active_models': list(self.active_models.keys()),
+            'uptime_seconds': time.time() - self.performance_monitor['start_time']
+        }
+    
+    def optimize_for_peak_performance(self):
+        """Optimize all models for peak performance"""
+        logger.info("🚀 Optimizing all models for peak performance...")
+        
+        for model_name, model in self.active_models.items():
+            logger.info(f"Optimizing {model_name}...")
+            
+            # Enable optimizations
+            if hasattr(model, 'eval'):
+                model.eval()
+            
+            # Set benchmark mode
+            torch.backends.cudnn.benchmark = True
+            torch.backends.cudnn.deterministic = False
+            
+            # Clear cache
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            
+            # Compile if possible
+            if hasattr(torch, 'compile'):
+                try:
+                    model = torch.compile(model, mode='max-autotune')
+                    self.active_models[model_name] = model
+                    logger.info(f"✅ {model_name} compiled for maximum performance")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not compile {model_name}: {e}")
+        
+        logger.info("🎯 Peak performance optimization completed!")
 
-def get_surrogate_manager() -> SurrogateManager:
-    """Get global surrogate manager instance"""
-    global _surrogate_manager
-    
-    if _surrogate_manager is None:
-        _surrogate_manager = SurrogateManager()
-        _surrogate_manager.load_all_models()
-    
-    return _surrogate_manager
+# Global enhanced manager instance
+enhanced_manager = None
 
-def load_surrogate(mode: str = "datacube") -> BaseModelWrapper:
-    """Load surrogate model for specified mode"""
-    manager = get_surrogate_manager()
-    
-    surrogate_mode = SurrogateMode(mode)
-    manager.set_mode(surrogate_mode)
-    
-    model = manager.get_model(surrogate_mode)
-    if not model:
-        raise RuntimeError(f"No surrogate model available for mode: {mode}")
-    
-    return model
+def get_enhanced_surrogate_manager() -> EnhancedSurrogateManager:
+    """Get global enhanced surrogate manager"""
+    global enhanced_manager
+    if enhanced_manager is None:
+        enhanced_manager = EnhancedSurrogateManager()
+    return enhanced_manager
 
-# Export main functions
+def load_enhanced_model(model_name: str = "enhanced_datacube") -> nn.Module:
+    """Load enhanced model with all optimizations"""
+    manager = get_enhanced_surrogate_manager()
+    return manager.get_enhanced_model(model_name)
+
+def predict_with_peak_performance(input_data: Union[torch.Tensor, Dict[str, torch.Tensor]], 
+                                 model_name: str = "enhanced_datacube",
+                                 return_uncertainty: bool = False) -> Dict[str, Any]:
+    """Make predictions with peak performance optimizations"""
+    manager = get_enhanced_surrogate_manager()
+    return manager.predict_with_enhancements(input_data, model_name, return_uncertainty)
+
+def optimize_all_models_for_peak_performance():
+    """Optimize all models for peak performance"""
+    manager = get_enhanced_surrogate_manager()
+    manager.optimize_for_peak_performance()
+
+# Convenience functions for backward compatibility
+def get_model(model_name: str = "enhanced_datacube") -> nn.Module:
+    """Get enhanced model (backward compatibility)"""
+    return load_enhanced_model(model_name)
+
+def predict(input_data: Union[torch.Tensor, Dict[str, torch.Tensor]], 
+           model_name: str = "enhanced_datacube") -> Dict[str, Any]:
+    """Make enhanced predictions (backward compatibility)"""
+    return predict_with_peak_performance(input_data, model_name)
+
+# Export enhanced components
 __all__ = [
-    'SurrogateManager',
+    'EnhancedSurrogateManager',
+    'EnhancedModelLoader',
     'ModelConfig',
-    'SurrogateMode',
-    'ModelFormat',
-    'get_surrogate_manager',
-    'load_surrogate',
-    'SHAPExplainer',
-    'SHAPExplainerManager',
-    'ExplanationConfig'
+    'ModelType',
+    'PerformanceLevel',
+    'get_enhanced_surrogate_manager',
+    'load_enhanced_model',
+    'predict_with_peak_performance',
+    'optimize_all_models_for_peak_performance',
+    'get_model',  # Backward compatibility
+    'predict'     # Backward compatibility
 ] 

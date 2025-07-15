@@ -1,0 +1,116 @@
+{
+  "enhanced_architecture": {
+    "complexity": {
+      "total_parameters": 2976716,
+      "trainable_parameters": 2976716,
+      "model_size_mb": 11.355270385742188,
+      "attention_blocks": 14,
+      "separable_conv_blocks": 7,
+      "use_attention": true,
+      "use_separable": true
+    },
+    "inference_time_ms": 65.51074981689453,
+    "input_shape": [
+      2,
+      5,
+      16,
+      32,
+      32
+    ],
+    "output_shape": [
+      2,
+      5,
+      16,
+      32,
+      32
+    ]
+  },
+  "attention_mechanisms": {
+    "spatial_attention_time_ms": 0.9989738464355469,
+    "channel_attention_time_ms": 1.0006427764892578,
+    "attention_improvement_percent": 56.64821243286133
+  },
+  "performance_optimizations": {
+    "mixed_precision_speedup": 0.713649143123198,
+    "separable_conv_speedup": 2.004297994269341
+  },
+  "physics_constraints": {
+    "computation_time_ms": 1.001596450805664,
+    "physics_losses": {
+      "mass_conservation": 1.2894307374954224,
+      "energy_conservation": 746.7739868164062,
+      "thermodynamic_consistency": 124030.71875
+    },
+    "total_physics_loss": 124778.7821675539
+  },
+  "uncertainty_quantification": {
+    "estimation_time_ms": 0.9987354278564453,
+    "mean_uncertainty": 1.2991807460784912,
+    "std_uncertainty": 0.7226283550262451,
+    "flattened_input_size": 500
+  },
+  "enterprise_integration": {
+    "system_active": true,
+    "sources_registered": 41,
+    "health_monitoring": false
+  },
+  "benchmarks": {
+    "basic": {
+      "8x16x16": {
+        "avg_time_ms": 33.10375213623047,
+        "throughput_samples_per_sec": 60.416112100208
+      },
+      "16x32x32": {
+        "avg_time_ms": 26.105546951293945,
+        "throughput_samples_per_sec": 76.61207036694047
+      },
+      "complexity": {
+        "total_parameters": 3233814,
+        "trainable_parameters": 3233814,
+        "model_size_mb": 12.336021423339844,
+        "attention_blocks": 2,
+        "separable_conv_blocks": 0,
+        "use_attention": false,
+        "use_separable": false
+      }
+    },
+    "enhanced": {
+      "8x16x16": {
+        "avg_time_ms": 38.90213966369629,
+        "throughput_samples_per_sec": 51.411053923761735
+      },
+      "16x32x32": {
+        "avg_time_ms": 48.81916046142578,
+        "throughput_samples_per_sec": 40.96752138087852
+      },
+      "complexity": {
+        "total_parameters": 2976716,
+        "trainable_parameters": 2976716,
+        "model_size_mb": 11.355270385742188,
+        "attention_blocks": 14,
+        "separable_conv_blocks": 7,
+        "use_attention": true,
+        "use_separable": true
+      }
+    },
+    "peak": {
+      "8x16x16": {
+        "avg_time_ms": 50.31905174255371,
+        "throughput_samples_per_sec": 39.74637698326585
+      },
+      "16x32x32": {
+        "avg_time_ms": 65.26622772216797,
+        "throughput_samples_per_sec": 30.64371988088245
+      },
+      "complexity": {
+        "total_parameters": 6675732,
+        "trainable_parameters": 6675732,
+        "model_size_mb": 25.465896606445312,
+        "attention_blocks": 14,
+        "separable_conv_blocks": 7,
+        "use_attention": true,
+        "use_separable": true
+      }
+    }
+  }
+}

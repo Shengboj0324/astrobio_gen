@@ -1,0 +1,331 @@
+# Enhanced Climate Datacube Training Configuration
+# ===============================================
+# Comprehensive configuration for peak accuracy and performance
+
+# Model Configuration
+model:
+  class_path: models.enhanced_datacube_unet.EnhancedCubeUNet
+  init_args:
+    n_input_vars: 5
+    n_output_vars: 5
+    input_variables: ["temperature", "pressure", "humidity", "velocity_u", "velocity_v"]
+    output_variables: ["temperature", "pressure", "humidity", "velocity_u", "velocity_v"]
+    base_features: 64  # Increased for better performance
+    depth: 5  # Deeper for better representation
+    dropout: 0.1
+    learning_rate: 2e-4
+    weight_decay: 1e-4
+    physics_weight: 0.2
+    use_physics_constraints: true
+    use_attention: true
+    use_transformer: true  # Enable transformer blocks
+    use_separable_conv: true  # Performance optimization
+    use_gradient_checkpointing: true  # Memory optimization
+    use_mixed_precision: true  # 2x speed boost
+    model_scaling: "efficient"  # EfficientNet-style scaling
+
+# Data Module Configuration
+data:
+  class_path: train_enhanced_cube.EnhancedCubeDM
+  init_args:
+    zarr_root: "data/processed/gcm_zarr"
+    batch_size: 8  # Reduced for memory efficiency with enhanced model
+    num_workers: 8
+    prefetch_factor: 2
+    chunk_size: [32, 64, 64]  # Optimized chunk size
+    cache_size_gb: 8.0
+    use_augmentation: true
+    multi_scale_training: true
+    scale_factors: [0.75, 1.0, 1.25]  # Multi-scale training
+    
+    # Advanced caching
+    cache_config:
+      enabled: true
+      max_size_gb: 16.0
+      eviction_policy: "lru"
+      persistence_enabled: true
+      cache_dir: "data/cache"
+    
+    # Streaming configuration
+    streaming_config:
+      enabled: true
+      buffer_size: 32
+      prefetch_batches: 4
+      memory_limit_gb: 32.0
+
+# Trainer Configuration
+trainer:
+  max_epochs: 200
+  precision: "16-mixed"  # Mixed precision training
+  accelerator: "auto"
+  devices: "auto"
+  strategy: "ddp"  # Distributed training
+  
+  # Performance optimizations
+  sync_batchnorm: true
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: "norm"
+  accumulate_grad_batches: 2
+  
+  # Memory optimization
+  enable_checkpointing: true
+  enable_progress_bar: true
+  enable_model_summary: true
+  
+  # Profiling
+  profiler: "simple"  # Can be "advanced" for detailed profiling
+  
+  # Callbacks
+  callbacks:
+    - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: "checkpoints/enhanced_cube"
+        filename: "enhanced-cube-{epoch:02d}-{val_loss:.3f}"
+        monitor: "val_loss"
+        mode: "min"
+        save_top_k: 3
+        save_last: true
+        save_weights_only: false
+        every_n_epochs: 1
+        auto_insert_metric_name: false
+    
+    - class_path: pytorch_lightning.callbacks.EarlyStopping
+      init_args:
+        monitor: "val_loss"
+        patience: 20
+        mode: "min"
+        min_delta: 0.001
+        strict: false
+        verbose: true
+    
+    - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "step"
+        log_momentum: true
+    
+    - class_path: pytorch_lightning.callbacks.DeviceStatsMonitor
+      init_args:
+        cpu_stats: true
+    
+    - class_path: pytorch_lightning.callbacks.ModelSummary
+      init_args:
+        max_depth: 3
+    
+    - class_path: pytorch_lightning.callbacks.StochasticWeightAveraging
+      init_args:
+        swa_lrs: 1e-5
+        swa_epoch_start: 0.8
+        annealing_epochs: 10
+        annealing_strategy: "cos"
+  
+  # Logging
+  logger:
+    - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      init_args:
+        save_dir: "logs"
+        name: "enhanced_cube"
+        version: null
+        log_graph: false
+        default_hp_metric: false
+        prefix: ""
+    
+    - class_path: pytorch_lightning.loggers.WandbLogger
+      init_args:
+        project: "enhanced-climate-datacube"
+        name: "enhanced-cube-training"
+        save_dir: "logs"
+        offline: false
+        id: null
+        anonymous: null
+        version: null
+        log_model: false
+        prefix: ""
+        tags: ["enhanced", "climate", "datacube", "attention", "transformer"]
+
+# Advanced Training Configuration
+training:
+  use_self_supervised: false  # Can be enabled for pre-training
+  use_adversarial: false  # Can be enabled for robustness
+  use_swa: true  # Stochastic Weight Averaging
+  gradient_clip_val: 1.0
+  
+  # Curriculum learning
+  curriculum_learning:
+    enabled: true
+    stages: 3
+    stage_epochs: [50, 100, 150]
+    complexity_progression: ["basic", "attention", "full"]
+  
+  # Self-supervised pre-training (optional)
+  self_supervised:
+    enabled: false
+    epochs: 50
+    masking_ratio: 0.15
+    temporal_prediction_steps: 3
+    learning_rate: 1e-4
+  
+  # Adversarial training (optional)
+  adversarial:
+    enabled: false
+    epsilon: 0.01
+    alpha: 0.005
+    num_iter: 5
+    weight: 0.1
+
+# Performance Configuration
+performance:
+  compile_model: false  # PyTorch 2.0 compilation (experimental)
+  profile_training: false  # Detailed profiling
+  memory_optimization: true
+  
+  # CUDA optimizations
+  cuda_optimizations:
+    benchmark: true
+    deterministic: false
+    allow_tf32: true
+    empty_cache_steps: 100
+  
+  # Data loading optimizations
+  data_loading:
+    pin_memory: true
+    persistent_workers: true
+    drop_last: true
+    prefetch_factor: 2
+
+# Enterprise URL System Integration
+enterprise_url:
+  enabled: true
+  health_check_interval: 300  # 5 minutes
+  retry_attempts: 3
+  timeout: 30
+  priority: "HIGH"
+  
+  # Data source priorities
+  data_sources:
+    rocke3d_climate: "CRITICAL"
+    nasa_gcm_data: "HIGH"
+    noaa_climate_data: "MEDIUM"
+    era5_reanalysis: "MEDIUM"
+
+# Physics Constraints Configuration
+physics:
+  enabled: true
+  weight: 0.2
+  
+  # Individual constraint weights
+  constraints:
+    mass_conservation: 1.0
+    energy_conservation: 1.0
+    momentum_conservation: 0.8
+    hydrostatic_balance: 0.9
+    thermodynamic_consistency: 0.7
+    radiative_transfer: 0.5
+    cloud_microphysics: 0.6
+    convective_adjustment: 0.4
+    boundary_layer_physics: 0.3
+  
+  # Physical constants (SI units)
+  constants:
+    specific_heat_air: 1004.0
+    specific_heat_water: 4186.0
+    latent_heat_vaporization: 2.26e6
+    latent_heat_fusion: 3.34e5
+    gas_constant_dry_air: 287.0
+    gas_constant_water_vapor: 461.5
+    gravity: 9.81
+    earth_radius: 6.371e6
+    stefan_boltzmann: 5.67e-8
+
+# Attention Configuration
+attention:
+  enabled: true
+  
+  # Spatial attention
+  spatial_attention:
+    enabled: true
+    reduction: 8
+    kernel_size: 3
+  
+  # Temporal attention
+  temporal_attention:
+    enabled: true
+    num_heads: 8
+    dropout: 0.1
+  
+  # Channel attention
+  channel_attention:
+    enabled: true
+    reduction: 16
+    use_max_pool: true
+
+# Transformer Configuration
+transformer:
+  enabled: true
+  num_layers: 2
+  num_heads: 8
+  hidden_dim_ratio: 4.0
+  dropout: 0.1
+  use_positional_encoding: true
+  
+  # Efficiency settings
+  use_flash_attention: false  # Requires flash-attn package
+  gradient_checkpointing: true
+
+# Data Augmentation Configuration
+augmentation:
+  enabled: true
+  
+  # Physics-informed augmentation
+  temperature_noise_std: 0.5
+  pressure_noise_std: 50.0
+  humidity_noise_std: 0.02
+  
+  # Spatial augmentation
+  spatial_rotation_prob: 0.3
+  spatial_rotation_range: [-15, 15]  # degrees
+  
+  # Temporal augmentation
+  temporal_shift_prob: 0.2
+  temporal_shift_range: [-2, 2]  # time steps
+  
+  # Scale augmentation
+  scale_factor_range: [0.95, 1.05]
+  scale_prob: 0.4
+
+# Validation Configuration
+validation:
+  check_val_every_n_epoch: 1
+  val_check_interval: 1.0
+  num_sanity_val_steps: 2
+  
+  # Physics validation
+  physics_validation:
+    enabled: true
+    tolerance: 1e-3
+    check_conservation_laws: true
+    check_boundary_conditions: true
+    check_stability: true
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  log_every_n_steps: 50
+  log_physics_losses: true
+  log_attention_weights: false  # Can be resource intensive
+  log_gradients: false
+  
+  # Metrics to track
+  metrics:
+    - "train_loss"
+    - "val_loss"
+    - "train_physics_loss"
+    - "val_physics_loss"
+    - "learning_rate"
+    - "gpu_memory_usage"
+    - "train_time_per_epoch"
+
+# Reproducibility Configuration
+reproducibility:
+  seed: 42
+  deterministic: false  # Set to true for full reproducibility (slower)
+  benchmark: true 
