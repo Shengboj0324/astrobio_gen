@@ -45,6 +45,14 @@ import time
 # Add current directory to path for imports
 sys.path.append(str(Path(__file__).parent))
 
+# Setup Unicode-safe logging for Windows
+try:
+    from utils.logging_config import setup_unicode_safe_logging
+    setup_unicode_safe_logging()
+except ImportError:
+    # Fallback to basic logging if Unicode config not available
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 # Enterprise URL system integration
 try:
     from utils.integrated_url_system import get_integrated_url_system

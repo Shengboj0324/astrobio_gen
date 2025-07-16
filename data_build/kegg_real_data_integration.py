@@ -28,6 +28,7 @@ import tarfile
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from urllib.parse import urljoin
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any, Tuple, Set
@@ -271,7 +272,6 @@ class KEGGDataDownloader:
         managed_base_url = await self._get_managed_base_url()
         
         # Fetch main pathway list
-        from urllib.parse import urljoin
         url = urljoin(managed_base_url, "list/pathway")
         response = await self._fetch_with_retry(url)
 
@@ -332,7 +332,6 @@ class KEGGDataDownloader:
         managed_base_url = await self._get_managed_base_url()
         
         # Fetch pathway information
-        from urllib.parse import urljoin
         url = urljoin(managed_base_url, f"get/{pathway_id}")
         response = await self._fetch_with_retry(url)
         

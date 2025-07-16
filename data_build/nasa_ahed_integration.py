@@ -151,6 +151,20 @@ class AHEDDownloader:
         self.session = None
         self.rate_limit_delay = 1.0  # 1 second between requests (NASA rate limiting)
         
+        # NASA AHED data themes/categories
+        self.themes = [
+            'Abiotic Building Blocks',
+            'Habitable Worlds',
+            'Biosignature Detection',
+            'Field Site Studies',
+            'Instrument Development',
+            'Mission Support',
+            'Environmental Extremes',
+            'Astrobiology Research',
+            'Life Detection',
+            'Planetary Protection'
+        ]
+        
         # Initialize enterprise URL system
         self._initialize_url_system()
     

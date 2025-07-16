@@ -149,6 +149,22 @@ class GTDBDownloader:
         self.rate_limit_delay = 0.1  # 100ms between requests
         self.data_priority = DataPriority.HIGH if DataPriority else None
         
+        # Available GTDB files mapping
+        self.available_files = {
+            'version': 'VERSION',
+            'methods': 'METHODS.txt',
+            'file_descriptions': 'FILE_DESCRIPTIONS.txt',
+            'bac120_metadata': 'bac120_metadata.tsv.gz',
+            'bac120_taxonomy': 'bac120_taxonomy.tsv',
+            'bac120_tree_gz': 'bac120.tree.gz',
+            'ar53_metadata': 'ar53_metadata.tsv.gz',
+            'ar53_taxonomy': 'ar53_taxonomy.tsv',
+            'ar53_tree_gz': 'ar53.tree.gz',
+            'fastani_results': 'fastani_results.tar.gz',
+            'mash_results': 'mash_results.tar.gz',
+            'checkm_results': 'checkm_results.tar.gz'
+        }
+        
         # Initialize enterprise URL system
         self._initialize_url_system()
     

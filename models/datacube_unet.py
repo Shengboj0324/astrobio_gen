@@ -273,13 +273,18 @@ class CubeUNet(pl.LightningModule):
         in_channels = self.n_input_vars
         features = self.base_features
         
+        # Store encoder feature sizes for proper skip connection handling
+        encoder_features = []
+        
         for i in range(self.depth):
             if i == 0:
                 # First block - just convolution
                 self.encoder_blocks.append(Conv3DBlock(in_channels, features, dropout=self.dropout))
+                encoder_features.append(features)
             else:
                 # Downsampling blocks
                 self.downsample_blocks.append(DownSample3D(in_channels, features, dropout=self.dropout))
+                encoder_features.append(features)
             
             in_channels = features
             features *= 2
@@ -290,15 +295,23 @@ class CubeUNet(pl.LightningModule):
         # Decoder (upsampling path)
         self.upsample_blocks = nn.ModuleList()
         
+        current_features = features
         for i in range(self.depth):
-            skip_channels = features // 4 if i > 0 else self.base_features
-            out_channels = features // 4 if i < self.depth - 1 else self.base_features
+            # Skip connection channels come from corresponding encoder layer
+            skip_idx = self.depth - 1 - i
+            skip_channels = encoder_features[skip_idx]
+            
+            # Output channels for this decoder layer
+            if i < self.depth - 1:
+                out_channels = current_features // 4
+            else:
+                out_channels = self.base_features
             
             self.upsample_blocks.append(
-                UpSample3D(features, skip_channels, out_channels, dropout=self.dropout)
+                UpSample3D(current_features, skip_channels, out_channels, dropout=self.dropout)
             )
             
-            features //= 2
+            current_features = out_channels
         
         # Output layer
         self.output_conv = nn.Conv3d(self.base_features, self.n_output_vars, 1)

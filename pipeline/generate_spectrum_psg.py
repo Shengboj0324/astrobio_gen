@@ -54,9 +54,7 @@ class PSGInterface:
             self.url_system = get_integrated_url_system()
             self.data_priority = DataPriority.HIGH  # PSG is critical for spectrum generation
             
-            # Register PSG in enterprise system if not already registered
-            self._register_psg_source()
-            
+            # Note: URL registration is deferred until first use to avoid async issues during init
             _LOG.info("✅ PSG interface integrated with enterprise URL system")
             
         except Exception as e:
@@ -64,22 +62,36 @@ class PSGInterface:
             _LOG.info("Falling back to direct PSG API access")
     
     def _register_psg_source(self):
-        """Register PSG as a managed data source"""
+        """Register PSG as a managed data source (deprecated - use async version)"""
+        # This method is kept for compatibility but should not be used
+        # URL registration is now handled lazily in get_psg_api_url()
+        _LOG.info("PSG source registration deferred until first API call")
+    
+    async def _register_psg_source_async(self):
+        """Async version: Register PSG as a managed data source"""
         try:
+            if not self.url_system:
+                return False
+                
             # Check if PSG is already registered in the URL system
-            # If not, this will be handled by the URL registry
             test_url = "https://psg.gsfc.nasa.gov/api.php"
-            managed_url = asyncio.run(self.url_system.get_url(test_url, self.data_priority))
+            managed_url = await self.url_system.get_url(test_url, self.data_priority)
             if managed_url:
                 self.current_api_url = managed_url
                 _LOG.info(f"PSG registered with managed URL: {managed_url}")
+                return True
+            return False
         except Exception as e:
             _LOG.warning(f"Could not register PSG source: {e}")
-    
+            return False
+
     async def get_psg_api_url(self) -> str:
         """Get the optimal PSG API URL using enterprise routing"""
         try:
             if self.url_system:
+                # Register PSG source if not already done
+                await self._register_psg_source_async()
+                
                 # Get managed URL for PSG API
                 test_url = "https://psg.gsfc.nasa.gov/api.php"
                 managed_url = await self.url_system.get_url(test_url, self.data_priority)
