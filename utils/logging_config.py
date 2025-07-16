@@ -139,4 +139,15 @@ def get_unicode_safe_logger(name: str) -> logging.Logger:
 
 # Auto-configure logging when module is imported
 if __name__ != '__main__':
-    setup_unicode_safe_logging() 
+    setup_unicode_safe_logging()
+    
+    # Also configure all existing loggers
+    import logging
+    for logger_name in logging.Logger.manager.loggerDict:
+        logger = logging.getLogger(logger_name)
+        if logger.handlers:
+            for handler in logger.handlers:
+                if isinstance(handler, logging.StreamHandler):
+                    handler.setFormatter(UnicodeAwareFormatter(
+                        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                    )) 

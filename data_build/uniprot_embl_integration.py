@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Comprehensive UniProt/EMBL Integration System
 ===========================================
@@ -34,6 +34,15 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any, Set, Tuple
 from dataclasses import dataclass, field
 import time
+
+# Setup Unicode-safe logging for Windows
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+try:
+    from utils.logging_config import setup_unicode_safe_logging
+    setup_unicode_safe_logging()
+except ImportError:
+    pass
 
 # Enterprise URL system integration
 import sys
@@ -121,15 +130,15 @@ class UniProtDownloader:
         """Initialize enterprise URL management for UniProt"""
         try:
             if not URL_SYSTEM_AVAILABLE:
-                logger.warning("Integrated URL system not available. Falling back to direct requests.")
+                logger.info("Enterprise URL system not available, using fallback UniProt URLs")
                 return
                 
             self.url_system = get_integrated_url_system()
             # URL acquisition will be done when needed in async methods
-            logger.info("✅ UniProt integrated with enterprise URL system")
+            logger.info("[OK] UniProt integrated with enterprise URL system")
             
         except Exception as e:
-            logger.warning(f"Failed to initialize enterprise URL system: {e}")
+            logger.warning(f"Failed to initialize enterprise URL system for UniProt: {e}")
             self.url_system = None
     
     async def _get_managed_url(self, test_url: str) -> str:

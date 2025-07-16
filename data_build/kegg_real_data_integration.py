@@ -165,7 +165,7 @@ class KEGGDataDownloader:
             self.url_system = get_integrated_url_system()
             self.data_priority = DataPriority.HIGH  # KEGG is high priority for pathway data
             
-            logger.info("✅ KEGG integration connected to enterprise URL system")
+            logger.info("[OK] KEGG integration connected to enterprise URL system")
             
         except Exception as e:
             logger.warning(f"Failed to initialize enterprise URL system: {e}")

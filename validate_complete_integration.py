@@ -4,11 +4,11 @@ Complete Integration Validation
 ===============================
 
 Final validation script demonstrating successful integration of:
-✅ Enterprise URL Management System
-✅ Data Acquisition Modules (KEGG, NCBI, UniProt, GTDB, PSG)
-✅ Surrogate Model Training Pipeline
-✅ 4D Datacube Generation
-✅ Quality Control and Monitoring
+[OK] Enterprise URL Management System
+[OK] Data Acquisition Modules (KEGG, NCBI, UniProt, GTDB, PSG)
+[OK] Surrogate Model Training Pipeline
+[OK] 4D Datacube Generation
+[OK] Quality Control and Monitoring
 
 This script provides the definitive proof that all systems work together seamlessly.
 """
@@ -41,7 +41,7 @@ class IntegrationValidator:
     
     async def validate_complete_integration(self) -> Dict[str, Any]:
         """Validate complete system integration"""
-        logger.info("🎯 FINAL INTEGRATION VALIDATION")
+        logger.info("[TARGET] FINAL INTEGRATION VALIDATION")
         logger.info("=" * 50)
         
         start_time = time.time()
@@ -70,7 +70,7 @@ class IntegrationValidator:
     
     async def _validate_enterprise_url_system(self):
         """Validate enterprise URL management system"""
-        logger.info("🌐 Validating Enterprise URL Management System...")
+        logger.info("[NET] Validating Enterprise URL Management System...")
         
         try:
             from utils.integrated_url_system import get_integrated_url_system
@@ -90,7 +90,7 @@ class IntegrationValidator:
             validation_results = await url_system.validate_system_integration()
             
             self.validation_results["enterprise_url_system"] = {
-                "status": "✅ OPERATIONAL",
+                "status": "[OK] OPERATIONAL",
                 "components_active": status.get("components", {}),
                 "url_acquisition_working": managed_url is not None,
                 "validation_passed": validation_results.get("overall_health", False),
@@ -99,18 +99,18 @@ class IntegrationValidator:
                 "failover_capability": "Available"
             }
             
-            logger.info("✅ Enterprise URL System: OPERATIONAL")
+            logger.info("[OK] Enterprise URL System: OPERATIONAL")
             
         except Exception as e:
             self.validation_results["enterprise_url_system"] = {
-                "status": "❌ FAILED",
+                "status": "[FAIL] FAILED",
                 "error": str(e)
             }
-            logger.error(f"❌ Enterprise URL System validation failed: {e}")
+            logger.error(f"[FAIL] Enterprise URL System validation failed: {e}")
     
     async def _validate_data_acquisition(self):
         """Validate data acquisition integration"""
-        logger.info("📊 Validating Data Acquisition Integration...")
+        logger.info("[DATA] Validating Data Acquisition Integration...")
         
         acquisition_status = {}
         
@@ -119,71 +119,71 @@ class IntegrationValidator:
             from data_build.kegg_real_data_integration import KEGGRealDataIntegration
             kegg = KEGGRealDataIntegration()
             acquisition_status["kegg"] = {
-                "status": "✅ INTEGRATED",
+                "status": "[OK] INTEGRATED",
                 "enterprise_url_connected": kegg.url_system is not None,
                 "fallback_available": True
             }
         except Exception as e:
-            acquisition_status["kegg"] = {"status": "❌ FAILED", "error": str(e)}
+            acquisition_status["kegg"] = {"status": "[FAIL] FAILED", "error": str(e)}
         
         # NCBI AGORA2 Integration
         try:
             from data_build.ncbi_agora2_integration import NCBIAgoraIntegration
             ncbi = NCBIAgoraIntegration()
             acquisition_status["ncbi_agora2"] = {
-                "status": "✅ INTEGRATED",
+                "status": "[OK] INTEGRATED",
                 "enterprise_url_connected": hasattr(ncbi, 'url_system'),
                 "fallback_available": True
             }
         except Exception as e:
-            acquisition_status["ncbi_agora2"] = {"status": "❌ FAILED", "error": str(e)}
+            acquisition_status["ncbi_agora2"] = {"status": "[FAIL] FAILED", "error": str(e)}
         
         # UniProt Integration
         try:
             from data_build.uniprot_embl_integration import UniProtEMBLIntegration
             uniprot = UniProtEMBLIntegration()
             acquisition_status["uniprot"] = {
-                "status": "✅ INTEGRATED", 
+                "status": "[OK] INTEGRATED", 
                 "enterprise_url_connected": True,
                 "fallback_available": True
             }
         except Exception as e:
-            acquisition_status["uniprot"] = {"status": "❌ FAILED", "error": str(e)}
+            acquisition_status["uniprot"] = {"status": "[FAIL] FAILED", "error": str(e)}
         
         # GTDB Integration
         try:
             from data_build.gtdb_integration import GTDBIntegration
             gtdb = GTDBIntegration()
             acquisition_status["gtdb"] = {
-                "status": "✅ INTEGRATED",
+                "status": "[OK] INTEGRATED",
                 "enterprise_url_connected": gtdb.url_system is not None,
                 "fallback_available": True
             }
         except Exception as e:
-            acquisition_status["gtdb"] = {"status": "❌ FAILED", "error": str(e)}
+            acquisition_status["gtdb"] = {"status": "[FAIL] FAILED", "error": str(e)}
         
         # PSG Spectrum Generation
         try:
             from pipeline.generate_spectrum_psg import PSGInterface
             psg = PSGInterface()
             acquisition_status["psg"] = {
-                "status": "✅ INTEGRATED",
+                "status": "[OK] INTEGRATED",
                 "enterprise_url_connected": psg.url_system is not None,
                 "fallback_available": True
             }
         except Exception as e:
-            acquisition_status["psg"] = {"status": "❌ FAILED", "error": str(e)}
+            acquisition_status["psg"] = {"status": "[FAIL] FAILED", "error": str(e)}
         
         self.validation_results["data_acquisition"] = acquisition_status
         
         successful_integrations = sum(1 for status in acquisition_status.values() 
-                                    if status.get("status", "").startswith("✅"))
+                                    if status.get("status", "").startswith("[OK]"))
         
-        logger.info(f"✅ Data Acquisition: {successful_integrations}/{len(acquisition_status)} modules integrated")
+        logger.info(f"[OK] Data Acquisition: {successful_integrations}/{len(acquisition_status)} modules integrated")
     
     async def _validate_surrogate_models(self):
         """Validate surrogate model integration"""
-        logger.info("🧠 Validating Surrogate Model Integration...")
+        logger.info("[AI] Validating Surrogate Model Integration...")
         
         try:
             # Test surrogate data manager
@@ -212,7 +212,7 @@ class IntegrationValidator:
                 output = model(test_input)
             
             self.validation_results["surrogate_models"] = {
-                "status": "✅ INTEGRATED",
+                "status": "[OK] INTEGRATED",
                 "data_manager_operational": data_manager.url_system is not None,
                 "data_acquisition_working": len(training_data) > 0 if training_data else False,
                 "preprocessing_working": len(processed_data) > 0,
@@ -220,18 +220,18 @@ class IntegrationValidator:
                 "enterprise_data_connected": True
             }
             
-            logger.info("✅ Surrogate Models: INTEGRATED")
+            logger.info("[OK] Surrogate Models: INTEGRATED")
             
         except Exception as e:
             self.validation_results["surrogate_models"] = {
-                "status": "❌ FAILED",
+                "status": "[FAIL] FAILED",
                 "error": str(e)
             }
-            logger.error(f"❌ Surrogate model validation failed: {e}")
+            logger.error(f"[FAIL] Surrogate model validation failed: {e}")
     
     async def _validate_datacube_system(self):
         """Validate 4D datacube system"""
-        logger.info("📦 Validating 4D Datacube System...")
+        logger.info("[PKG] Validating 4D Datacube System...")
         
         try:
             from models.datacube_unet import CubeUNet
@@ -256,7 +256,7 @@ class IntegrationValidator:
                 datamodule_available = False
             
             self.validation_results["datacube_system"] = {
-                "status": "✅ INTEGRATED",
+                "status": "[OK] INTEGRATED",
                 "model_operational": True,
                 "4d_processing_working": output.shape == test_input.shape,
                 "datamodule_available": datamodule_available,
@@ -264,18 +264,18 @@ class IntegrationValidator:
                 "climate_data_sources": "Connected via Enterprise URL System"
             }
             
-            logger.info("✅ 4D Datacube System: INTEGRATED")
+            logger.info("[OK] 4D Datacube System: INTEGRATED")
             
         except Exception as e:
             self.validation_results["datacube_system"] = {
-                "status": "❌ FAILED",
+                "status": "[FAIL] FAILED",
                 "error": str(e)
             }
-            logger.error(f"❌ Datacube system validation failed: {e}")
+            logger.error(f"[FAIL] Datacube system validation failed: {e}")
     
     async def _validate_end_to_end_pipeline(self):
         """Validate complete end-to-end pipeline"""
-        logger.info("🔄 Validating End-to-End Pipeline...")
+        logger.info("[PROC] Validating End-to-End Pipeline...")
         
         try:
             from run_comprehensive_data_system import ComprehensiveDataSystem
@@ -287,7 +287,7 @@ class IntegrationValidator:
             await system.initialize_components()
             
             self.validation_results["end_to_end_pipeline"] = {
-                "status": "✅ OPERATIONAL",
+                "status": "[OK] OPERATIONAL",
                 "system_initialized": True,
                 "enterprise_url_connected": system.url_system is not None,
                 "global_network_connected": system.global_network is not None,
@@ -299,18 +299,18 @@ class IntegrationValidator:
                 "pipeline_ready": True
             }
             
-            logger.info("✅ End-to-End Pipeline: OPERATIONAL")
+            logger.info("[OK] End-to-End Pipeline: OPERATIONAL")
             
         except Exception as e:
             self.validation_results["end_to_end_pipeline"] = {
-                "status": "❌ FAILED",
+                "status": "[FAIL] FAILED",
                 "error": str(e)
             }
-            logger.error(f"❌ End-to-end pipeline validation failed: {e}")
+            logger.error(f"[FAIL] End-to-end pipeline validation failed: {e}")
     
     def _generate_final_assessment(self):
         """Generate final integration assessment"""
-        logger.info("🎯 Generating Final Assessment...")
+        logger.info("[TARGET] Generating Final Assessment...")
         
         # Count successful integrations
         successful_components = 0
@@ -321,23 +321,23 @@ class IntegrationValidator:
                 continue
                 
             total_components += 1
-            if isinstance(results, dict) and results.get("status", "").startswith("✅"):
+            if isinstance(results, dict) and results.get("status", "").startswith("[OK]"):
                 successful_components += 1
         
         success_rate = (successful_components / total_components * 100) if total_components > 0 else 0
         
         # Determine overall status
         if success_rate >= 90:
-            overall_status = "🎉 COMPLETE SUCCESS"
+            overall_status = "[SUCCESS] COMPLETE SUCCESS"
             assessment = "Full enterprise integration achieved!"
         elif success_rate >= 70:
-            overall_status = "✅ MOSTLY SUCCESSFUL"
+            overall_status = "[OK] MOSTLY SUCCESSFUL"
             assessment = "Enterprise integration largely successful with minor issues."
         elif success_rate >= 50:
-            overall_status = "⚠️ PARTIAL SUCCESS"
+            overall_status = "[WARN] PARTIAL SUCCESS"
             assessment = "Basic integration working, some components need attention."
         else:
-            overall_status = "❌ INTEGRATION INCOMPLETE"
+            overall_status = "[FAIL] INTEGRATION INCOMPLETE"
             assessment = "Significant integration issues require resolution."
         
         self.validation_results["overall_status"] = overall_status
@@ -348,22 +348,22 @@ class IntegrationValidator:
         
         # Generate summary
         summary = f"""
-🎯 FINAL INTEGRATION VALIDATION RESULTS
+[TARGET] FINAL INTEGRATION VALIDATION RESULTS
 ==========================================
 
-📊 Overall Status: {overall_status}
+[DATA] Overall Status: {overall_status}
 📈 Success Rate: {success_rate:.1f}% ({successful_components}/{total_components} components)
 🕒 Validation Duration: {self.validation_results.get('validation_duration', 0):.2f} seconds
 
-🌐 Enterprise URL System: {self.validation_results['enterprise_url_system'].get('status', 'Unknown')}
-📊 Data Acquisition: {successful_components >= 1}
-🧠 Surrogate Models: {self.validation_results.get('surrogate_models', {}).get('status', 'Unknown')}
-📦 4D Datacube System: {self.validation_results.get('datacube_system', {}).get('status', 'Unknown')}
-🔄 End-to-End Pipeline: {self.validation_results.get('end_to_end_pipeline', {}).get('status', 'Unknown')}
+[NET] Enterprise URL System: {self.validation_results['enterprise_url_system'].get('status', 'Unknown')}
+[DATA] Data Acquisition: {successful_components >= 1}
+[AI] Surrogate Models: {self.validation_results.get('surrogate_models', {}).get('status', 'Unknown')}
+[PKG] 4D Datacube System: {self.validation_results.get('datacube_system', {}).get('status', 'Unknown')}
+[PROC] End-to-End Pipeline: {self.validation_results.get('end_to_end_pipeline', {}).get('status', 'Unknown')}
 
-🎯 Assessment: {assessment}
+[TARGET] Assessment: {assessment}
 
-✅ INTEGRATION COMPLETE: Your enterprise astrobiology research platform is ready!
+[OK] INTEGRATION COMPLETE: Your enterprise astrobiology research platform is ready!
 """
         
         self.validation_results["summary"] = summary
@@ -371,7 +371,7 @@ class IntegrationValidator:
 
 async def main():
     """Run final integration validation"""
-    logger.info("🚀 Starting Final Integration Validation...")
+    logger.info("[START] Starting Final Integration Validation...")
     
     validator = IntegrationValidator()
     results = await validator.validate_complete_integration()

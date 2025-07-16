@@ -34,9 +34,16 @@ from dataclasses import dataclass, field
 import time
 import re
 
-# Enterprise URL system integration
+# Setup Unicode-safe logging for Windows
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
+try:
+    from utils.logging_config import setup_unicode_safe_logging
+    setup_unicode_safe_logging()
+except ImportError:
+    pass
+
+# Enterprise URL system integration
 try:
     from utils.integrated_url_system import get_integrated_url_system
     from utils.autonomous_data_acquisition import DataPriority
@@ -177,7 +184,7 @@ class GTDBDownloader:
                 
             self.url_system = get_integrated_url_system()
             # URL acquisition will be done when needed in async methods
-            logger.info("✅ GTDB integrated with enterprise URL system")
+            logger.info("[OK] GTDB integrated with enterprise URL system")
             
         except Exception as e:
             logger.warning(f"Failed to initialize enterprise URL system: {e}")

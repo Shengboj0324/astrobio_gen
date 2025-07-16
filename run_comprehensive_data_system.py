@@ -161,38 +161,28 @@ class ComprehensiveDataSystem:
     def _initialize_enterprise_url_system(self):
         """Initialize enterprise URL management system"""
         try:
-            if URL_SYSTEM_AVAILABLE:
-                self.logger.info("🌐 Initializing enterprise URL management system...")
-                self.url_system = get_integrated_url_system()
-                self.global_network = GlobalScientificNetwork()
-                self.logger.info("✅ Enterprise URL system initialized successfully")
-            else:
-                self.logger.warning("⚠️ Enterprise URL system not available, using direct access")
+            self.logger.info("[NET] Initializing enterprise URL management system...")
+            self.url_system = get_integrated_url_system()
+            self.global_network = GlobalScientificNetwork()
+            self.logger.info("[OK] Enterprise URL system initialized successfully")
         except Exception as e:
-            self.logger.error(f"❌ Failed to initialize enterprise URL system: {e}")
-            self.errors.append(f"URL system initialization failed: {e}")
+            self.logger.error(f"Failed to initialize enterprise URL system: {e}")
+            self.url_system = None
+            self.global_network = None
     
     async def initialize_components(self):
-        """Initialize all system components with enterprise URL support"""
-        self.logger.info("🚀 Initializing comprehensive data system components with enterprise URL management")
-        
+        """Initialize all system components with enterprise URL management"""
         try:
-            # Run enterprise URL system health check first
-            if self.url_system:
-                self.logger.info("🔍 Running enterprise URL system validation...")
-                try:
-                    # Use the correct method name: validate_system_integration()
-                    health_status = await self.url_system.validate_system_integration()
-                    self.logger.info(f"📊 URL system validation: {health_status.get('summary', 'Unknown')}")
-                    
-                    # Log any integration issues for immediate attention
-                    integration_issues = health_status.get('integration_issues', [])
-                    if integration_issues:
-                        self.logger.warning(f"⚠️ Found {len(integration_issues)} integration issues - checking failover")
-                    
-                except Exception as e:
-                    self.logger.warning(f"⚠️ URL system validation failed: {e}")
-        
+            self.logger.info("[START] Initializing comprehensive data system components with enterprise URL management")
+            
+            # Enterprise URL system validation  
+            self.logger.info("[SEARCH] Running enterprise URL system validation...")
+            health_status = await self.url_system.validate_system_integration()
+            self.logger.info(f"[DATA] URL system validation: {health_status.get('summary', 'Unknown')}")
+            
+            # Initialize data pipeline with enterprise URL integration
+            from data_build.automated_data_pipeline import AutomatedDataPipeline, PipelineConfig
+            
             # Initialize data management components
             self.data_manager = AdvancedDataManager()
             self.quality_monitor = QualityMonitor()
@@ -1066,18 +1056,18 @@ async def main():
     try:
         # Execute based on mode
         if args.mode == 'full':
-            logger.info("🚀 Running FULL pipeline with REAL datasets")
+            logger.info("[START] Running FULL pipeline with REAL datasets")
             results = await system.run_full_pipeline()
         elif args.mode == 'test':
-            logger.info("🧪 Running TEST mode with REAL datasets (small samples)")
+            logger.info("[TEST] Running TEST mode with REAL datasets (small samples)")
             results = await system.run_test_mode()
         elif args.mode == 'high_quality_only':
-            logger.info("✨ Running HIGH-QUALITY DATA ONLY mode")
-            logger.info("   📊 UniProt/EMBL-EBI protein databases")
-            logger.info("   🧬 JGI GEMs metagenome-assembled genomes")
-            logger.info("   🦠 GTDB genome taxonomy database")
-            logger.info("   🌌 NASA AHED astrobiology datasets")
-            logger.info("   ❌ ZERO dummy/synthetic data")
+            logger.info("[HIGH-QUALITY] Running HIGH-QUALITY DATA ONLY mode")
+            logger.info("   [DATA] UniProt/EMBL-EBI protein databases")
+            logger.info("   [BIO] JGI GEMs metagenome-assembled genomes")
+            logger.info("   [MICRO] GTDB genome taxonomy database")
+            logger.info("   [SPACE] NASA AHED astrobiology datasets")
+            logger.info("   [ZERO] ZERO dummy/synthetic data")
             results = await system.run_high_quality_only_mode()
         elif args.mode == 'quality':
             results = await system.run_quality_validation_only()
