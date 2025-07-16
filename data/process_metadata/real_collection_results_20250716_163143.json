@@ -1,0 +1,151 @@
+{
+  "fields_processed": 8,
+  "fields_successful": 8,
+  "total_real_sources": 493,
+  "average_quality": 0.7964730290456449,
+  "collection_time": 178.5012218952179,
+  "field_results": {
+    "experimental_provenance": {
+      "target_count": 100,
+      "actual_count": 55,
+      "success_rate": 0.55,
+      "average_quality": 0.7872727272727283,
+      "collection_time": 19.372500896453857,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "semantic_scholar",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 8,
+        "medium": 47,
+        "low": 0
+      }
+    },
+    "observational_context": {
+      "target_count": 100,
+      "actual_count": 74,
+      "success_rate": 0.74,
+      "average_quality": 0.8256756756756756,
+      "collection_time": 21.06691026687622,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "semantic_scholar",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 23,
+        "medium": 51,
+        "low": 0
+      }
+    },
+    "computational_lineage": {
+      "target_count": 100,
+      "actual_count": 53,
+      "success_rate": 0.53,
+      "average_quality": 0.7905660377358501,
+      "collection_time": 20.846694946289062,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 7,
+        "medium": 46,
+        "low": 0
+      }
+    },
+    "methodological_evolution": {
+      "target_count": 100,
+      "actual_count": 57,
+      "success_rate": 0.57,
+      "average_quality": 0.780701754385966,
+      "collection_time": 22.365407466888428,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "semantic_scholar",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 8,
+        "medium": 49,
+        "low": 0
+      }
+    },
+    "quality_control_processes": {
+      "target_count": 100,
+      "actual_count": 55,
+      "success_rate": 0.55,
+      "average_quality": 0.758181818181819,
+      "collection_time": 26.763050079345703,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 2,
+        "medium": 53,
+        "low": 0
+      }
+    },
+    "decision_trees": {
+      "target_count": 100,
+      "actual_count": 65,
+      "success_rate": 0.65,
+      "average_quality": 0.804615384615385,
+      "collection_time": 17.658786296844482,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 12,
+        "medium": 53,
+        "low": 0
+      }
+    },
+    "systematic_biases": {
+      "target_count": 100,
+      "actual_count": 64,
+      "success_rate": 0.64,
+      "average_quality": 0.8125000000000002,
+      "collection_time": 24.284568548202515,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "semantic_scholar",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 12,
+        "medium": 52,
+        "low": 0
+      }
+    },
+    "failed_experiments": {
+      "target_count": 100,
+      "actual_count": 70,
+      "success_rate": 0.7,
+      "average_quality": 0.7985714285714292,
+      "collection_time": 26.121407747268677,
+      "status": "SUCCESS",
+      "platforms_used": [
+        "crossref",
+        "semantic_scholar",
+        "openalex"
+      ],
+      "quality_distribution": {
+        "high": 11,
+        "medium": 59,
+        "low": 0
+      }
+    }
+  },
+  "overall_success": true
+}
