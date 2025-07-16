@@ -211,7 +211,7 @@ class EnhancedModelLoader:
             # Multi-modal configuration
             if config.multimodal_config:
                 multimodal_config = MultiModalConfig(**config.multimodal_config)
-            else:
+    else:
                 multimodal_config = MultiModalConfig()
             
             enhanced_config.update({
@@ -260,8 +260,8 @@ class EnhancedModelLoader:
         torch.backends.cudnn.benchmark = True
         torch.backends.cudnn.deterministic = False
         
-        return model
-    
+    return model
+
     def _get_device(self, device: str) -> torch.device:
         """Get appropriate device"""
         if device == "auto":
@@ -314,7 +314,7 @@ class EnhancedModelLoader:
         memory_allocated = torch.cuda.memory_allocated() / (1024 ** 2)  # MB
         memory_reserved = torch.cuda.memory_reserved() / (1024 ** 2)  # MB
         
-        return {
+    return {
             'avg_inference_time_ms': avg_inference_time,
             'memory_allocated_mb': memory_allocated,
             'memory_reserved_mb': memory_reserved,
@@ -446,7 +446,7 @@ class EnhancedSurrogateManager:
         with torch.no_grad():
             if hasattr(model, 'forward') and isinstance(inputs, dict):
                 outputs = model(inputs)
-            else:
+    else:
                 outputs = model(inputs['datacube'])
         
         # Record performance
@@ -478,7 +478,7 @@ class EnhancedSurrogateManager:
             if 'fused_features' in outputs:
                 results['fused_features'] = outputs['fused_features']
         
-        else:
+    else:
             results = {
                 'predictions': outputs,
                 'inference_time_ms': inference_time * 1000,
@@ -534,7 +534,7 @@ class EnhancedSurrogateManager:
                     model = torch.compile(model, mode='max-autotune')
                     self.active_models[model_name] = model
                     logger.info(f"✅ {model_name} compiled for maximum performance")
-                except Exception as e:
+            except Exception as e:
                     logger.warning(f"⚠️ Could not compile {model_name}: {e}")
         
         logger.info("🎯 Peak performance optimization completed!")

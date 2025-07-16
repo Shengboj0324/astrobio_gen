@@ -19,6 +19,7 @@ import logging
 import time
 import json
 import re
+import aiohttp
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Callable
@@ -31,6 +32,13 @@ from .predictive_url_discovery import PredictiveURLDiscovery, get_predictive_dis
 from .local_mirror_infrastructure import LocalMirrorInfrastructure, get_mirror_infrastructure
 from .autonomous_data_acquisition import AutonomousDataAcquisition, get_autonomous_system, DataPriority
 from .global_scientific_network import GlobalScientificNetwork, get_global_network
+
+# Import SSL configuration
+try:
+    from .ssl_config import get_aiohttp_connector, get_requests_session
+    SSL_CONFIG_AVAILABLE = True
+except ImportError:
+    SSL_CONFIG_AVAILABLE = False
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -69,6 +77,9 @@ class IntegratedURLSystem:
         # Performance cache
         self.url_cache = {}
         self.cache_ttl = 3600  # 1 hour
+        
+        # HTTP session for data acquisition with SSL configuration
+        self._session = None
         
         logger.info("Integrated URL System initialized with all components")
     
@@ -511,6 +522,65 @@ class IntegratedURLSystem:
             logger.error(f"Error during system integration validation: {e}")
         
         return validation_results
+
+    async def get_session(self) -> aiohttp.ClientSession:
+        """
+        Get HTTP session for data acquisition - Compatibility method
+        This provides a shared session for all data acquisition modules
+        """
+        if self._session is None or self._session.closed:
+            # Create session with SSL configuration and error handling
+            timeout = aiohttp.ClientTimeout(total=30, connect=10)
+            
+            # Use SSL configuration if available
+            if SSL_CONFIG_AVAILABLE:
+                try:
+                    # Try with SSL verification first
+                    connector = get_aiohttp_connector(verify_ssl=True)
+                except Exception:
+                    # Fall back to relaxed SSL for problematic endpoints
+                    connector = get_aiohttp_connector(verify_ssl=False)
+                    logger.warning("Using relaxed SSL configuration due to certificate issues")
+            else:
+                # Fallback connector without SSL verification
+                connector = aiohttp.TCPConnector(
+                    limit=100,
+                    ttl_dns_cache=300,
+                    use_dns_cache=True,
+                    ssl=False
+                )
+                logger.warning("SSL configuration not available, using fallback connector")
+            
+            self._session = aiohttp.ClientSession(
+                timeout=timeout,
+                connector=connector,
+                headers={
+                    'User-Agent': 'Astrobiology-Research-Platform/1.0',
+                    'Accept': 'application/json, text/plain, */*'
+                }
+            )
+            
+        return self._session
+    
+    async def get_managed_url(self, original_url: str, priority: DataPriority = DataPriority.MEDIUM) -> str:
+        """
+        Get managed URL - Compatibility method
+        This is an alias for get_url() to maintain API compatibility
+        """
+        return await self.get_url(original_url, priority)
+    
+    async def run_health_check_async(self) -> Dict[str, Any]:
+        """
+        Run async health check - Compatibility method
+        This is an alias for validate_system_integration()
+        """
+        return await self.validate_system_integration()
+    
+    async def close_session(self):
+        """Close HTTP session properly"""
+        if self._session and not self._session.closed:
+            await self._session.close()
+            self._session = None
 
 # Global instance and convenience functions
 integrated_system = None
