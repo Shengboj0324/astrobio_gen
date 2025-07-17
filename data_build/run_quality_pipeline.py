@@ -45,7 +45,7 @@ class PracticalDataCleaner:
         2. Chemical consistency 
         3. Environmental condition filtering
         """
-        logger.info("🧬 Cleaning KEGG pathway data...")
+        logger.info("[BIO] Cleaning KEGG pathway data...")
         
         results = {
             'original_count': 0,
@@ -165,8 +165,8 @@ class PracticalDataCleaner:
         with open(self.processed_path / "pathway_quality_report.json", 'w') as f:
             json.dump(quality_report, f, indent=2)
         
-        logger.info(f"   ✅ Cleaned KEGG data: {results['original_count']} → {results['cleaned_count']} edges")
-        logger.info(f"   📊 Retained {len(valid_pathways)} high-quality pathways")
+        logger.info(f"   [OK] Cleaned KEGG data: {results['original_count']} → {results['cleaned_count']} edges")
+        logger.info(f"   [DATA] Retained {len(valid_pathways)} high-quality pathways")
         
         return edges_df, results
     
@@ -174,7 +174,7 @@ class PracticalDataCleaner:
         """
         Clean and validate environmental condition vectors
         """
-        logger.info("🌍 Cleaning environmental vectors...")
+        logger.info("[EARTH] Cleaning environmental vectors...")
         
         results = {
             'original_count': 0,
@@ -259,7 +259,7 @@ class PracticalDataCleaner:
         output_file = self.processed_path / "env_vectors_cleaned.csv"
         env_df.to_csv(output_file, index=False)
         
-        logger.info(f"   ✅ Cleaned environmental data: {results['original_count']} → {results['cleaned_count']} conditions")
+        logger.info(f"   [OK] Cleaned environmental data: {results['original_count']} → {results['cleaned_count']} conditions")
         
         return env_df, results
     
@@ -267,7 +267,7 @@ class PracticalDataCleaner:
         """
         Clean genomic data with focus on quality metrics
         """
-        logger.info("🧬 Cleaning genomic data...")
+        logger.info("[BIO] Cleaning genomic data...")
         
         results = {
             'files_processed': 0,
@@ -343,7 +343,7 @@ class PracticalDataCleaner:
         output_file = self.processed_path / "genomic_metadata_cleaned.csv"
         genome_df.to_csv(output_file, index=False)
         
-        logger.info(f"   ✅ Processed genomic metadata: {results['sequences_processed']} sequences")
+        logger.info(f"   [OK] Processed genomic metadata: {results['sequences_processed']} sequences")
         
         return genome_df, results
     
@@ -351,7 +351,7 @@ class PracticalDataCleaner:
         """
         Generate comprehensive quality summary report
         """
-        logger.info("📊 Generating quality summary...")
+        logger.info("[DATA] Generating quality summary...")
         
         summary = {
             'timestamp': pd.Timestamp.now().isoformat(),
@@ -402,7 +402,7 @@ class PracticalDataCleaner:
         """
         Run the complete data quality pipeline
         """
-        logger.info("🚀 Starting complete data quality pipeline...")
+        logger.info("[START] Starting complete data quality pipeline...")
         
         all_results = {}
         
@@ -443,49 +443,49 @@ class PracticalDataCleaner:
         Print a comprehensive final report
         """
         print("\n" + "="*60)
-        print("🌍 NASA-READY DATA QUALITY REPORT")
+        print("[EARTH] NASA-READY DATA QUALITY REPORT")
         print("="*60)
         
-        print(f"\n📊 OVERALL QUALITY SCORE: {summary['overall_quality_score']:.1%}")
-        print(f"🚀 NASA READINESS: {'✅ YES' if summary['nasa_readiness'] else '❌ NO'}")
+        print(f"\n[DATA] OVERALL QUALITY SCORE: {summary['overall_quality_score']:.1%}")
+        print(f"[START] NASA READINESS: {'[OK] YES' if summary['nasa_readiness'] else '[FAIL] NO'}")
         
-        print("\n📈 DATASET BREAKDOWN:")
+        print("\n[CHART] DATASET BREAKDOWN:")
         for dataset_name, results in all_results.items():
             if 'error' in results:
-                print(f"  ❌ {dataset_name}: ERROR - {results['error']}")
+                print(f"  [FAIL] {dataset_name}: ERROR - {results['error']}")
             else:
                 original = results.get('original_count', 0)
                 cleaned = results.get('cleaned_count', 0)
                 retention = cleaned / original * 100 if original > 0 else 0
-                print(f"  📊 {dataset_name}: {original:,} → {cleaned:,} ({retention:.1f}% retained)")
+                print(f"  [DATA] {dataset_name}: {original:,} → {cleaned:,} ({retention:.1f}% retained)")
         
-        print("\n🔍 QUALITY ISSUES IDENTIFIED:")
+        print("\n[SEARCH] QUALITY ISSUES IDENTIFIED:")
         issue_count = 0
         for dataset_name, results in all_results.items():
             if 'quality_issues' in results:
                 for issue in results['quality_issues']:
-                    print(f"  ⚠️  {dataset_name}: {issue}")
+                    print(f"  [WARN]  {dataset_name}: {issue}")
                     issue_count += 1
         
         if issue_count == 0:
-            print("  ✅ No quality issues detected!")
+            print("  [OK] No quality issues detected!")
         
-        print("\n💡 RECOMMENDATIONS:")
+        print("\n[IDEA] RECOMMENDATIONS:")
         for i, rec in enumerate(summary.get('recommendations', []), 1):
             print(f"  {i}. {rec}")
         
         if not summary.get('recommendations'):
-            print("  ✅ Data meets NASA quality standards!")
+            print("  [OK] Data meets NASA quality standards!")
         
         print("\n📁 OUTPUT FILES:")
         output_files = list(self.processed_path.glob("*"))
         for file_path in output_files:
             size_mb = file_path.stat().st_size / 1024 / 1024
-            print(f"  📄 {file_path.name} ({size_mb:.1f} MB)")
+            print(f"  [DOC] {file_path.name} ({size_mb:.1f} MB)")
         
         print("\n" + "="*60)
-        print("✅ Data quality pipeline completed!")
-        print("🚀 Ready for NASA-grade machine learning!")
+        print("[OK] Data quality pipeline completed!")
+        print("[START] Ready for NASA-grade machine learning!")
         print("="*60)
 
 

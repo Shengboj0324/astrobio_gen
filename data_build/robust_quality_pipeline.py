@@ -46,7 +46,7 @@ class RobustDataQualityManager:
         """
         Clean KEGG edges data handling your specific numeric reaction ID format
         """
-        logger.info("🧬 Cleaning KEGG edges data (robust mode)...")
+        logger.info("[BIO] Cleaning KEGG edges data (robust mode)...")
         
         results = {
             'original_count': 0,
@@ -170,8 +170,8 @@ class RobustDataQualityManager:
         with open(self.processed_path / "reaction_analysis.json", 'w') as f:
             json.dump(reaction_report, f, indent=2)
         
-        logger.info(f"   ✅ Cleaned KEGG edges: {results['original_count']} → {results['cleaned_count']} edges")
-        logger.info(f"   📊 Valid reactions: {len(valid_reactions)}/{len(reaction_stats)} ({len(valid_reactions)/len(reaction_stats)*100:.1f}%)")
+        logger.info(f"   [OK] Cleaned KEGG edges: {results['original_count']} → {results['cleaned_count']} edges")
+        logger.info(f"   [DATA] Valid reactions: {len(valid_reactions)}/{len(reaction_stats)} ({len(valid_reactions)/len(reaction_stats)*100:.1f}%)")
         
         return edges_df, results
     
@@ -179,7 +179,7 @@ class RobustDataQualityManager:
         """
         Clean environmental vectors handling duplicate conditions smartly
         """
-        logger.info("🌍 Cleaning environmental vectors (robust mode)...")
+        logger.info("[EARTH] Cleaning environmental vectors (robust mode)...")
         
         results = {
             'original_count': 0,
@@ -326,8 +326,8 @@ class RobustDataQualityManager:
         with open(self.processed_path / "environmental_analysis.json", 'w') as f:
             json.dump(env_analysis, f, indent=2)
         
-        logger.info(f"   ✅ Cleaned environmental data: {results['original_count']} → {results['cleaned_count']} conditions")
-        logger.info(f"   📊 Unique combinations: {env_analysis['unique_combinations']}")
+        logger.info(f"   [OK] Cleaned environmental data: {results['original_count']} → {results['cleaned_count']} conditions")
+        logger.info(f"   [DATA] Unique combinations: {env_analysis['unique_combinations']}")
         
         return env_df, results
     
@@ -335,7 +335,7 @@ class RobustDataQualityManager:
         """
         Clean genomic data with better handling of large datasets
         """
-        logger.info("🧬 Cleaning genomic data (robust mode)...")
+        logger.info("[BIO] Cleaning genomic data (robust mode)...")
         
         results = {
             'files_processed': 0,
@@ -451,8 +451,8 @@ class RobustDataQualityManager:
         with open(self.processed_path / "genomic_analysis.json", 'w') as f:
             json.dump(genomic_analysis, f, indent=2)
         
-        logger.info(f"   ✅ Cleaned genomic data: {results['sequences_processed']} → {len(genome_df)} entries")
-        logger.info(f"   📊 Mean completeness: {genomic_analysis['completeness_stats']['mean_completeness']:.1%}")
+        logger.info(f"   [OK] Cleaned genomic data: {results['sequences_processed']} → {len(genome_df)} entries")
+        logger.info(f"   [DATA] Mean completeness: {genomic_analysis['completeness_stats']['mean_completeness']:.1%}")
         
         return genome_df, results
     
@@ -460,7 +460,7 @@ class RobustDataQualityManager:
         """
         Generate a comprehensive quality report with actionable insights
         """
-        logger.info("📊 Generating comprehensive quality report...")
+        logger.info("[DATA] Generating comprehensive quality report...")
         
         summary = {
             'timestamp': pd.Timestamp.now().isoformat(),
@@ -531,7 +531,7 @@ class RobustDataQualityManager:
         """
         Run the robust data quality pipeline
         """
-        logger.info("🚀 Starting robust data quality pipeline...")
+        logger.info("[START] Starting robust data quality pipeline...")
         
         all_results = {}
         
@@ -572,68 +572,68 @@ class RobustDataQualityManager:
         Print a comprehensive, actionable report
         """
         print("\n" + "="*70)
-        print("🌍 ROBUST DATA QUALITY REPORT")
+        print("[EARTH] ROBUST DATA QUALITY REPORT")
         print("="*70)
         
-        print(f"\n📊 OVERALL QUALITY SCORE: {summary['overall_quality_score']:.1%}")
-        print(f"🚀 NASA READINESS: {'✅ YES' if summary['nasa_readiness'] else '❌ NO'}")
-        print(f"🤖 ML READINESS: {'✅ YES' if summary['data_ready_for_ml'] else '❌ NO'}")
+        print(f"\n[DATA] OVERALL QUALITY SCORE: {summary['overall_quality_score']:.1%}")
+        print(f"[START] NASA READINESS: {'[OK] YES' if summary['nasa_readiness'] else '[FAIL] NO'}")
+        print(f"[BOT] ML READINESS: {'[OK] YES' if summary['data_ready_for_ml'] else '[FAIL] NO'}")
         
-        print("\n📈 DATASET BREAKDOWN:")
+        print("\n[CHART] DATASET BREAKDOWN:")
         for dataset_name, results in all_results.items():
             if 'error' in results:
-                print(f"  ❌ {dataset_name}: ERROR - {results['error']}")
+                print(f"  [FAIL] {dataset_name}: ERROR - {results['error']}")
             else:
                 if 'cleaned_count' in results and 'original_count' in results:
                     original = results['original_count']
                     cleaned = results['cleaned_count']
                     retention = cleaned / original * 100 if original > 0 else 0
-                    print(f"  📊 {dataset_name}: {original:,} → {cleaned:,} ({retention:.1f}% retained)")
+                    print(f"  [DATA] {dataset_name}: {original:,} → {cleaned:,} ({retention:.1f}% retained)")
                 elif 'sequences_processed' in results:
                     processed = results['sequences_processed']
-                    print(f"  📊 {dataset_name}: {processed:,} sequences processed")
+                    print(f"  [DATA] {dataset_name}: {processed:,} sequences processed")
         
-        print("\n🔍 QUALITY ISSUES & SOLUTIONS:")
+        print("\n[SEARCH] QUALITY ISSUES & SOLUTIONS:")
         issue_count = 0
         for dataset_name, results in all_results.items():
             if 'quality_issues' in results:
                 for issue in results['quality_issues']:
-                    print(f"  ⚠️  {dataset_name}: {issue}")
+                    print(f"  [WARN]  {dataset_name}: {issue}")
                     issue_count += 1
         
         if issue_count == 0:
-            print("  ✅ No quality issues detected!")
+            print("  [OK] No quality issues detected!")
         
-        print("\n💡 RECOMMENDATIONS:")
+        print("\n[IDEA] RECOMMENDATIONS:")
         for i, rec in enumerate(summary.get('recommendations', []), 1):
             print(f"  {i}. {rec}")
         
         if not summary.get('recommendations'):
-            print("  ✅ Data quality is excellent!")
+            print("  [OK] Data quality is excellent!")
         
         print("\n📁 OUTPUT FILES:")
         output_files = list(self.processed_path.glob("*"))
         for file_path in output_files:
             if file_path.is_file():
                 size_mb = file_path.stat().st_size / 1024 / 1024
-                print(f"  📄 {file_path.name} ({size_mb:.1f} MB)")
+                print(f"  [DOC] {file_path.name} ({size_mb:.1f} MB)")
         
-        print(f"\n🎯 NEXT STEPS:")
+        print(f"\n[TARGET] NEXT STEPS:")
         if summary['data_ready_for_ml']:
-            print("  1. ✅ Your data is ready for machine learning training!")
-            print("  2. 🔄 Update your training scripts to use cleaned data:")
+            print("  1. [OK] Your data is ready for machine learning training!")
+            print("  2. [PROC] Update your training scripts to use cleaned data:")
             print("     - Use data/processed/kegg_edges_cleaned.csv")
             print("     - Use data/processed/env_vectors_cleaned.csv")
             print("     - Use data/processed/genomic_metadata_cleaned.csv")
-            print("  3. 📊 Monitor training performance with clean data")
+            print("  3. [DATA] Monitor training performance with clean data")
         else:
-            print("  1. 🔧 Address quality issues identified above")
-            print("  2. 📊 Consider relaxing thresholds if scientifically justified")
-            print("  3. 🔄 Re-run pipeline after improvements")
+            print("  1. [FIX] Address quality issues identified above")
+            print("  2. [DATA] Consider relaxing thresholds if scientifically justified")
+            print("  3. [PROC] Re-run pipeline after improvements")
         
         print("\n" + "="*70)
-        print("✅ Robust data quality pipeline completed!")
-        print("🔬 Ready for scientific machine learning!")
+        print("[OK] Robust data quality pipeline completed!")
+        print("[LAB] Ready for scientific machine learning!")
         print("="*70)
 
 

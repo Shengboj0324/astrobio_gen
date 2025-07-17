@@ -124,7 +124,7 @@ class KnowledgeRetriever:
     
     def _initialize_knowledge_base(self):
         """Initialize knowledge base from KEGG and GCM sources"""
-        logger.info("🧠 Initializing astrobiology knowledge base...")
+        logger.info("[AI] Initializing astrobiology knowledge base...")
         
         try:
             # Create knowledge database if it doesn't exist
@@ -151,10 +151,10 @@ class KnowledgeRetriever:
             # Build knowledge base from existing data sources
             self._build_knowledge_base()
             
-            logger.info("✅ Knowledge base initialized successfully")
+            logger.info("[OK] Knowledge base initialized successfully")
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize knowledge base: {e}")
+            logger.error(f"[FAIL] Failed to initialize knowledge base: {e}")
             raise
     
     def _build_knowledge_base(self):
@@ -337,7 +337,7 @@ class AstrobiologyPEFTLLM:
     
     def _load_model(self):
         """Load and configure PEFT model"""
-        logger.info(f"🤖 Loading PEFT LLM: {self.config.base_model_name}")
+        logger.info(f"[BOT] Loading PEFT LLM: {self.config.base_model_name}")
         
         try:
             # Configure quantization for efficiency
@@ -386,11 +386,11 @@ class AstrobiologyPEFTLLM:
             # Enable training mode for LoRA adapters
             self.model.train()
             
-            logger.info(f"✅ PEFT LLM loaded successfully on {self.device}")
-            logger.info(f"📊 Trainable parameters: {self.model.get_nb_trainable_parameters()}")
+            logger.info(f"[OK] PEFT LLM loaded successfully on {self.device}")
+            logger.info(f"[DATA] Trainable parameters: {self.model.get_nb_trainable_parameters()}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to load PEFT LLM: {e}")
+            logger.error(f"[FAIL] Failed to load PEFT LLM: {e}")
             raise
     
     def _create_prompt_template(self, prompt_type: str) -> str:
@@ -456,11 +456,11 @@ Script:"""
             # Generate response
             response = await self._generate_text(prompt)
             
-            logger.info("✅ Generated plain-English rationale")
+            logger.info("[OK] Generated plain-English rationale")
             return response
             
         except Exception as e:
-            logger.error(f"❌ Failed to generate rationale: {e}")
+            logger.error(f"[FAIL] Failed to generate rationale: {e}")
             return f"Analysis shows habitability score of {surrogate_outputs.habitability_score:.2f} with surface temperature {surrogate_outputs.surface_temperature:.1f}K."
     
     async def generate_qa_response(self, question: str, surrogate_outputs: Optional[SurrogateOutputs] = None) -> str:
@@ -492,11 +492,11 @@ Script:"""
             # Generate response
             response = await self._generate_text(prompt)
             
-            logger.info("✅ Generated Q&A response with knowledge retrieval")
+            logger.info("[OK] Generated Q&A response with knowledge retrieval")
             return response
             
         except Exception as e:
-            logger.error(f"❌ Failed to generate Q&A response: {e}")
+            logger.error(f"[FAIL] Failed to generate Q&A response: {e}")
             return "I apologize, but I'm unable to answer that question at the moment. Please try rephrasing or ask about specific aspects of habitability assessment."
     
     async def generate_voice_over(self, surrogate_outputs: SurrogateOutputs) -> str:
@@ -543,11 +543,11 @@ Script:"""
             # Generate response
             response = await self._generate_text(prompt)
             
-            logger.info("✅ Generated voice-over script")
+            logger.info("[OK] Generated voice-over script")
             return response
             
         except Exception as e:
-            logger.error(f"❌ Failed to generate voice-over: {e}")
+            logger.error(f"[FAIL] Failed to generate voice-over: {e}")
             return f"Our analysis reveals {habitability_desc} for this exoplanet, with {temp_desc} and {atm_desc}. These results provide {conf_desc} and contribute to our understanding of planetary habitability."
     
     async def _generate_text(self, prompt: str) -> str:
@@ -608,12 +608,12 @@ class LLMSurrogateCoordinator:
             from models.surrogate_transformer import SurrogateTransformer
             from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration
             
-            logger.info("✅ Surrogate model integration verified")
+            logger.info("[OK] Surrogate model integration verified")
             
         except ImportError as e:
-            logger.warning(f"⚠️ Surrogate model integration not available: {e}")
+            logger.warning(f"[WARN] Surrogate model integration not available: {e}")
         
-        logger.info("✅ LLM-Surrogate Coordinator initialized")
+        logger.info("[OK] LLM-Surrogate Coordinator initialized")
     
     async def process_surrogate_outputs(self, surrogate_outputs: Dict[str, Any]) -> SurrogateOutputs:
         """Convert raw surrogate outputs to structured format"""
@@ -713,7 +713,7 @@ def create_llm_surrogate_system(config: Optional[LLMConfig] = None) -> LLMSurrog
 # Example usage and testing
 async def test_peft_llm_integration():
     """Test the PEFT LLM integration system"""
-    logger.info("🧪 Testing PEFT LLM Integration...")
+    logger.info("[TEST] Testing PEFT LLM Integration...")
     
     try:
         # Create coordinator
@@ -728,9 +728,9 @@ async def test_peft_llm_integration():
         # Test comprehensive analysis
         analysis = await coordinator.generate_comprehensive_analysis(sample_outputs)
         
-        print("\n🎯 PEFT LLM Analysis Results:")
+        print("\n[TARGET] PEFT LLM Analysis Results:")
         print("=" * 50)
-        print(f"📝 Plain-English Rationale:\n{analysis['plain_english_rationale']}\n")
+        print(f"[NOTE] Plain-English Rationale:\n{analysis['plain_english_rationale']}\n")
         print(f"🎤 Voice-Over Script:\n{analysis['voice_over_script']}\n")
         
         # Test Q&A
@@ -738,10 +738,10 @@ async def test_peft_llm_integration():
         qa_response = await coordinator.answer_question(question, sample_outputs)
         print(f"❓ Q&A Response:\n{qa_response}\n")
         
-        logger.info("✅ PEFT LLM integration test completed successfully")
+        logger.info("[OK] PEFT LLM integration test completed successfully")
         
     except Exception as e:
-        logger.error(f"❌ PEFT LLM integration test failed: {e}")
+        logger.error(f"[FAIL] PEFT LLM integration test failed: {e}")
         raise
 
 if __name__ == "__main__":

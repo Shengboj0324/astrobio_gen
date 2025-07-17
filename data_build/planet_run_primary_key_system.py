@@ -323,7 +323,7 @@ class PlanetRunManager:
                 # Create directory structure
                 self._create_run_directory(run_id, planet_id)
                 
-                logger.info(f"✅ Created planet run {run_id} for {planet_id}")
+                logger.info(f"[OK] Created planet run {run_id} for {planet_id}")
                 return run_id
     
     def _create_run_directory(self, run_id: int, planet_id: str):
@@ -395,7 +395,7 @@ class PlanetRunManager:
                 # Update completeness
                 self._update_completeness(session, run_id)
             
-            logger.info(f"📄 Registered {domain.value} file for run {run_id}: {file_path.name}")
+            logger.info(f"[DOC] Registered {domain.value} file for run {run_id}: {file_path.name}")
             return file_id
     
     def _update_completeness(self, session, run_id: int):
@@ -538,7 +538,7 @@ class PlanetRunManager:
                 else:
                     run.ml_split = "test"
             
-            logger.info(f"✅ Assigned ML splits: {n_train} train, {n_val} val, "
+            logger.info(f"[OK] Assigned ML splits: {n_train} train, {n_val} val, "
                        f"{len(complete_runs) - n_train - n_val} test")
     
     def get_statistics(self) -> Dict[str, Any]:
@@ -630,7 +630,7 @@ def get_planet_run_manager(database_path: str = None) -> PlanetRunManager:
 
 def create_example_planet_runs(manager: PlanetRunManager, n_runs: int = 100):
     """Create example planet runs for testing"""
-    logger.info(f"🧪 Creating {n_runs} example planet runs...")
+    logger.info(f"[TEST] Creating {n_runs} example planet runs...")
     
     # Well-known exoplanets for realistic examples
     example_planets = [
@@ -690,7 +690,7 @@ def create_example_planet_runs(manager: PlanetRunManager, n_runs: int = 100):
         if (i + 1) % 20 == 0:
             logger.info(f"  Created {i + 1}/{n_runs} planet runs...")
     
-    logger.info(f"✅ Created {len(run_ids)} example planet runs")
+    logger.info(f"[OK] Created {len(run_ids)} example planet runs")
     return run_ids
 
 if __name__ == "__main__":
@@ -720,7 +720,7 @@ if __name__ == "__main__":
     
     # Example query
     training_runs = manager.get_planet_runs(ml_split="train", min_completeness=0.0)
-    print(f"\n🎯 Found {len(training_runs)} training planet runs")
+    print(f"\n[TARGET] Found {len(training_runs)} training planet runs")
     
     if training_runs:
         example_run = training_runs[0]

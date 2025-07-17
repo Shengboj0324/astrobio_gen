@@ -274,7 +274,7 @@ class ComprehensiveDataSystem:
     
     async def run_high_quality_integrations(self, limits: Dict[str, int] = None) -> Dict[str, Any]:
         """Run all high-quality data integrations (REAL scientific datasets)"""
-        self.logger.info("🚀 Starting HIGH-QUALITY DATA INTEGRATIONS (NO dummy data)")
+        self.logger.info("[START] Starting HIGH-QUALITY DATA INTEGRATIONS (NO dummy data)")
         results = {}
         
         try:
@@ -285,46 +285,46 @@ class ComprehensiveDataSystem:
             max_ahed_datasets = limits.get('ahed_datasets', 50) if limits else None
             
             # 1. UniProt/EMBL-EBI Integration (Protein sequences)
-            self.logger.info("📊 Running UniProt/EMBL-EBI integration...")
+            self.logger.info("[DATA] Running UniProt/EMBL-EBI integration...")
             try:
                 uniprot_results = await self.uniprot_integration.run_full_integration(
                     divisions=['bacteria', 'archaea', 'fungi'],
                     max_entries_per_division=max_entries_per_division
                 )
                 results['uniprot'] = uniprot_results
-                self.logger.info(f"✅ UniProt integration completed: {uniprot_results.get('total_entries', 0)} entries")
+                self.logger.info(f"[OK] UniProt integration completed: {uniprot_results.get('total_entries', 0)} entries")
             except Exception as e:
-                self.logger.error(f"❌ UniProt integration failed: {e}")
+                self.logger.error(f"[FAIL] UniProt integration failed: {e}")
                 results['uniprot'] = {'error': str(e), 'status': 'failed'}
             
             # 2. JGI GEMs Integration (Metagenome-assembled genomes)
-            self.logger.info("🧬 Running JGI GEMs integration...")
+            self.logger.info("[BIO] Running JGI GEMs integration...")
             try:
                 jgi_results = await self.jgi_gems_integration.run_full_integration(
                     max_genomes=max_jgi_genomes,
                     download_genome_files=False  # Metadata only for now
                 )
                 results['jgi_gems'] = jgi_results
-                self.logger.info(f"✅ JGI GEMs integration completed: {jgi_results.get('statistics', {}).get('total_genomes', 0)} genomes")
+                self.logger.info(f"[OK] JGI GEMs integration completed: {jgi_results.get('statistics', {}).get('total_genomes', 0)} genomes")
             except Exception as e:
-                self.logger.error(f"❌ JGI GEMs integration failed: {e}")
+                self.logger.error(f"[FAIL] JGI GEMs integration failed: {e}")
                 results['jgi_gems'] = {'error': str(e), 'status': 'failed'}
             
             # 3. GTDB Integration (Genome taxonomy database)
-            self.logger.info("🦠 Running GTDB integration...")
+            self.logger.info("[MICRO] Running GTDB integration...")
             try:
                 gtdb_results = await self.gtdb_integration.run_full_integration(
                     domains=['bacteria', 'archaea'],
                     max_genomes_per_domain=max_genomes_per_domain
                 )
                 results['gtdb'] = gtdb_results
-                self.logger.info(f"✅ GTDB integration completed: {gtdb_results.get('statistics', {}).get('total_genomes', 0)} genomes")
+                self.logger.info(f"[OK] GTDB integration completed: {gtdb_results.get('statistics', {}).get('total_genomes', 0)} genomes")
             except Exception as e:
-                self.logger.error(f"❌ GTDB integration failed: {e}")
+                self.logger.error(f"[FAIL] GTDB integration failed: {e}")
                 results['gtdb'] = {'error': str(e), 'status': 'failed'}
             
             # 4. NASA AHED Integration (Astrobiology datasets)
-            self.logger.info("🌌 Running NASA AHED integration...")
+            self.logger.info("[GALAXY] Running NASA AHED integration...")
             try:
                 ahed_results = await self.nasa_ahed_integration.run_full_integration(
                     themes=["Abiotic Building Blocks of Life", "Characterizing Environments for Habitability and Biosignatures"],
@@ -332,9 +332,9 @@ class ComprehensiveDataSystem:
                     download_files=False  # Metadata only for now
                 )
                 results['nasa_ahed'] = ahed_results
-                self.logger.info(f"✅ NASA AHED integration completed: {ahed_results.get('statistics', {}).get('total_datasets', 0)} datasets")
+                self.logger.info(f"[OK] NASA AHED integration completed: {ahed_results.get('statistics', {}).get('total_datasets', 0)} datasets")
             except Exception as e:
-                self.logger.error(f"❌ NASA AHED integration failed: {e}")
+                self.logger.error(f"[FAIL] NASA AHED integration failed: {e}")
                 results['nasa_ahed'] = {'error': str(e), 'status': 'failed'}
             
             # Generate integration summary
@@ -350,11 +350,11 @@ class ComprehensiveDataSystem:
                 'integration_results': results
             }
             
-            self.logger.info(f"🎉 HIGH-QUALITY INTEGRATIONS COMPLETED: {successful_integrations}/{total_integrations} successful")
+            self.logger.info(f"[SUCCESS] HIGH-QUALITY INTEGRATIONS COMPLETED: {successful_integrations}/{total_integrations} successful")
             return integration_summary
             
         except Exception as e:
-            self.logger.error(f"❌ High-quality integrations failed: {e}")
+            self.logger.error(f"[FAIL] High-quality integrations failed: {e}")
             self.errors.append(str(e))
             return {'error': str(e), 'status': 'failed'}
     

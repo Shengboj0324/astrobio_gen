@@ -352,7 +352,7 @@ class IntegrationValidator:
 ==========================================
 
 [DATA] Overall Status: {overall_status}
-📈 Success Rate: {success_rate:.1f}% ({successful_components}/{total_components} components)
+[CHART] Success Rate: {success_rate:.1f}% ({successful_components}/{total_components} components)
 🕒 Validation Duration: {self.validation_results.get('validation_duration', 0):.2f} seconds
 
 [NET] Enterprise URL System: {self.validation_results['enterprise_url_system'].get('status', 'Unknown')}

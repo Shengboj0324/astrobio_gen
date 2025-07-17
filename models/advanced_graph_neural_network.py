@@ -656,20 +656,20 @@ def list_gnn_models() -> List[str]:
 
 if __name__ == "__main__":
     # Demonstration of advanced GNN capabilities
-    print("🧠 Advanced Graph Neural Network Demonstration")
+    print("[AI] Advanced Graph Neural Network Demonstration")
     print("=" * 50)
     
     # Create GNN for metabolic networks
     metabolic_gnn = create_graph_neural_network("metabolic_network")
-    print(f"✅ Created metabolic GNN with {sum(p.numel() for p in metabolic_gnn.parameters())} parameters")
+    print(f"[OK] Created metabolic GNN with {sum(p.numel() for p in metabolic_gnn.parameters())} parameters")
     
     # Create GNN for atmospheric dynamics
     atmospheric_gnn = create_graph_neural_network("atmospheric_dynamics")
-    print(f"✅ Created atmospheric GNN with {sum(p.numel() for p in atmospheric_gnn.parameters())} parameters")
+    print(f"[OK] Created atmospheric GNN with {sum(p.numel() for p in atmospheric_gnn.parameters())} parameters")
     
     # Register models
     register_gnn_model("metabolic_network", metabolic_gnn)
     register_gnn_model("atmospheric_dynamics", atmospheric_gnn)
     
-    print(f"📊 Registered models: {list_gnn_models()}")
-    print("🚀 Advanced Graph Neural Networks ready for astrobiology research!") 
+    print(f"[DATA] Registered models: {list_gnn_models()}")
+    print("[START] Advanced Graph Neural Networks ready for astrobiology research!") 

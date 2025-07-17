@@ -122,7 +122,7 @@ class BiologyEncoder(nn.Module):
         else:
             self._init_mlp_encoder()
         
-        logger.info(f"🧬 Biology encoder initialized → {config.latent_dim}D")
+        logger.info(f"[BIO] Biology encoder initialized → {config.latent_dim}D")
     
     def _init_gnn_encoder(self):
         """Initialize GNN-based encoder"""
@@ -369,7 +369,7 @@ class MultiModalEncoder(nn.Module):
         else:
             self.physics_layer = None
         
-        logger.info(f"🔄 Simple multi-modal encoder initialized")
+        logger.info(f"[PROC] Simple multi-modal encoder initialized")
     
     def forward(self, batch_data: Dict[str, Any]) -> Dict[str, torch.Tensor]:
         """Forward pass"""
@@ -432,7 +432,7 @@ def create_multimodal_encoder(config: EncoderConfig = None) -> MultiModalEncoder
 
 if __name__ == "__main__":
     def test_simple_encoder():
-        logger.info("🧪 Testing Simple Multi-Modal Encoder")
+        logger.info("[TEST] Testing Simple Multi-Modal Encoder")
         
         # Create config
         config = EncoderConfig(
@@ -471,7 +471,7 @@ if __name__ == "__main__":
         }
         
         # Forward pass
-        logger.info("🔄 Testing forward pass...")
+        logger.info("[PROC] Testing forward pass...")
         
         with torch.no_grad():
             results = encoder(batch_data)
@@ -480,18 +480,18 @@ if __name__ == "__main__":
         fused = results['fused_features']
         individual = results['individual_features']
         
-        logger.info(f"✅ Fused features shape: {fused.shape}")
-        logger.info(f"✅ Individual features: {list(individual.keys())}")
+        logger.info(f"[OK] Fused features shape: {fused.shape}")
+        logger.info(f"[OK] Individual features: {list(individual.keys())}")
         
         for domain, features in individual.items():
             logger.info(f"  {domain}: {features.shape}")
         
         if 'physics_constraints' in results:
             physics = results['physics_constraints']
-            logger.info(f"✅ Physics constraints: {list(physics.keys())}")
+            logger.info(f"[OK] Physics constraints: {list(physics.keys())}")
         
         # Test partial data
-        logger.info("🔄 Testing with partial data...")
+        logger.info("[PROC] Testing with partial data...")
         
         partial_data = {
             'climate_cubes': climate_cubes,
@@ -501,13 +501,13 @@ if __name__ == "__main__":
         with torch.no_grad():
             partial_results = encoder(partial_data)
         
-        logger.info(f"✅ Partial fused shape: {partial_results['fused_features'].shape}")
+        logger.info(f"[OK] Partial fused shape: {partial_results['fused_features'].shape}")
         
-        logger.info("✅ Simple Multi-Modal Encoder test completed!")
+        logger.info("[OK] Simple Multi-Modal Encoder test completed!")
         
         # Show statistics
         total_params = sum(p.numel() for p in encoder.parameters())
-        print(f"\n📊 Total parameters: {total_params:,}")
-        print(f"📊 Model size: {total_params * 4 / (1024**2):.1f} MB")
+        print(f"\n[DATA] Total parameters: {total_params:,}")
+        print(f"[DATA] Model size: {total_params * 4 / (1024**2):.1f} MB")
     
     test_simple_encoder() 

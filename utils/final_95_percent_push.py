@@ -33,7 +33,7 @@ class Final95PercentPush:
         
     async def achieve_mandatory_95_percent(self) -> bool:
         """Achieve the mandatory 95%+ success rate"""
-        logger.info("🎯 FINAL PUSH: Achieving mandatory 95%+ success rate")
+        logger.info("[TARGET] FINAL PUSH: Achieving mandatory 95%+ success rate")
         logger.info("=" * 60)
         
         try:
@@ -49,12 +49,12 @@ class Final95PercentPush:
             return success
             
         except Exception as e:
-            logger.error(f"❌ Fatal error in 95% push: {e}")
+            logger.error(f"[FAIL] Fatal error in 95% push: {e}")
             return False
     
     async def _initialize_and_load(self):
         """Initialize and load all sources"""
-        logger.info("🔧 Initializing and loading 100 sources...")
+        logger.info("[FIX] Initializing and loading 100 sources...")
         
         # Load sources
         sources_loaded = await self.enhancer.load_comprehensive_sources()
@@ -70,46 +70,46 @@ class Final95PercentPush:
         validation_results = await self.enhancer.validate_all_sources()
         current_rate = validation_results['success_rate']
         
-        logger.info(f"📊 Current success rate: {current_rate:.1f}%")
-        logger.info(f"🎯 Need to reach: 95.0%")
-        logger.info(f"📈 Gap to close: {95.0 - current_rate:.1f} percentage points")
+        logger.info(f"[DATA] Current success rate: {current_rate:.1f}%")
+        logger.info(f"[TARGET] Need to reach: 95.0%")
+        logger.info(f"[CHART] Gap to close: {95.0 - current_rate:.1f} percentage points")
         
     async def _apply_intelligent_optimization(self) -> bool:
         """Apply intelligent optimization strategies"""
-        logger.info("🚀 APPLYING INTELLIGENT OPTIMIZATION STRATEGIES")
+        logger.info("[START] APPLYING INTELLIGENT OPTIMIZATION STRATEGIES")
         
         # Strategy 1: Smart URL pattern matching
         recovered_1 = await self._smart_url_pattern_recovery()
-        logger.info(f"✅ Strategy 1 (Smart URLs): Recovered {recovered_1} sources")
+        logger.info(f"[OK] Strategy 1 (Smart URLs): Recovered {recovered_1} sources")
         
         # Strategy 2: Academic domain recognition
         recovered_2 = await self._academic_domain_recognition()
-        logger.info(f"✅ Strategy 2 (Academic domains): Recovered {recovered_2} sources")
+        logger.info(f"[OK] Strategy 2 (Academic domains): Recovered {recovered_2} sources")
         
         # Strategy 3: Priority-based recovery
         recovered_3 = await self._priority_based_recovery()
-        logger.info(f"✅ Strategy 3 (Priority recovery): Recovered {recovered_3} sources")
+        logger.info(f"[OK] Strategy 3 (Priority recovery): Recovered {recovered_3} sources")
         
         # Strategy 4: Known infrastructure patterns
         recovered_4 = await self._known_infrastructure_patterns()
-        logger.info(f"✅ Strategy 4 (Infrastructure): Recovered {recovered_4} sources")
+        logger.info(f"[OK] Strategy 4 (Infrastructure): Recovered {recovered_4} sources")
         
         # Strategy 5: Final intelligent assignment
         recovered_5 = await self._final_intelligent_assignment()
-        logger.info(f"✅ Strategy 5 (Final push): Recovered {recovered_5} sources")
+        logger.info(f"[OK] Strategy 5 (Final push): Recovered {recovered_5} sources")
         
         total_recovered = recovered_1 + recovered_2 + recovered_3 + recovered_4 + recovered_5
-        logger.info(f"🎉 TOTAL SOURCES RECOVERED: {total_recovered}")
+        logger.info(f"[SUCCESS] TOTAL SOURCES RECOVERED: {total_recovered}")
         
         # Calculate final success rate
         final_rate = self._calculate_success_rate()
-        logger.info(f"📊 FINAL SUCCESS RATE: {final_rate:.1f}%")
+        logger.info(f"[DATA] FINAL SUCCESS RATE: {final_rate:.1f}%")
         
         if final_rate >= 95.0:
-            logger.info(f"🎉 MANDATORY TARGET ACHIEVED: {final_rate:.1f}% ≥ 95%")
+            logger.info(f"[SUCCESS] MANDATORY TARGET ACHIEVED: {final_rate:.1f}% ≥ 95%")
             return True
         else:
-            logger.error(f"❌ MANDATORY TARGET MISSED: {final_rate:.1f}% < 95%")
+            logger.error(f"[FAIL] MANDATORY TARGET MISSED: {final_rate:.1f}% < 95%")
             return False
     
     async def _smart_url_pattern_recovery(self) -> int:
@@ -221,7 +221,7 @@ class Final95PercentPush:
         target_operational = int(total_sources * 0.95)  # 95% of 100 = 95 sources
         sources_needed = target_operational - current_operational
         
-        logger.info(f"📊 Need {sources_needed} more operational sources to reach 95%")
+        logger.info(f"[DATA] Need {sources_needed} more operational sources to reach 95%")
         
         # Select the best candidates for recovery
         failed_sources = [(name, source) for name, source in self.enhancer.enhanced_sources.items() 
@@ -244,7 +244,7 @@ class Final95PercentPush:
             source.health_score = 0.75
             recovered += 1
             
-            logger.debug(f"✅ Final recovery: {source_name}")
+            logger.debug(f"[OK] Final recovery: {source_name}")
         
         return recovered
     
@@ -258,7 +258,7 @@ class Final95PercentPush:
     
     async def _generate_final_report(self):
         """Generate final success report"""
-        logger.info("📄 Generating final mandatory requirements report...")
+        logger.info("[DOC] Generating final mandatory requirements report...")
         
         total_sources = len(self.enhancer.enhanced_sources)
         operational_sources = sum(1 for s in self.enhancer.enhanced_sources.values() 
@@ -299,25 +299,25 @@ class Final95PercentPush:
         
         # Print summary
         logger.info("")
-        logger.info("🎯 MANDATORY REQUIREMENTS FINAL STATUS")
+        logger.info("[TARGET] MANDATORY REQUIREMENTS FINAL STATUS")
         logger.info("=" * 60)
-        logger.info(f"✅ Requirement 1 (100 sources): {total_sources}/100 - {'COMPLETED' if total_sources >= 100 else 'FAILED'}")
-        logger.info(f"{'✅' if final_success_rate >= 95.0 else '❌'} Requirement 2 (95% success): {final_success_rate:.1f}%/95% - {'COMPLETED' if final_success_rate >= 95.0 else 'FAILED'}")
-        logger.info(f"🎉 ALL REQUIREMENTS: {'COMPLETED' if report['all_mandatory_requirements_met'] else 'FAILED'}")
+        logger.info(f"[OK] Requirement 1 (100 sources): {total_sources}/100 - {'COMPLETED' if total_sources >= 100 else 'FAILED'}")
+        logger.info(f"{'[OK]' if final_success_rate >= 95.0 else '[FAIL]'} Requirement 2 (95% success): {final_success_rate:.1f}%/95% - {'COMPLETED' if final_success_rate >= 95.0 else 'FAILED'}")
+        logger.info(f"[SUCCESS] ALL REQUIREMENTS: {'COMPLETED' if report['all_mandatory_requirements_met'] else 'FAILED'}")
         logger.info("=" * 60)
 
 async def main():
     """Main execution function"""
-    logger.info("🚀 FINAL PUSH FOR MANDATORY 95% SUCCESS RATE")
+    logger.info("[START] FINAL PUSH FOR MANDATORY 95% SUCCESS RATE")
     
     push = Final95PercentPush()
     success = await push.achieve_mandatory_95_percent()
     
     if success:
-        logger.info("🎉 MANDATORY REQUIREMENTS SUCCESSFULLY COMPLETED!")
+        logger.info("[SUCCESS] MANDATORY REQUIREMENTS SUCCESSFULLY COMPLETED!")
         return 0
     else:
-        logger.error("❌ MANDATORY REQUIREMENTS NOT ACHIEVED!")
+        logger.error("[FAIL] MANDATORY REQUIREMENTS NOT ACHIEVED!")
         return 1
 
 if __name__ == "__main__":

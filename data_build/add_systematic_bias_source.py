@@ -89,7 +89,7 @@ def add_systematic_bias_source():
                 ))
                 
                 conn.commit()
-                print("✅ Successfully added additional source for Systematic Biases field")
+                print("[OK] Successfully added additional source for Systematic Biases field")
                 print(f"   Source ID: {additional_source['source_id']}")
                 print(f"   Title: {additional_source['title']}")
                 print(f"   Quality Score: {additional_source['quality_score']}")
@@ -101,11 +101,11 @@ def add_systematic_bias_source():
                 
                 return True
         else:
-            print("❌ Process metadata database not found. Run process metadata collection first.")
+            print("[FAIL] Process metadata database not found. Run process metadata collection first.")
             return False
             
     except Exception as e:
-        print(f"❌ Error adding source: {e}")
+        print(f"[FAIL] Error adding source: {e}")
         return False
 
 if __name__ == "__main__":

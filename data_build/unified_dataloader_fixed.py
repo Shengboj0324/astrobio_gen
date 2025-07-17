@@ -379,7 +379,7 @@ class PlanetRunDataset(Dataset):
         self._cache = {} if config.enable_caching else None
         self._cache_lock = Lock()
         
-        logger.info(f"📊 Dataset initialized: {len(self.available_runs)} runs ({data_split.value})")
+        logger.info(f"[DATA] Dataset initialized: {len(self.available_runs)} runs ({data_split.value})")
     
     def _load_available_runs(self) -> List[int]:
         """Load available planet runs for the specified split"""
@@ -573,7 +573,7 @@ class SimpleDataLoader:
             collate_fn=collate_multimodal_batch
         )
         
-        logger.info(f"🔄 DataLoader initialized: batch_size={config.batch_size}")
+        logger.info(f"[PROC] DataLoader initialized: batch_size={config.batch_size}")
     
     def __iter__(self):
         """Iterator"""
@@ -597,14 +597,14 @@ def create_multimodal_dataloaders(config: DataLoaderConfig,
     val_loader = SimpleDataLoader(val_dataset, config)
     test_loader = SimpleDataLoader(test_dataset, config)
     
-    logger.info(f"📦 Created dataloaders: {len(train_dataset)} train, {len(val_dataset)} val, {len(test_dataset)} test")
+    logger.info(f"[PKG] Created dataloaders: {len(train_dataset)} train, {len(val_dataset)} val, {len(test_dataset)} test")
     
     return train_loader, val_loader, test_loader
 
 if __name__ == "__main__":
     # Test the unified dataloader
     def test_dataloader():
-        logger.info("🧪 Testing Unified DataLoader Architecture (Fixed)")
+        logger.info("[TEST] Testing Unified DataLoader Architecture (Fixed)")
         
         # Create mock storage
         mock_storage = MockDataStorage(n_runs=15)
@@ -626,7 +626,7 @@ if __name__ == "__main__":
         train_loader, val_loader, test_loader = create_multimodal_dataloaders(config, mock_storage)
         
         # Test training loader
-        logger.info("🔄 Testing training dataloader...")
+        logger.info("[PROC] Testing training dataloader...")
         batch_count = 0
         for i, batch in enumerate(train_loader):
             logger.info(f"Batch {i}:")
@@ -658,28 +658,28 @@ if __name__ == "__main__":
                 break
         
         # Test validation loader
-        logger.info("🔄 Testing validation dataloader...")
+        logger.info("[PROC] Testing validation dataloader...")
         val_batch = next(iter(val_loader))
         logger.info(f"Validation batch - Run IDs: {val_batch.run_ids.tolist()}")
         
         # Test batch device movement
         if torch.cuda.is_available():
             device = torch.device('cuda')
-            logger.info("🔄 Testing GPU batch transfer...")
+            logger.info("[PROC] Testing GPU batch transfer...")
             try:
                 gpu_batch = val_batch.to(device)
                 logger.info(f"  GPU batch planet params device: {gpu_batch.planet_params.device}")
-                logger.info("  ✅ GPU transfer successful")
+                logger.info("  [OK] GPU transfer successful")
             except Exception as e:
                 logger.warning(f"  GPU transfer failed: {e}")
         else:
-            logger.info("🔄 CUDA not available, skipping GPU test")
+            logger.info("[PROC] CUDA not available, skipping GPU test")
         
-        logger.info("✅ Unified DataLoader test completed successfully!")
+        logger.info("[OK] Unified DataLoader test completed successfully!")
         
         # Show final statistics
         print("\n" + "="*60)
-        print("🔄 UNIFIED DATALOADER STATISTICS")
+        print("[PROC] UNIFIED DATALOADER STATISTICS")
         print("="*60)
         print(f"Training samples: {len(train_loader.dataset)}")
         print(f"Validation samples: {len(val_loader.dataset)}")
@@ -687,13 +687,13 @@ if __name__ == "__main__":
         print(f"Batch size: {config.batch_size}")
         print(f"PyTorch Geometric available: {PYTORCH_GEOMETRIC_AVAILABLE}")
         print(f"\nMulti-modal features:")
-        print(f"  ✅ Climate datacubes (4D tensors)")
-        print(f"  ✅ Biological networks (graphs/adjacency)")
-        print(f"  ✅ High-resolution spectra")
-        print(f"  ✅ Planet parameters")
-        print(f"  ✅ Metadata integration")
-        print(f"  ✅ Intelligent batching")
-        print(f"  ✅ Error handling")
+        print(f"  [OK] Climate datacubes (4D tensors)")
+        print(f"  [OK] Biological networks (graphs/adjacency)")
+        print(f"  [OK] High-resolution spectra")
+        print(f"  [OK] Planet parameters")
+        print(f"  [OK] Metadata integration")
+        print(f"  [OK] Intelligent batching")
+        print(f"  [OK] Error handling")
         print("="*60)
     
     # Run test

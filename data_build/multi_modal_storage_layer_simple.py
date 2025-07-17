@@ -180,7 +180,7 @@ class MultiModalStorage:
         Returns:
             Path to stored NPZ file
         """
-        logger.info(f"📦 Storing climate datacube for run {run_id}")
+        logger.info(f"[PKG] Storing climate datacube for run {run_id}")
         
         run_dir = self._get_run_directory(run_id)
         climate_dir = run_dir / "climate"
@@ -231,7 +231,7 @@ class MultiModalStorage:
         )
         self._register_file(file_info)
         
-        logger.info(f"✅ Stored climate datacube: {npz_path}")
+        logger.info(f"[OK] Stored climate datacube: {npz_path}")
         return npz_path
     
     async def load_climate_datacube(self, 
@@ -318,7 +318,7 @@ class MultiModalStorage:
         Returns:
             Path to stored NPZ file
         """
-        logger.info(f"🧬 Storing {network_type} network for run {run_id}")
+        logger.info(f"[BIO] Storing {network_type} network for run {run_id}")
         
         run_dir = self._get_run_directory(run_id)
         bio_dir = run_dir / "biosphere"
@@ -365,7 +365,7 @@ class MultiModalStorage:
         )
         self._register_file(file_info)
         
-        logger.info(f"✅ Stored biological network: {npz_path}")
+        logger.info(f"[OK] Stored biological network: {npz_path}")
         return npz_path
     
     async def load_biological_network(self, 
@@ -495,7 +495,7 @@ class MultiModalStorage:
         )
         self._register_file(file_info)
         
-        logger.info(f"✅ Stored spectrum: {npz_path}")
+        logger.info(f"[OK] Stored spectrum: {npz_path}")
         return npz_path
     
     async def load_spectrum(self,
@@ -672,7 +672,7 @@ def get_storage_manager(config: StorageConfig = None) -> MultiModalStorage:
 
 async def create_example_data(storage: MultiModalStorage, run_id: int):
     """Create example data for testing storage system"""
-    logger.info(f"🧪 Creating example data for run {run_id}")
+    logger.info(f"[TEST] Creating example data for run {run_id}")
     
     # Create example climate datacube
     time_steps = 10
@@ -732,14 +732,14 @@ async def create_example_data(storage: MultiModalStorage, run_id: int):
                                 resolution=100000, instrument="PSG",
                                 metadata=spectrum_metadata)
     
-    logger.info(f"✅ Created example data for run {run_id}")
+    logger.info(f"[OK] Created example data for run {run_id}")
 
 if __name__ == "__main__":
     import asyncio
     
     # Test the storage system
     async def test_storage():
-        logger.info("🧪 Testing Multi-Modal Storage System")
+        logger.info("[TEST] Testing Multi-Modal Storage System")
         
         # Initialize storage
         config = StorageConfig(
@@ -755,7 +755,7 @@ if __name__ == "__main__":
             await create_example_data(storage, run_id)
         
         # Test loading data
-        logger.info("🔄 Testing data loading...")
+        logger.info("[PROC] Testing data loading...")
         
         for run_id in test_run_ids:
             try:
@@ -785,7 +785,7 @@ if __name__ == "__main__":
                 logger.error(f"Error loading data for run {run_id}: {e}")
         
         # Test cache performance
-        logger.info("⚡ Testing cache performance...")
+        logger.info("[FAST] Testing cache performance...")
         start_time = time.time()
         
         # Load same data multiple times (should hit cache)
@@ -826,7 +826,7 @@ if __name__ == "__main__":
         
         # Clean up cache
         storage.clear_cache()
-        logger.info("✅ Multi-Modal Storage test completed successfully!")
+        logger.info("[OK] Multi-Modal Storage test completed successfully!")
     
     # Run test
     asyncio.run(test_storage()) 

@@ -963,22 +963,22 @@ async def main():
         
         # Print honest summary
         print("\n" + "="*80)
-        print("🔬 REAL PROCESS METADATA COLLECTION RESULTS")
+        print("[LAB] REAL PROCESS METADATA COLLECTION RESULTS")
         print("="*80)
-        print(f"📊 Total Real Sources Collected: {results['total_real_sources']}")
-        print(f"📊 Fields Successful: {results['fields_successful']}/{results['fields_processed']}")
-        print(f"📊 Overall Success Rate: {results['fields_successful']/results['fields_processed']:.1%}")
-        print(f"📊 Average Quality Score: {results['average_quality']:.3f}")
-        print(f"📊 Collection Time: {results['collection_time']:.1f} seconds")
-        print(f"📊 Overall Success: {results['overall_success']}")
+        print(f"[DATA] Total Real Sources Collected: {results['total_real_sources']}")
+        print(f"[DATA] Fields Successful: {results['fields_successful']}/{results['fields_processed']}")
+        print(f"[DATA] Overall Success Rate: {results['fields_successful']/results['fields_processed']:.1%}")
+        print(f"[DATA] Average Quality Score: {results['average_quality']:.3f}")
+        print(f"[DATA] Collection Time: {results['collection_time']:.1f} seconds")
+        print(f"[DATA] Overall Success: {results['overall_success']}")
         
-        print(f"\n🎯 HONEST ASSESSMENT:")
+        print(f"\n[TARGET] HONEST ASSESSMENT:")
         print(f"   Data Quality: {report['honest_assessment']['data_quality']}")
         print(f"   Target Achievement: {report['honest_assessment']['target_achievement']}")
         print(f"   Production Ready: {report['honest_assessment']['production_ready']}")
         print(f"   Confidence Level: {report['honest_assessment']['confidence_level']}")
         
-        print(f"\n💡 RECOMMENDATIONS:")
+        print(f"\n[IDEA] RECOMMENDATIONS:")
         for recommendation in report['recommendations']:
             print(f"   • {recommendation}")
         
@@ -992,7 +992,7 @@ async def main():
         
     except Exception as e:
         logger.error(f"Real process metadata collection failed: {e}")
-        print(f"\n❌ COLLECTION FAILED: {e}")
+        print(f"\n[FAIL] COLLECTION FAILED: {e}")
         return {
             'status': 'FAILED',
             'error': str(e)

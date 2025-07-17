@@ -85,20 +85,20 @@ class ExpandedURLIntegration:
                     expanded_sources[domain] = registry_data
                     
                     source_count = len(registry_data) if registry_data else 0
-                    logger.info(f"✅ Loaded {source_count} sources from {registry_file}")
+                    logger.info(f"[OK] Loaded {source_count} sources from {registry_file}")
                     
                 except Exception as e:
-                    logger.error(f"❌ Failed to load {registry_file}: {e}")
+                    logger.error(f"[FAIL] Failed to load {registry_file}: {e}")
                     
             else:
-                logger.warning(f"⚠️ Registry file not found: {registry_file}")
+                logger.warning(f"[WARN] Registry file not found: {registry_file}")
                 
         self.expanded_registries = expanded_sources
         return expanded_sources
     
     def integrate_with_existing_system(self) -> bool:
         """Integrate expanded sources with existing URL management system"""
-        logger.info("\n🔧 INTEGRATING WITH EXISTING URL MANAGEMENT SYSTEM")
+        logger.info("\n[FIX] INTEGRATING WITH EXISTING URL MANAGEMENT SYSTEM")
         logger.info("-" * 60)
         
         try:
@@ -144,20 +144,20 @@ class ExpandedURLIntegration:
                 self.total_sources_added = sources_added
                 self.existing_url_system = url_manager
                 
-                logger.info(f"✅ Successfully integrated {sources_added} new data sources")
+                logger.info(f"[OK] Successfully integrated {sources_added} new data sources")
                 return True
                 
             else:
-                logger.warning("⚠️ Existing URL management system not found")
+                logger.warning("[WARN] Existing URL management system not found")
                 return False
                 
         except Exception as e:
-            logger.error(f"❌ Integration failed: {e}")
+            logger.error(f"[FAIL] Integration failed: {e}")
             return False
     
     def generate_integration_summary(self) -> Dict[str, Any]:
         """Generate comprehensive summary of integration"""
-        logger.info("\n📊 GENERATING INTEGRATION SUMMARY")
+        logger.info("\n[DATA] GENERATING INTEGRATION SUMMARY")
         logger.info("-" * 40)
         
         summary = {
@@ -225,7 +225,7 @@ class ExpandedURLIntegration:
     
     def create_updated_config_file(self) -> bool:
         """Create updated configuration file with all sources"""
-        logger.info("\n💾 CREATING UPDATED CONFIGURATION")
+        logger.info("\n[SAVE] CREATING UPDATED CONFIGURATION")
         logger.info("-" * 40)
         
         try:
@@ -247,16 +247,16 @@ class ExpandedURLIntegration:
             with open(config_file, 'w') as f:
                 yaml.dump(config_data, f, default_flow_style=False, indent=2)
             
-            logger.info(f"✅ Updated configuration saved to: {config_file}")
+            logger.info(f"[OK] Updated configuration saved to: {config_file}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to create configuration: {e}")
+            logger.error(f"[FAIL] Failed to create configuration: {e}")
             return False
     
     def validate_integration(self) -> Dict[str, Any]:
         """Validate the integration results"""
-        logger.info("\n🔍 VALIDATING INTEGRATION")
+        logger.info("\n[SEARCH] VALIDATING INTEGRATION")
         logger.info("-" * 30)
         
         validation_results = {
@@ -302,10 +302,10 @@ class ExpandedURLIntegration:
             validation_results['domain_coverage'][domain] = domain_stats
         
         # Log validation results
-        logger.info(f"✅ Validated {validation_results['total_sources_validated']} sources")
-        logger.info(f"✅ Valid URLs: {validation_results['valid_urls']}")
-        logger.info(f"⚠️ Invalid URLs: {validation_results['invalid_urls']}")
-        logger.info(f"⚠️ Missing metadata: {validation_results['missing_metadata']}")
+        logger.info(f"[OK] Validated {validation_results['total_sources_validated']} sources")
+        logger.info(f"[OK] Valid URLs: {validation_results['valid_urls']}")
+        logger.info(f"[WARN] Invalid URLs: {validation_results['invalid_urls']}")
+        logger.info(f"[WARN] Missing metadata: {validation_results['missing_metadata']}")
         
         if validation_results['critical_issues']:
             logger.warning(f"🚨 {len(validation_results['critical_issues'])} critical issues found")
@@ -317,33 +317,33 @@ class ExpandedURLIntegration:
     def print_integration_report(self):
         """Print comprehensive integration report"""
         print("\n" + "="*80)
-        print("🚀 EXPANDED DATA SOURCES INTEGRATION REPORT")
+        print("[START] EXPANDED DATA SOURCES INTEGRATION REPORT")
         print("="*80)
         
         if not self.integration_summary:
-            print("❌ No integration summary available")
+            print("[FAIL] No integration summary available")
             return
         
         summary = self.integration_summary
         
-        print(f"\n📊 INTEGRATION OVERVIEW")
+        print(f"\n[DATA] INTEGRATION OVERVIEW")
         print(f"├─ Total Domains: {summary['total_domains']}")
         print(f"├─ Total Sources Added: {summary['total_sources_added']}")
         print(f"├─ Estimated Total Size: {summary['estimated_total_size_gb']:.1f} GB")
         print(f"└─ Authentication Required: {summary['authentication_required']} sources")
         
-        print(f"\n🎯 PRIORITY BREAKDOWN")
+        print(f"\n[TARGET] PRIORITY BREAKDOWN")
         for priority, count in summary['priority_breakdown'].items():
             print(f"├─ {priority.replace('_', ' ').title()}: {count} sources")
         
-        print(f"\n🌐 DOMAIN BREAKDOWN")
+        print(f"\n[NET] DOMAIN BREAKDOWN")
         for domain, domain_data in summary['domains'].items():
             print(f"├─ {domain.title()}:")
             print(f"│  ├─ Sources: {domain_data['source_count']}")
             print(f"│  ├─ Size: {domain_data['total_size_gb']:.1f} GB")
             print(f"│  └─ Priority 1: {domain_data['priority_1_count']} sources")
         
-        print(f"\n⭐ TOP PRIORITY SOURCES")
+        print(f"\n[STAR] TOP PRIORITY SOURCES")
         for i, source in enumerate(summary['top_sources'][:5], 1):
             print(f"{i}. {source.name}")
             print(f"   ├─ Domain: {source.domain}")
@@ -351,11 +351,11 @@ class ExpandedURLIntegration:
             print(f"   ├─ Size: {source.estimated_size_gb:.1f} GB")
             print(f"   └─ Mirrors: {source.mirrors}")
         
-        print(f"\n✅ INTEGRATION STATUS")
+        print(f"\n[OK] INTEGRATION STATUS")
         for status, count in summary['sources_by_status'].items():
             print(f"├─ {status.title()}: {count} sources")
         
-        print(f"\n🔗 SAMPLE HIGH-VALUE SOURCES BY DOMAIN:")
+        print(f"\n[LINK] SAMPLE HIGH-VALUE SOURCES BY DOMAIN:")
         
         domain_samples = {
             'astronomy': 'Exoplanet.eu (7554+ planets)',
@@ -369,7 +369,7 @@ class ExpandedURLIntegration:
             if domain in summary['domains']:
                 print(f"├─ {domain.title()}: {sample}")
         
-        print(f"\n🎉 INTEGRATION COMPLETE!")
+        print(f"\n[SUCCESS] INTEGRATION COMPLETE!")
         print(f"Your enterprise URL management system now has access to")
         print(f"{summary['total_sources_added']} additional high-quality data sources")
         print(f"across {summary['total_domains']} scientific domains.")
@@ -377,20 +377,20 @@ class ExpandedURLIntegration:
 
 def main():
     """Main integration workflow"""
-    logger.info("🚀 Starting Expanded URL Integration")
+    logger.info("[START] Starting Expanded URL Integration")
     
     integrator = ExpandedURLIntegration()
     
     # Step 1: Load expanded registries
     expanded_sources = integrator.load_expanded_registries()
     if not expanded_sources:
-        logger.error("❌ No expanded sources loaded. Exiting.")
+        logger.error("[FAIL] No expanded sources loaded. Exiting.")
         return False
     
     # Step 2: Integrate with existing system
     integration_success = integrator.integrate_with_existing_system()
     if not integration_success:
-        logger.warning("⚠️ Integration with existing system failed, continuing with standalone configuration")
+        logger.warning("[WARN] Integration with existing system failed, continuing with standalone configuration")
     
     # Step 3: Generate summary
     summary = integrator.generate_integration_summary()
@@ -404,7 +404,7 @@ def main():
     # Step 6: Print comprehensive report
     integrator.print_integration_report()
     
-    logger.info("✅ Expanded URL Integration completed successfully!")
+    logger.info("[OK] Expanded URL Integration completed successfully!")
     return True
 
 if __name__ == "__main__":

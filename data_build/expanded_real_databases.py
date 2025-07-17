@@ -379,12 +379,12 @@ async def main():
         with open(registry_file, 'w') as f:
             json.dump(registry, f, indent=2)
         
-        print(f"✅ Expanded database registry created: {registry_file}")
+        print(f"[OK] Expanded database registry created: {registry_file}")
         print(f"   Total databases: {registry['metadata']['total_databases']}")
         print(f"   Categories: {list(registry['metadata']['categories'].keys())}")
         
         # Validate connectivity (optional - can be slow)
-        print("\n🔍 Testing database connectivity...")
+        print("\n[SEARCH] Testing database connectivity...")
         validation = await expanded_db.validate_all_databases()
         
         # Save validation results
@@ -392,7 +392,7 @@ async def main():
         with open(validation_file, 'w') as f:
             json.dump(validation, f, indent=2)
         
-        print(f"✅ Connectivity validation completed: {validation_file}")
+        print(f"[OK] Connectivity validation completed: {validation_file}")
         print(f"   Accessible: {validation['accessible_databases']}/{validation['total_databases']}")
         print(f"   Success rate: {validation['connectivity_rate']:.1f}%")
         

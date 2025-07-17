@@ -193,7 +193,7 @@ class PlanetRunDataset(Dataset):
         self._cache = {} if config.enable_caching else None
         self._cache_lock = Lock()
         
-        logger.info(f"📊 Dataset initialized: {len(self.available_runs)} runs ({data_split.value})")
+        logger.info(f"[DATA] Dataset initialized: {len(self.available_runs)} runs ({data_split.value})")
     
     def _load_available_runs(self) -> List[int]:
         """Load available planet runs for the specified split"""
@@ -551,7 +551,7 @@ class AdaptiveDataLoader:
             persistent_workers=True if config.num_workers > 0 else False
         )
         
-        logger.info(f"🔄 Adaptive DataLoader initialized: batch_size={self.current_batch_size}")
+        logger.info(f"[PROC] Adaptive DataLoader initialized: batch_size={self.current_batch_size}")
     
     def __iter__(self):
         """Iterator with adaptive batching"""
@@ -648,14 +648,14 @@ def create_multimodal_dataloaders(config: DataLoaderConfig,
     val_loader = AdaptiveDataLoader(val_dataset, config)
     test_loader = AdaptiveDataLoader(test_dataset, config)
     
-    logger.info(f"📦 Created dataloaders: {len(train_dataset)} train, {len(val_dataset)} val, {len(test_dataset)} test")
+    logger.info(f"[PKG] Created dataloaders: {len(train_dataset)} train, {len(val_dataset)} val, {len(test_dataset)} test")
     
     return train_loader, val_loader, test_loader
 
 if __name__ == "__main__":
     # Test the unified dataloader
     async def test_dataloader():
-        logger.info("🧪 Testing Unified DataLoader Architecture")
+        logger.info("[TEST] Testing Unified DataLoader Architecture")
         
         # Create test storage with example data
         storage_config = StorageConfig(storage_root=Path("data/test_planet_runs"))
@@ -682,7 +682,7 @@ if __name__ == "__main__":
         train_loader, val_loader, test_loader = create_multimodal_dataloaders(config, storage_manager)
         
         # Test training loader
-        logger.info("🔄 Testing training dataloader...")
+        logger.info("[PROC] Testing training dataloader...")
         for i, batch in enumerate(train_loader):
             logger.info(f"Batch {i}:")
             logger.info(f"  Run IDs: {batch.run_ids}")
@@ -708,16 +708,16 @@ if __name__ == "__main__":
         # Test memory estimation
         if hasattr(train_loader, '_estimate_batch_memory'):
             memory_mb = train_loader._estimate_batch_memory(batch)
-            logger.info(f"📊 Estimated batch memory: {memory_mb:.1f} MB")
+            logger.info(f"[DATA] Estimated batch memory: {memory_mb:.1f} MB")
         
         # Test batch device movement
         if torch.cuda.is_available():
             device = torch.device('cuda')
-            logger.info("🔄 Testing GPU batch transfer...")
+            logger.info("[PROC] Testing GPU batch transfer...")
             gpu_batch = batch.to(device)
             logger.info(f"  GPU batch planet params device: {gpu_batch.planet_params.device}")
         
-        logger.info("✅ Unified DataLoader test completed successfully!")
+        logger.info("[OK] Unified DataLoader test completed successfully!")
     
     # Run test
     import asyncio

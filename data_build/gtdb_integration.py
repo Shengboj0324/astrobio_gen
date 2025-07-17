@@ -27,6 +27,7 @@ import pandas as pd
 import gzip
 import tarfile
 import requests
+import json
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any, Set, Tuple
@@ -370,6 +371,26 @@ class GTDBParser:
         self.db_path = self.output_path / "gtdb.db"
         self._initialize_database()
     
+    def _safe_int(self, value, default=0):
+        """Safely convert value to integer, handling 'none' and other invalid values"""
+        if value is None or str(value).lower() in ['none', 'na', 'nan', '']:
+            return default
+        try:
+            return int(float(str(value)))  # Convert via float first to handle decimal strings
+        except (ValueError, TypeError):
+            logger.warning(f"Could not convert '{value}' to integer, using default {default}")
+            return default
+    
+    def _safe_float(self, value, default=0.0):
+        """Safely convert value to float, handling 'none' and other invalid values"""
+        if value is None or str(value).lower() in ['none', 'na', 'nan', '']:
+            return default
+        try:
+            return float(str(value))
+        except (ValueError, TypeError):
+            logger.warning(f"Could not convert '{value}' to float, using default {default}")
+            return default
+    
     def _initialize_database(self):
         """Initialize SQLite database for GTDB data"""
         with sqlite3.connect(self.db_path) as conn:
@@ -514,22 +535,22 @@ class GTDBParser:
                         ncbi_genus=ncbi_parts.get('g', ''),
                         ncbi_species=ncbi_parts.get('s', ''),
                         ncbi_taxonomy=ncbi_taxonomy,
-                        ncbi_taxid=int(row.get('ncbi_taxid', 0)),
+                        ncbi_taxid=self._safe_int(row.get('ncbi_taxid', 0)),
                         # Genome statistics
-                        genome_size=int(row.get('genome_size', 0)),
-                        contig_count=int(row.get('contig_count', 0)),
-                        n50=int(row.get('n50_contigs', 0)),
-                        scaffold_count=int(row.get('scaffold_count', 0)),
-                        total_gap_length=int(row.get('total_gap_length', 0)),
+                        genome_size=self._safe_int(row.get('genome_size', 0)),
+                        contig_count=self._safe_int(row.get('contig_count', 0)),
+                        n50=self._safe_int(row.get('n50_contigs', 0)),
+                        scaffold_count=self._safe_int(row.get('scaffold_count', 0)),
+                        total_gap_length=self._safe_int(row.get('total_gap_length', 0)),
                         # Quality metrics
-                        checkm_completeness=float(row.get('checkm_completeness', 0)),
-                        checkm_contamination=float(row.get('checkm_contamination', 0)),
-                        checkm_strain_heterogeneity=float(row.get('checkm_strain_heterogeneity', 0)),
+                        checkm_completeness=self._safe_float(row.get('checkm_completeness', 0)),
+                        checkm_contamination=self._safe_float(row.get('checkm_contamination', 0)),
+                        checkm_strain_heterogeneity=self._safe_float(row.get('checkm_strain_heterogeneity', 0)),
                         # Gene content
-                        protein_count=int(row.get('protein_count', 0)),
-                        gene_count=int(row.get('gene_count', 0)),
-                        ssu_count=int(row.get('ssu_count', 0)),
-                        ssu_length=int(row.get('ssu_length', 0)),
+                        protein_count=self._safe_int(row.get('protein_count', 0)),
+                        gene_count=self._safe_int(row.get('gene_count', 0)),
+                        ssu_count=self._safe_int(row.get('ssu_count', 0)),
+                        ssu_length=self._safe_int(row.get('ssu_length', 0)),
                         # Assembly information
                         assembly_level=str(row.get('assembly_level', '')),
                         assembly_type=str(row.get('assembly_type', '')),

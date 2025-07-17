@@ -781,7 +781,7 @@ def create_nas_config(task_type: str = "climate_modeling",
 
 if __name__ == "__main__":
     # Demonstration of NAS capabilities
-    print("🔍 Neural Architecture Search Demonstration")
+    print("[SEARCH] Neural Architecture Search Demonstration")
     print("=" * 50)
     
     # Create NAS configuration
@@ -790,14 +790,14 @@ if __name__ == "__main__":
     # Create NAS orchestrator
     orchestrator = get_nas_orchestrator(config)
     
-    print(f"✅ Created NAS orchestrator for {config.task_type}")
-    print(f"📊 Search algorithm: {config.search_algorithm}")
-    print(f"🎯 Objectives: {config.objectives}")
+    print(f"[OK] Created NAS orchestrator for {config.task_type}")
+    print(f"[DATA] Search algorithm: {config.search_algorithm}")
+    print(f"[TARGET] Objectives: {config.objectives}")
     print(f"🏗️ Search space: {len(orchestrator.search_space.operations)} operations")
     
     # Sample architecture
     sample_arch = orchestrator.search_space.sample_architecture()
-    print(f"📋 Sample architecture: {sample_arch['num_layers']} layers")
+    print(f"[BOARD] Sample architecture: {sample_arch['num_layers']} layers")
     
-    print("🚀 Neural Architecture Search ready for optimal model discovery!")
-    print("🧠 Ready to discover world-class architectures for astrobiology research!") 
+    print("[START] Neural Architecture Search ready for optimal model discovery!")
+    print("[AI] Ready to discover world-class architectures for astrobiology research!") 

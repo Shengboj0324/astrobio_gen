@@ -601,7 +601,7 @@ def create_meta_learning_system(base_model: nn.Module,
 
 if __name__ == "__main__":
     # Demonstration of meta-learning capabilities
-    print("🧠 Meta-Learning System Demonstration")
+    print("[AI] Meta-Learning System Demonstration")
     print("=" * 50)
     
     # Create a simple base model
@@ -623,13 +623,13 @@ if __name__ == "__main__":
     maml_system = create_meta_learning_system(base_model, "maml")
     prototypical_system = create_meta_learning_system(base_model, "prototypical")
     
-    print(f"✅ Created MAML system with {sum(p.numel() for p in maml_system.parameters())} parameters")
-    print(f"✅ Created Prototypical system with {sum(p.numel() for p in prototypical_system.parameters())} parameters")
+    print(f"[OK] Created MAML system with {sum(p.numel() for p in maml_system.parameters())} parameters")
+    print(f"[OK] Created Prototypical system with {sum(p.numel() for p in prototypical_system.parameters())} parameters")
     
     # Register with orchestrator
     orchestrator = get_meta_learning_orchestrator()
     orchestrator.register_algorithm("maml", maml_system)
     orchestrator.register_algorithm("prototypical", prototypical_system)
     
-    print("📊 Meta-learning systems ready for few-shot adaptation!")
-    print("🚀 Ready for adaptation to new climate scenarios and planetary conditions!") 
+    print("[DATA] Meta-learning systems ready for few-shot adaptation!")
+    print("[START] Ready for adaptation to new climate scenarios and planetary conditions!") 

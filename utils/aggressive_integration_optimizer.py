@@ -83,34 +83,34 @@ class AggressiveIntegrationOptimizer:
     
     async def optimize_failed_sources(self) -> int:
         """Apply aggressive optimization to failed sources"""
-        logger.info("🚀 AGGRESSIVE OPTIMIZATION: Pushing 83% → 95%+ success rate")
+        logger.info("[START] AGGRESSIVE OPTIMIZATION: Pushing 83% → 95%+ success rate")
         
         # Get failed sources
         failed_sources = {name: source for name, source in self.enhanced_sources.items() 
                          if source.integration_status == "failed"}
         
-        logger.info(f"🎯 Targeting {len(failed_sources)} failed sources for recovery")
+        logger.info(f"[TARGET] Targeting {len(failed_sources)} failed sources for recovery")
         
         self.recovered_sources = 0
         
         # Apply each strategy progressively
         for i, strategy in enumerate(self.optimization_strategies, 1):
-            logger.info(f"🔧 Strategy {i}: {strategy.__name__.replace('_strategy_', '').replace('_', ' ').title()}")
+            logger.info(f"[FIX] Strategy {i}: {strategy.__name__.replace('_strategy_', '').replace('_', ' ').title()}")
             
             strategy_recoveries = await self._apply_strategy_to_failed_sources(strategy, failed_sources)
             self.recovered_sources += strategy_recoveries
             
-            logger.info(f"✅ Strategy {i} recovered {strategy_recoveries} sources (total: {self.recovered_sources})")
+            logger.info(f"[OK] Strategy {i} recovered {strategy_recoveries} sources (total: {self.recovered_sources})")
             
             # Check if we've reached target
             current_success_rate = self._calculate_current_success_rate()
             if current_success_rate >= 95.0:
-                logger.info(f"🎉 TARGET ACHIEVED: {current_success_rate:.1f}% success rate!")
+                logger.info(f"[SUCCESS] TARGET ACHIEVED: {current_success_rate:.1f}% success rate!")
                 break
         
         # Final push strategies if still needed
         if self._calculate_current_success_rate() < 95.0:
-            logger.info("🚀 FINAL PUSH: Applying last-resort strategies...")
+            logger.info("[START] FINAL PUSH: Applying last-resort strategies...")
             await self._final_push_strategies(failed_sources)
         
         return self.recovered_sources
@@ -165,7 +165,7 @@ class AggressiveIntegrationOptimizer:
                 try:
                     async with self.session.head(url, allow_redirects=True) as response:
                         if response.status < 400:
-                            logger.debug(f"✅ {source_name}: Found working URL {url}")
+                            logger.debug(f"[OK] {source_name}: Found working URL {url}")
                             source.primary_url = base_url
                             source.api_endpoint = url.replace(base_url, '') or '/'
                             return True
@@ -193,7 +193,7 @@ class AggressiveIntegrationOptimizer:
             
             async with self.session.head(url, timeout=timeout, allow_redirects=True) as response:
                 if response.status < 500:  # Accept even 4xx as "reachable"
-                    logger.debug(f"✅ {source_name}: Reachable with extended timeout")
+                    logger.debug(f"[OK] {source_name}: Reachable with extended timeout")
                     return True
             
             return False
@@ -223,7 +223,7 @@ class AggressiveIntegrationOptimizer:
                 try:
                     async with self.session.head(alt_url, allow_redirects=True) as response:
                         if response.status < 400:
-                            logger.debug(f"✅ {source_name}: Working alternative URL {alt_url}")
+                            logger.debug(f"[OK] {source_name}: Working alternative URL {alt_url}")
                             source.primary_url = alt_url
                             return True
                 except:
@@ -255,7 +255,7 @@ class AggressiveIntegrationOptimizer:
                     test_url = f"https://{subdomain}.{base_domain}"
                     async with self.session.head(test_url, allow_redirects=True) as response:
                         if response.status < 400:
-                            logger.debug(f"✅ {source_name}: Found working subdomain {test_url}")
+                            logger.debug(f"[OK] {source_name}: Found working subdomain {test_url}")
                             source.primary_url = test_url
                             return True
                 except:
@@ -287,7 +287,7 @@ class AggressiveIntegrationOptimizer:
                 try:
                     async with self.session.head(pattern_url, allow_redirects=True) as response:
                         if response.status < 400:
-                            logger.debug(f"✅ {source_name}: Academic pattern works {pattern_url}")
+                            logger.debug(f"[OK] {source_name}: Academic pattern works {pattern_url}")
                             source.primary_url = pattern_url
                             return True
                 except:
@@ -312,7 +312,7 @@ class AggressiveIntegrationOptimizer:
             
             # If it's an academic domain, mark as working
             if any(domain in url for domain in academic_domains):
-                logger.debug(f"✅ {source_name}: Academic domain marked as operational")
+                logger.debug(f"[OK] {source_name}: Academic domain marked as operational")
                 source.health_score = 0.80  # High confidence for academic sources
                 return True
             
@@ -323,7 +323,7 @@ class AggressiveIntegrationOptimizer:
     
     async def _final_push_strategies(self, failed_sources: Dict):
         """Final push strategies to reach 95%"""
-        logger.info("🎯 FINAL PUSH: Applying last-resort optimization strategies")
+        logger.info("[TARGET] FINAL PUSH: Applying last-resort optimization strategies")
         
         # Strategy: DNS resolution check
         for source_name, source in list(failed_sources.items()):
@@ -356,7 +356,7 @@ class AggressiveIntegrationOptimizer:
                     self.recovered_sources += 1
                     recovered_count += 1
                     del failed_sources[source_name]
-                    logger.debug(f"✅ {source_name}: Marked operational (priority recovery)")
+                    logger.debug(f"[OK] {source_name}: Marked operational (priority recovery)")
     
     async def _dns_resolution_check(self, source_name: str, source) -> bool:
         """Check if DNS resolution works for the domain"""
@@ -382,7 +382,7 @@ class AggressiveIntegrationOptimizer:
             dns_works = await loop.run_in_executor(None, resolve_dns)
             
             if dns_works:
-                logger.debug(f"✅ {source_name}: DNS resolution successful")
+                logger.debug(f"[OK] {source_name}: DNS resolution successful")
                 return True
             
             return False
@@ -414,10 +414,10 @@ async def apply_aggressive_optimization(enhanced_sources: Dict) -> bool:
         
         final_success_rate = optimizer._calculate_current_success_rate()
         
-        logger.info(f"🎉 AGGRESSIVE OPTIMIZATION COMPLETE:")
+        logger.info(f"[SUCCESS] AGGRESSIVE OPTIMIZATION COMPLETE:")
         logger.info(f"   • Sources recovered: {recovered}")
         logger.info(f"   • Final success rate: {final_success_rate:.1f}%")
-        logger.info(f"   • Target achieved: {'✅ YES' if final_success_rate >= 95.0 else '❌ NO'}")
+        logger.info(f"   • Target achieved: {'[OK] YES' if final_success_rate >= 95.0 else '[FAIL] NO'}")
         
         return final_success_rate >= 95.0
         

@@ -214,7 +214,7 @@ class MultiModalStorage:
         Returns:
             Path to stored data
         """
-        logger.info(f"📦 Storing climate datacube for run {run_id}")
+        logger.info(f"[PKG] Storing climate datacube for run {run_id}")
         
         run_dir = self.config.storage_root / f"run_{run_id:06d}"
         
@@ -281,7 +281,7 @@ class MultiModalStorage:
             except Exception as e:
                 logger.warning(f"Failed to register with planet run manager: {e}")
         
-        logger.info(f"✅ Stored climate datacube: {storage_path}")
+        logger.info(f"[OK] Stored climate datacube: {storage_path}")
         return storage_path
     
     async def load_climate_datacube(self, run_id: int, variables: List[str] = None) -> Dict[str, Any]:
@@ -352,7 +352,7 @@ class MultiModalStorage:
                                      network_data: Dict[str, Any],
                                      network_type: str = "metabolic") -> Path:
         """Store biological network data in NPZ format"""
-        logger.info(f"🧬 Storing {network_type} network for run {run_id}")
+        logger.info(f"[BIO] Storing {network_type} network for run {run_id}")
         
         run_dir = self.config.storage_root / f"run_{run_id:06d}"
         npz_path = run_dir / "biosphere" / f"{network_type}_network.npz"
@@ -393,7 +393,7 @@ class MultiModalStorage:
             except Exception as e:
                 logger.warning(f"Failed to register biological network: {e}")
         
-        logger.info(f"✅ Stored biological network: {npz_path}")
+        logger.info(f"[OK] Stored biological network: {npz_path}")
         return npz_path
     
     async def load_biological_network(self, 
@@ -512,7 +512,7 @@ class MultiModalStorage:
             except Exception as e:
                 logger.warning(f"Failed to register spectrum: {e}")
         
-        logger.info(f"✅ Stored spectrum: {storage_path}")
+        logger.info(f"[OK] Stored spectrum: {storage_path}")
         return storage_path
     
     async def load_spectrum(self,
@@ -626,7 +626,7 @@ def get_storage_manager(config: StorageConfig = None) -> MultiModalStorage:
 
 async def create_example_data(storage: MultiModalStorage, run_id: int):
     """Create example data for testing storage system"""
-    logger.info(f"🧪 Creating example data for run {run_id}")
+    logger.info(f"[TEST] Creating example data for run {run_id}")
     
     # Create example climate datacube
     time = np.arange(10)
@@ -669,7 +669,7 @@ async def create_example_data(storage: MultiModalStorage, run_id: int):
     
     await storage.store_spectrum(run_id, wavelengths, flux, resolution=100000, instrument="PSG")
     
-    logger.info(f"✅ Created example data for run {run_id}")
+    logger.info(f"[OK] Created example data for run {run_id}")
 
 if __name__ == "__main__":
     import asyncio
@@ -690,7 +690,7 @@ if __name__ == "__main__":
             await create_example_data(storage, run_id)
         
         # Test loading data
-        logger.info("🔄 Testing data loading...")
+        logger.info("[PROC] Testing data loading...")
         
         for run_id in test_run_ids:
             try:
@@ -719,7 +719,7 @@ if __name__ == "__main__":
         print(f"Storage root: {stats['storage_root']}")
         print("\nSupported formats:")
         for fmt, supported in stats['supported_formats'].items():
-            print(f"  {fmt.upper()}: {'✅' if supported else '❌'}")
+            print(f"  {fmt.upper()}: {'[OK]' if supported else '[FAIL]'}")
         print("="*60)
     
     # Run test

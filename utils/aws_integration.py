@@ -60,13 +60,13 @@ class AWSManager:
             # Initialize s3fs for file-like operations
             self.s3fs = s3fs.S3FileSystem()
             
-            logger.info(f"✅ AWS session initialized in region {self.region}")
+            logger.info(f"[OK] AWS session initialized in region {self.region}")
             
         except NoCredentialsError:
-            logger.warning("⚠️ AWS credentials not found. Please configure AWS credentials.")
+            logger.warning("[WARN] AWS credentials not found. Please configure AWS credentials.")
             logger.warning("Run: aws configure (after installing AWS CLI v2)")
         except Exception as e:
-            logger.error(f"❌ Error initializing AWS session: {e}")
+            logger.error(f"[FAIL] Error initializing AWS session: {e}")
     
     def verify_credentials(self) -> Dict[str, Any]:
         """Verify AWS credentials and permissions"""
@@ -124,14 +124,14 @@ class AWSManager:
                     )
                 
                 created_buckets[purpose] = bucket_name
-                logger.info(f"✅ Created {purpose} bucket: {bucket_name}")
+                logger.info(f"[OK] Created {purpose} bucket: {bucket_name}")
                 
             except ClientError as e:
                 if e.response['Error']['Code'] == 'BucketAlreadyExists':
-                    logger.warning(f"⚠️ Bucket {bucket_name} already exists")
+                    logger.warning(f"[WARN] Bucket {bucket_name} already exists")
                     created_buckets[purpose] = bucket_name
                 else:
-                    logger.error(f"❌ Error creating {purpose} bucket: {e}")
+                    logger.error(f"[FAIL] Error creating {purpose} bucket: {e}")
         
         return created_buckets
     
@@ -146,7 +146,7 @@ class AWSManager:
             if local_path.is_file():
                 # Upload single file
                 self.s3_client.upload_file(str(local_path), bucket, s3_key)
-                logger.info(f"✅ Uploaded {local_path} to s3://{bucket}/{s3_key}")
+                logger.info(f"[OK] Uploaded {local_path} to s3://{bucket}/{s3_key}")
                 
             elif local_path.is_dir():
                 # Upload directory recursively
@@ -156,12 +156,12 @@ class AWSManager:
                         s3_file_key = f"{s3_key}/{relative_path}".replace('\\', '/')
                         
                         self.s3_client.upload_file(str(file_path), bucket, s3_file_key)
-                        logger.info(f"✅ Uploaded {file_path} to s3://{bucket}/{s3_file_key}")
+                        logger.info(f"[OK] Uploaded {file_path} to s3://{bucket}/{s3_file_key}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error uploading {local_path}: {e}")
+            logger.error(f"[FAIL] Error uploading {local_path}: {e}")
             return False
     
     def download_data(self, bucket: str, s3_key: str, local_path: str) -> bool:
@@ -171,11 +171,11 @@ class AWSManager:
             local_path.parent.mkdir(parents=True, exist_ok=True)
             
             self.s3_client.download_file(bucket, s3_key, str(local_path))
-            logger.info(f"✅ Downloaded s3://{bucket}/{s3_key} to {local_path}")
+            logger.info(f"[OK] Downloaded s3://{bucket}/{s3_key} to {local_path}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error downloading s3://{bucket}/{s3_key}: {e}")
+            logger.error(f"[FAIL] Error downloading s3://{bucket}/{s3_key}: {e}")
             return False
     
     def sync_directory(self, local_dir: str, bucket: str, s3_prefix: str = '') -> bool:
@@ -205,11 +205,11 @@ class AWSManager:
                     uploaded_files += 1
                     logger.info(f"📤 Synced {relative_path}")
             
-            logger.info(f"✅ Sync completed: {uploaded_files} files uploaded")
+            logger.info(f"[OK] Sync completed: {uploaded_files} files uploaded")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error syncing directory: {e}")
+            logger.error(f"[FAIL] Error syncing directory: {e}")
             return False
     
     def list_buckets(self) -> List[str]:
@@ -218,7 +218,7 @@ class AWSManager:
             response = self.s3_client.list_buckets()
             return [bucket['Name'] for bucket in response['Buckets']]
         except Exception as e:
-            logger.error(f"❌ Error listing buckets: {e}")
+            logger.error(f"[FAIL] Error listing buckets: {e}")
             return []
     
     def get_bucket_size(self, bucket: str) -> Dict[str, Any]:
@@ -244,7 +244,7 @@ class AWSManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error getting bucket size: {e}")
+            logger.error(f"[FAIL] Error getting bucket size: {e}")
             return {}
     
     def setup_lifecycle_policy(self, bucket: str) -> bool:
@@ -279,16 +279,16 @@ class AWSManager:
                 LifecycleConfiguration=lifecycle_config
             )
             
-            logger.info(f"✅ Lifecycle policy applied to {bucket}")
+            logger.info(f"[OK] Lifecycle policy applied to {bucket}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error setting lifecycle policy: {e}")
+            logger.error(f"[FAIL] Error setting lifecycle policy: {e}")
             return False
 
 def configure_aws_credentials():
     """Helper function to guide AWS credentials setup"""
-    print("🔧 AWS Credentials Setup Guide:")
+    print("[FIX] AWS Credentials Setup Guide:")
     print("1. Install AWS CLI v2 from: https://aws.amazon.com/cli/")
     print("2. Run: aws configure")
     print("3. Enter your AWS Access Key ID and Secret Access Key")
@@ -301,12 +301,12 @@ def configure_aws_credentials():
 
 def test_aws_connection():
     """Test AWS connection and setup"""
-    print("🧪 Testing AWS Connection...")
+    print("[TEST] Testing AWS Connection...")
     
     aws_manager = AWSManager()
     
     if aws_manager.session is None:
-        print("❌ AWS session not initialized")
+        print("[FAIL] AWS session not initialized")
         configure_aws_credentials()
         return False
     
@@ -314,7 +314,7 @@ def test_aws_connection():
     verification = aws_manager.verify_credentials()
     
     if verification['status'] == 'success':
-        print(f"✅ AWS Connection successful!")
+        print(f"[OK] AWS Connection successful!")
         print(f"Account ID: {verification['account_id']}")
         print(f"User ARN: {verification['user_arn']}")
         print(f"Region: {verification['region']}")
@@ -327,7 +327,7 @@ def test_aws_connection():
         
         return True
     else:
-        print(f"❌ AWS Connection failed: {verification['error']}")
+        print(f"[FAIL] AWS Connection failed: {verification['error']}")
         configure_aws_credentials()
         return False
 

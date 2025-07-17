@@ -275,7 +275,7 @@ class BiologyEncoder(nn.Module):
             nn.Linear(config.latent_dim * 2, config.latent_dim)
         )
         
-        logger.info(f"🧬 Biology encoder initialized: {config.bio_gnn_type.upper()} → {config.latent_dim}D")
+        logger.info(f"[BIO] Biology encoder initialized: {config.bio_gnn_type.upper()} → {config.latent_dim}D")
     
     def _init_fallback_encoder(self):
         """Initialize fallback encoder for when PyG is not available"""
@@ -669,7 +669,7 @@ class MultiModalEncoder(nn.Module):
         else:
             self.physics_layer = None
         
-        logger.info(f"🔄 Multi-modal encoder initialized with {config.fusion_strategy.value} fusion")
+        logger.info(f"[PROC] Multi-modal encoder initialized with {config.fusion_strategy.value} fusion")
     
     def forward(self, batch_data: Dict[str, Any]) -> Dict[str, torch.Tensor]:
         """
@@ -752,7 +752,7 @@ def create_multimodal_encoder(config: EncoderConfig = None) -> MultiModalEncoder
 if __name__ == "__main__":
     # Test the multi-modal encoder
     def test_multimodal_encoder():
-        logger.info("🧪 Testing Multi-Modal Encoder Architecture")
+        logger.info("[TEST] Testing Multi-Modal Encoder Architecture")
         
         # Create encoder config
         config = EncoderConfig(
@@ -796,7 +796,7 @@ if __name__ == "__main__":
         }
         
         # Forward pass
-        logger.info("🔄 Testing forward pass...")
+        logger.info("[PROC] Testing forward pass...")
         
         with torch.no_grad():
             results = encoder(batch_data)
@@ -805,20 +805,20 @@ if __name__ == "__main__":
         fused_features = results['fused_features']
         individual_features = results['individual_features']
         
-        logger.info(f"✅ Fused features shape: {fused_features.shape}")
-        logger.info(f"✅ Individual features available: {list(individual_features.keys())}")
+        logger.info(f"[OK] Fused features shape: {fused_features.shape}")
+        logger.info(f"[OK] Individual features available: {list(individual_features.keys())}")
         
         for domain, features in individual_features.items():
             logger.info(f"  {domain}: {features.shape}")
         
         if 'physics_constraints' in results:
             physics = results['physics_constraints']
-            logger.info(f"✅ Physics constraints: {list(physics.keys())}")
+            logger.info(f"[OK] Physics constraints: {list(physics.keys())}")
             for constraint, value in physics.items():
                 logger.info(f"  {constraint}: {value.shape}")
         
         # Test with missing modalities
-        logger.info("🔄 Testing with missing modalities...")
+        logger.info("[PROC] Testing with missing modalities...")
         
         partial_batch = {
             'climate_cubes': climate_cubes,
@@ -828,11 +828,11 @@ if __name__ == "__main__":
         with torch.no_grad():
             partial_results = encoder(partial_batch)
         
-        logger.info(f"✅ Partial results shape: {partial_results['fused_features'].shape}")
-        logger.info(f"✅ Available modalities: {list(partial_results['individual_features'].keys())}")
+        logger.info(f"[OK] Partial results shape: {partial_results['fused_features'].shape}")
+        logger.info(f"[OK] Available modalities: {list(partial_results['individual_features'].keys())}")
         
         # Test different fusion strategies
-        logger.info("🔄 Testing different fusion strategies...")
+        logger.info("[PROC] Testing different fusion strategies...")
         
         for fusion_strategy in [FusionStrategy.CONCATENATION, FusionStrategy.CROSS_ATTENTION]:
             test_config = EncoderConfig(
@@ -845,28 +845,28 @@ if __name__ == "__main__":
             with torch.no_grad():
                 test_results = encoder(batch_data)
             
-            logger.info(f"✅ {fusion_strategy.value}: {test_results['fused_features'].shape}")
+            logger.info(f"[OK] {fusion_strategy.value}: {test_results['fused_features'].shape}")
         
-        logger.info("✅ Multi-Modal Encoder test completed successfully!")
+        logger.info("[OK] Multi-Modal Encoder test completed successfully!")
         
         # Show model statistics
         total_params = sum(p.numel() for p in encoder.parameters())
         trainable_params = sum(p.numel() for p in encoder.parameters() if p.requires_grad)
         
         print("\n" + "="*60)
-        print("🧠 MULTI-MODAL ENCODER STATISTICS")
+        print("[AI] MULTI-MODAL ENCODER STATISTICS")
         print("="*60)
         print(f"Total parameters: {total_params:,}")
         print(f"Trainable parameters: {trainable_params:,}")
         print(f"Model size: {total_params * 4 / (1024**2):.1f} MB")
         print(f"\nDomain encoders:")
         print(f"  🌡️ Climate: 3D U-Net with attention")
-        print(f"  🧬 Biology: {config.bio_gnn_type.upper()} with {config.bio_num_layers} layers")
+        print(f"  [BIO] Biology: {config.bio_gnn_type.upper()} with {config.bio_num_layers} layers")
         print(f"  🌈 Spectroscopy: 1D CNN with {len(config.spec_num_filters)} layers")
         print(f"\nFusion:")
         print(f"  Strategy: {config.fusion_strategy.value}")
         print(f"  Latent dimension: {config.latent_dim}")
-        print(f"  Physics constraints: {'✅' if config.use_physics_constraints else '❌'}")
+        print(f"  Physics constraints: {'[OK]' if config.use_physics_constraints else '[FAIL]'}")
         print("="*60)
     
     # Run test

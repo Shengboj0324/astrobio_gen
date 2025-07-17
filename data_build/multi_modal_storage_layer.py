@@ -221,7 +221,7 @@ class MultiModalStorage:
         Returns:
             Path to stored Zarr dataset
         """
-        logger.info(f"📦 Storing climate datacube for run {run_id}")
+        logger.info(f"[PKG] Storing climate datacube for run {run_id}")
         
         # Get run directory
         run_info = self.planet_run_manager.get_planet_runs()[0]  # Simplified for example
@@ -271,7 +271,7 @@ class MultiModalStorage:
             variables=list(datacube.data_vars.keys())
         )
         
-        logger.info(f"✅ Stored climate datacube: {zarr_path}")
+        logger.info(f"[OK] Stored climate datacube: {zarr_path}")
         return zarr_path
     
     async def load_climate_datacube(self, 
@@ -384,7 +384,7 @@ class MultiModalStorage:
         Returns:
             Path to stored NPZ file
         """
-        logger.info(f"🧬 Storing {network_type} network for run {run_id}")
+        logger.info(f"[BIO] Storing {network_type} network for run {run_id}")
         
         run_dir = self.config.storage_root / f"run_{run_id:06d}"
         npz_path = run_dir / "biosphere" / f"{network_type}_network.npz"
@@ -428,7 +428,7 @@ class MultiModalStorage:
             variables=list(network_data.keys())
         )
         
-        logger.info(f"✅ Stored biological network: {npz_path}")
+        logger.info(f"[OK] Stored biological network: {npz_path}")
         return npz_path
     
     async def load_biological_network(self, 
@@ -562,7 +562,7 @@ class MultiModalStorage:
             variables=['wavelengths', 'flux']
         )
         
-        logger.info(f"✅ Stored spectrum: {hdf5_path}")
+        logger.info(f"[OK] Stored spectrum: {hdf5_path}")
         return hdf5_path
     
     async def load_spectrum(self,
@@ -688,7 +688,7 @@ class MultiModalStorage:
             variables=variables
         )
         
-        logger.info(f"✅ Stored observation: {fits_path}")
+        logger.info(f"[OK] Stored observation: {fits_path}")
         return fits_path
     
     # === UTILITY METHODS ===
@@ -805,7 +805,7 @@ class MultiModalStorage:
     
     async def optimize_storage(self):
         """Run storage optimization tasks"""
-        logger.info("🔧 Running storage optimization...")
+        logger.info("[FIX] Running storage optimization...")
         
         # Clear unused cache items
         self._evict_cache_items()
@@ -840,7 +840,7 @@ class MultiModalStorage:
             optimization_stats['integrity_checks'] = integrity_results['checked']
             optimization_stats['errors_fixed'] = integrity_results['fixed']
             
-            logger.info(f"✅ Storage optimization complete: {optimization_stats}")
+            logger.info(f"[OK] Storage optimization complete: {optimization_stats}")
             return optimization_stats
             
         except Exception as e:
@@ -908,7 +908,7 @@ class MultiModalStorage:
         except Exception as e:
             logger.error(f"Data compression failed: {e}")
         
-        logger.info(f"📦 Compressed {compressed_files} files, saved {space_saved_gb:.2f} GB")
+        logger.info(f"[PKG] Compressed {compressed_files} files, saved {space_saved_gb:.2f} GB")
         return {'files': compressed_files, 'space_saved_gb': space_saved_gb}
     
     async def _migrate_to_cold_storage(self) -> Dict[str, Any]:
@@ -978,7 +978,7 @@ class MultiModalStorage:
     
     async def _rebuild_indices(self) -> int:
         """Rebuild storage indices for optimal performance"""
-        logger.info("📊 Rebuilding storage indices...")
+        logger.info("[DATA] Rebuilding storage indices...")
         
         rebuilt_count = 0
         
@@ -1024,12 +1024,12 @@ class MultiModalStorage:
         except Exception as e:
             logger.error(f"Index rebuilding failed: {e}")
         
-        logger.info(f"🔧 Rebuilt {rebuilt_count} indices")
+        logger.info(f"[FIX] Rebuilt {rebuilt_count} indices")
         return rebuilt_count
     
     async def _validate_data_integrity(self) -> Dict[str, int]:
         """Validate data integrity and fix corrupted files"""
-        logger.info("🔍 Validating data integrity...")
+        logger.info("[SEARCH] Validating data integrity...")
         
         checked_files = 0
         fixed_files = 0
@@ -1053,9 +1053,9 @@ class MultiModalStorage:
                                 # Attempt to repair or mark for regeneration
                                 if await self._attempt_file_repair(file_path, data_file):
                                     fixed_files += 1
-                                    logger.info(f"🔧 Repaired corrupted file: {file_path.name}")
+                                    logger.info(f"[FIX] Repaired corrupted file: {file_path.name}")
                                 else:
-                                    logger.warning(f"⚠️ Could not repair: {file_path.name}")
+                                    logger.warning(f"[WARN] Could not repair: {file_path.name}")
                             
                         except Exception as e:
                             logger.warning(f"Integrity check failed for {file_path}: {e}")
@@ -1070,7 +1070,7 @@ class MultiModalStorage:
         except Exception as e:
             logger.error(f"Data integrity validation failed: {e}")
         
-        logger.info(f"✅ Checked {checked_files} files, fixed {fixed_files} issues")
+        logger.info(f"[OK] Checked {checked_files} files, fixed {fixed_files} issues")
         return {'checked': checked_files, 'fixed': fixed_files}
     
     async def _validate_file_integrity(self, file_path: Path, file_format: str) -> bool:
@@ -1166,7 +1166,7 @@ def get_storage_manager(config: StorageConfig = None) -> MultiModalStorage:
 
 async def create_example_data(storage: MultiModalStorage, run_id: int):
     """Create example data for testing storage system"""
-    logger.info(f"🧪 Creating example data for run {run_id}")
+    logger.info(f"[TEST] Creating example data for run {run_id}")
     
     # Create example climate datacube
     import xarray as xr
@@ -1207,7 +1207,7 @@ async def create_example_data(storage: MultiModalStorage, run_id: int):
     
     await storage.store_spectrum(run_id, wavelengths, flux, resolution=100000, instrument="PSG")
     
-    logger.info(f"✅ Created example data for run {run_id}")
+    logger.info(f"[OK] Created example data for run {run_id}")
 
 if __name__ == "__main__":
     import asyncio
@@ -1228,7 +1228,7 @@ if __name__ == "__main__":
             await create_example_data(storage, run_id)
         
         # Test loading data
-        logger.info("🔄 Testing data loading...")
+        logger.info("[PROC] Testing data loading...")
         
         for run_id in test_run_ids:
             # Load climate data

@@ -69,7 +69,7 @@ class AstrobioPlatformDataIntegration:
     
     async def initialize_full_system(self) -> Dict[str, Any]:
         """Initialize complete integrated system"""
-        logger.info("🚀 Initializing Full Astrobiology Platform Integration")
+        logger.info("[START] Initializing Full Astrobiology Platform Integration")
         logger.info("Target: 96.4% accuracy through comprehensive data integration")
         
         initialization_results = {
@@ -82,12 +82,12 @@ class AstrobioPlatformDataIntegration:
         
         try:
             # 1. Initialize comprehensive data expansion system
-            logger.info("📊 Initializing comprehensive data sources (500+)...")
+            logger.info("[DATA] Initializing comprehensive data sources (500+)...")
             data_status = await self._initialize_data_sources()
             initialization_results['data_sources_ready'] = data_status['success']
             
             # 2. Initialize PEFT LLM system
-            logger.info("🧠 Initializing PEFT LLM system...")
+            logger.info("[AI] Initializing PEFT LLM system...")
             llm_status = await self._initialize_llm_system()
             initialization_results['llm_system_ready'] = llm_status['success']
             
@@ -97,7 +97,7 @@ class AstrobioPlatformDataIntegration:
             initialization_results['knowledge_base_ready'] = kb_status['success']
             
             # 4. Setup integration pipeline
-            logger.info("🔄 Setting up data integration pipeline...")
+            logger.info("[PROC] Setting up data integration pipeline...")
             pipeline_status = await self._setup_integration_pipeline()
             initialization_results['integration_pipeline_ready'] = pipeline_status['success']
             
@@ -111,11 +111,11 @@ class AstrobioPlatformDataIntegration:
             
             initialization_results['overall_status'] = 'ready' if all_ready else 'partial'
             
-            logger.info(f"✅ System initialization complete: {initialization_results['overall_status']}")
+            logger.info(f"[OK] System initialization complete: {initialization_results['overall_status']}")
             return initialization_results
             
         except Exception as e:
-            logger.error(f"❌ System initialization failed: {e}")
+            logger.error(f"[FAIL] System initialization failed: {e}")
             initialization_results['overall_status'] = 'failed'
             initialization_results['error'] = str(e)
             return initialization_results
@@ -126,14 +126,14 @@ class AstrobioPlatformDataIntegration:
             # Get data source registry overview
             total_sources = sum(len(sources) for sources in self.data_expansion.data_sources.values())
             
-            logger.info(f"📋 Data source registry loaded: {total_sources} sources across 5 domains")
+            logger.info(f"[BOARD] Data source registry loaded: {total_sources} sources across 5 domains")
             
             # Validate high-priority sources
             priority_1_sources = []
             for domain, sources in self.data_expansion.data_sources.items():
                 priority_1_sources.extend([s for s in sources if s.priority == 1])
             
-            logger.info(f"⭐ Priority 1 sources identified: {len(priority_1_sources)}")
+            logger.info(f"[STAR] Priority 1 sources identified: {len(priority_1_sources)}")
             
             return {
                 'success': True,
@@ -143,14 +143,14 @@ class AstrobioPlatformDataIntegration:
             }
             
         except Exception as e:
-            logger.error(f"❌ Data source initialization failed: {e}")
+            logger.error(f"[FAIL] Data source initialization failed: {e}")
             return {'success': False, 'error': str(e)}
     
     async def _initialize_llm_system(self) -> Dict[str, Any]:
         """Initialize the PEFT LLM system"""
         try:
             # Create simplified version for demonstration
-            logger.info("🔧 Setting up PEFT LLM integration...")
+            logger.info("[FIX] Setting up PEFT LLM integration...")
             
             # In production, this would initialize the actual LLM
             self.llm_system = {
@@ -160,7 +160,7 @@ class AstrobioPlatformDataIntegration:
                 'astrobiology_specialization': True
             }
             
-            logger.info("✅ PEFT LLM system ready for astrobiology tasks")
+            logger.info("[OK] PEFT LLM system ready for astrobiology tasks")
             
             return {
                 'success': True,
@@ -170,7 +170,7 @@ class AstrobioPlatformDataIntegration:
             }
             
         except Exception as e:
-            logger.error(f"❌ LLM system initialization failed: {e}")
+            logger.error(f"[FAIL] LLM system initialization failed: {e}")
             return {'success': False, 'error': str(e)}
     
     async def _initialize_knowledge_base(self) -> Dict[str, Any]:
@@ -205,7 +205,7 @@ class AstrobioPlatformDataIntegration:
                 'total_vectors': knowledge_stats['total_entries']
             }
             
-            logger.info(f"✅ Knowledge base ready: {knowledge_stats['total_entries']:,} total entries")
+            logger.info(f"[OK] Knowledge base ready: {knowledge_stats['total_entries']:,} total entries")
             
             return {
                 'success': True,
@@ -214,13 +214,13 @@ class AstrobioPlatformDataIntegration:
             }
             
         except Exception as e:
-            logger.error(f"❌ Knowledge base initialization failed: {e}")
+            logger.error(f"[FAIL] Knowledge base initialization failed: {e}")
             return {'success': False, 'error': str(e)}
     
     async def _setup_integration_pipeline(self) -> Dict[str, Any]:
         """Setup the complete data integration pipeline"""
         try:
-            logger.info("🔄 Configuring integration pipeline...")
+            logger.info("[PROC] Configuring integration pipeline...")
             
             pipeline_config = {
                 'batch_processing': True,
@@ -242,7 +242,7 @@ class AstrobioPlatformDataIntegration:
                 'llm_integration'
             ]
             
-            logger.info(f"📋 Pipeline stages configured: {len(stages)} stages")
+            logger.info(f"[BOARD] Pipeline stages configured: {len(stages)} stages")
             
             return {
                 'success': True,
@@ -252,12 +252,12 @@ class AstrobioPlatformDataIntegration:
             }
             
         except Exception as e:
-            logger.error(f"❌ Pipeline setup failed: {e}")
+            logger.error(f"[FAIL] Pipeline setup failed: {e}")
             return {'success': False, 'error': str(e)}
     
     async def run_comprehensive_integration(self) -> Dict[str, Any]:
         """Run complete data integration process"""
-        logger.info("🚀 Starting Comprehensive Data Integration Process")
+        logger.info("[START] Starting Comprehensive Data Integration Process")
         logger.info("Goal: Integrate 500+ sources to achieve 96.4% accuracy")
         
         integration_results = {
@@ -272,17 +272,17 @@ class AstrobioPlatformDataIntegration:
         
         try:
             # Phase 1: Integrate Priority 1 sources (highest quality)
-            logger.info("\n📊 PHASE 1: Priority 1 Sources (Critical)")
+            logger.info("\n[DATA] PHASE 1: Priority 1 Sources (Critical)")
             phase_1_results = await self._integrate_priority_sources(priority=1)
             integration_results['phase_1_priority_sources'] = phase_1_results
             
             # Phase 2: Integrate Priority 2 sources (important)
-            logger.info("\n📊 PHASE 2: Priority 2 Sources (Important)")
+            logger.info("\n[DATA] PHASE 2: Priority 2 Sources (Important)")
             phase_2_results = await self._integrate_priority_sources(priority=2)
             integration_results['phase_2_standard_sources'] = phase_2_results
             
             # Phase 3: Integrate Priority 3 sources (supplementary)
-            logger.info("\n📊 PHASE 3: Priority 3 Sources (Supplementary)")
+            logger.info("\n[DATA] PHASE 3: Priority 3 Sources (Supplementary)")
             phase_3_results = await self._integrate_priority_sources(priority=3)
             integration_results['phase_3_supplementary_sources'] = phase_3_results
             
@@ -308,16 +308,16 @@ class AstrobioPlatformDataIntegration:
                 'last_update': datetime.now()
             }
             
-            logger.info(f"\n🎯 INTEGRATION COMPLETE!")
-            logger.info(f"✅ Total Sources: {overall_metrics['total_sources']}")
-            logger.info(f"📊 Quality Score: {overall_metrics['quality_score']:.3f}")
-            logger.info(f"🎯 Target (96.4%): {'ACHIEVED' if target_achieved else 'IN PROGRESS'}")
+            logger.info(f"\n[TARGET] INTEGRATION COMPLETE!")
+            logger.info(f"[OK] Total Sources: {overall_metrics['total_sources']}")
+            logger.info(f"[DATA] Quality Score: {overall_metrics['quality_score']:.3f}")
+            logger.info(f"[TARGET] Target (96.4%): {'ACHIEVED' if target_achieved else 'IN PROGRESS'}")
             logger.info(f"⏱️ Processing Time: {processing_time:.2f} seconds")
             
             return integration_results
             
         except Exception as e:
-            logger.error(f"❌ Integration process failed: {e}")
+            logger.error(f"[FAIL] Integration process failed: {e}")
             integration_results['error'] = str(e)
             return integration_results
     
@@ -330,7 +330,7 @@ class AstrobioPlatformDataIntegration:
             domain_priority_sources = [s for s in sources if s.priority == priority]
             priority_sources.extend([(domain, s) for s in domain_priority_sources])
         
-        logger.info(f"🔄 Processing {len(priority_sources)} Priority {priority} sources...")
+        logger.info(f"[PROC] Processing {len(priority_sources)} Priority {priority} sources...")
         
         results = {
             'total_sources': len(priority_sources),
@@ -378,7 +378,7 @@ class AstrobioPlatformDataIntegration:
         success_rate_actual = (results['successful'] / results['total_sources']) * 100
         avg_quality = np.mean(results['quality_scores']) if results['quality_scores'] else 0.0
         
-        logger.info(f"✅ Priority {priority}: {results['successful']}/{results['total_sources']} "
+        logger.info(f"[OK] Priority {priority}: {results['successful']}/{results['total_sources']} "
                    f"({success_rate_actual:.1f}% success, {avg_quality:.3f} avg quality)")
         
         # Show domain breakdown
@@ -505,7 +505,7 @@ class AstrobioPlatformDataIntegration:
             return " ".join(rationale_parts)
             
         except Exception as e:
-            logger.error(f"❌ LLM rationale generation failed: {e}")
+            logger.error(f"[FAIL] LLM rationale generation failed: {e}")
             return f"Analysis based on available data sources (quality: {self.integration_status['overall_quality']:.3f})"
     
     async def get_integration_status_report(self) -> Dict[str, Any]:
@@ -535,7 +535,7 @@ class AstrobioPlatformDataIntegration:
 
 async def demonstrate_full_integration():
     """Demonstrate the complete platform integration"""
-    logger.info("🎯 COMPREHENSIVE ASTROBIOLOGY PLATFORM INTEGRATION DEMO")
+    logger.info("[TARGET] COMPREHENSIVE ASTROBIOLOGY PLATFORM INTEGRATION DEMO")
     logger.info("Showcasing 500+ data sources → Enhanced Models → PEFT LLM system")
     logger.info("=" * 80)
     
@@ -543,22 +543,22 @@ async def demonstrate_full_integration():
     integration_system = AstrobioPlatformDataIntegration()
     
     # Initialize full system
-    logger.info("\n🔧 System Initialization...")
+    logger.info("\n[FIX] System Initialization...")
     init_results = await integration_system.initialize_full_system()
     
     if init_results['overall_status'] != 'ready':
-        logger.warning(f"⚠️ System partially ready: {init_results}")
+        logger.warning(f"[WARN] System partially ready: {init_results}")
     
     # Run comprehensive integration
-    logger.info("\n🚀 Running Comprehensive Integration...")
+    logger.info("\n[START] Running Comprehensive Integration...")
     integration_results = await integration_system.run_comprehensive_integration()
     
     # Generate status report
-    logger.info("\n📊 Generating Final Status Report...")
+    logger.info("\n[DATA] Generating Final Status Report...")
     status_report = await integration_system.get_integration_status_report()
     
     # Demonstrate LLM integration
-    logger.info("\n🧠 Demonstrating Enhanced LLM Rationale Generation...")
+    logger.info("\n[AI] Demonstrating Enhanced LLM Rationale Generation...")
     
     sample_surrogate_output = {
         'habitability_score': 0.847,
@@ -572,22 +572,22 @@ async def demonstrate_full_integration():
     enhanced_rationale = await integration_system.generate_llm_rationale(sample_surrogate_output)
     
     # Final summary
-    logger.info("\n🎉 INTEGRATION DEMONSTRATION COMPLETE!")
+    logger.info("\n[SUCCESS] INTEGRATION DEMONSTRATION COMPLETE!")
     logger.info("=" * 60)
     
     overall_metrics = integration_results.get('overall_metrics', {})
-    logger.info(f"✅ Total Sources Integrated: {overall_metrics.get('total_sources', 0)}")
-    logger.info(f"📊 Overall Quality Score: {overall_metrics.get('quality_score', 0):.3f}")
-    logger.info(f"🎯 Target Achievement: {'YES' if integration_results.get('quality_achievement') else 'IN PROGRESS'}")
-    logger.info(f"⚡ Processing Efficiency: {overall_metrics.get('processing_efficiency', 0):.1f} sources/sec")
+    logger.info(f"[OK] Total Sources Integrated: {overall_metrics.get('total_sources', 0)}")
+    logger.info(f"[DATA] Overall Quality Score: {overall_metrics.get('quality_score', 0):.3f}")
+    logger.info(f"[TARGET] Target Achievement: {'YES' if integration_results.get('quality_achievement') else 'IN PROGRESS'}")
+    logger.info(f"[FAST] Processing Efficiency: {overall_metrics.get('processing_efficiency', 0):.1f} sources/sec")
     
-    logger.info(f"\n📝 Enhanced LLM Rationale Example:")
+    logger.info(f"\n[NOTE] Enhanced LLM Rationale Example:")
     logger.info(f"   {enhanced_rationale}")
     
-    logger.info(f"\n🔧 System Status:")
+    logger.info(f"\n[FIX] System Status:")
     health = status_report.get('system_health', {})
     for component, operational in health.items():
-        status = "✅ OPERATIONAL" if operational else "⚠️ PARTIAL"
+        status = "[OK] OPERATIONAL" if operational else "[WARN] PARTIAL"
         logger.info(f"   {component}: {status}")
     
     return {

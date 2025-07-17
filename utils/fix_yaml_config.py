@@ -17,7 +17,7 @@ def fix_yaml_config():
     config_path = Path("config/data_sources/expanded_sources_integrated.yaml")
     
     if not config_path.exists():
-        print(f"❌ Configuration file not found: {config_path}")
+        print(f"[FAIL] Configuration file not found: {config_path}")
         return False
     
     try:
@@ -146,11 +146,11 @@ def fix_yaml_config():
         with open(config_path, 'w') as f:
             yaml.dump(clean_config, f, default_flow_style=False, indent=2)
         
-        print(f"✅ Fixed YAML configuration: {config_path}")
+        print(f"[OK] Fixed YAML configuration: {config_path}")
         return True
         
     except Exception as e:
-        print(f"❌ Failed to fix configuration: {e}")
+        print(f"[FAIL] Failed to fix configuration: {e}")
         return False
 
 if __name__ == "__main__":

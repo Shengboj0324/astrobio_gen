@@ -208,7 +208,7 @@ class AGORA2Downloader:
                 
             self.url_system = get_integrated_url_system()
             
-            logger.info("✅ AGORA2 downloader integrated with enterprise URL system")
+            logger.info("[OK] AGORA2 downloader integrated with enterprise URL system")
             
         except Exception as e:
             logger.warning(f"Failed to initialize enterprise URL system for AGORA2: {e}")
@@ -437,7 +437,7 @@ class NCBIGenomeDownloader:
                 
             self.url_system = get_integrated_url_system()
             # URL acquisition will be done when needed in async methods
-            logger.info("✅ NCBI integrated with enterprise URL system")
+            logger.info("[OK] NCBI integrated with enterprise URL system")
             
         except Exception as e:
             logger.warning(f"Failed to initialize enterprise URL system for NCBI: {e}")

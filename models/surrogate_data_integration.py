@@ -126,7 +126,7 @@ class SurrogateDataManager:
         """Initialize enterprise URL and data acquisition systems"""
         try:
             if URL_SYSTEM_AVAILABLE:
-                logger.info("🌐 Initializing enterprise data acquisition for surrogate models...")
+                logger.info("[NET] Initializing enterprise data acquisition for surrogate models...")
                 
                 # Initialize URL management
                 self.url_system = get_integrated_url_system()
@@ -137,12 +137,12 @@ class SurrogateDataManager:
                 self.gtdb_integration = GTDBIntegration()
                 self.psg_interface = PSGInterface()
                 
-                logger.info("✅ Enterprise data acquisition initialized for surrogate models")
+                logger.info("[OK] Enterprise data acquisition initialized for surrogate models")
             else:
-                logger.warning("⚠️ Enterprise URL system not available, using fallback data sources")
+                logger.warning("[WARN] Enterprise URL system not available, using fallback data sources")
                 
         except Exception as e:
-            logger.error(f"❌ Failed to initialize enterprise data systems: {e}")
+            logger.error(f"[FAIL] Failed to initialize enterprise data systems: {e}")
     
     async def acquire_training_data(self, 
                                   n_samples: int = 1000,
@@ -150,7 +150,7 @@ class SurrogateDataManager:
         """Acquire training data from enterprise-managed sources"""
         
         data_types = data_types or ["planetary", "spectral", "genomics", "climate"]
-        logger.info(f"📊 Acquiring {n_samples} training samples for surrogate models...")
+        logger.info(f"[DATA] Acquiring {n_samples} training samples for surrogate models...")
         
         training_data = {
             "planetary_params": [],
@@ -165,35 +165,35 @@ class SurrogateDataManager:
             if "planetary" in data_types:
                 planetary_data = await self._acquire_planetary_data(n_samples)
                 training_data["planetary_params"] = planetary_data
-                logger.info(f"✅ Acquired {len(planetary_data)} planetary parameter sets")
+                logger.info(f"[OK] Acquired {len(planetary_data)} planetary parameter sets")
             
             # Acquire spectral data via PSG
             if "spectral" in data_types and self.psg_interface:
                 spectral_data = await self._acquire_spectral_data(n_samples)
                 training_data["spectral_data"] = spectral_data
-                logger.info(f"✅ Acquired {len(spectral_data)} spectral datasets")
+                logger.info(f"[OK] Acquired {len(spectral_data)} spectral datasets")
             
             # Acquire genomic features
             if "genomics" in data_types:
                 genomic_data = await self._acquire_genomic_features(n_samples)
                 training_data["genomic_features"] = genomic_data
-                logger.info(f"✅ Acquired {len(genomic_data)} genomic feature sets")
+                logger.info(f"[OK] Acquired {len(genomic_data)} genomic feature sets")
             
             # Acquire climate profiles
             if "climate" in data_types:
                 climate_data = await self._acquire_climate_profiles(n_samples)
                 training_data["climate_profiles"] = climate_data
-                logger.info(f"✅ Acquired {len(climate_data)} climate profiles")
+                logger.info(f"[OK] Acquired {len(climate_data)} climate profiles")
             
             # Compute overall quality metrics
             quality_scores = self._compute_data_quality(training_data)
             training_data["quality_scores"] = quality_scores
             
-            logger.info(f"🎯 Training data acquisition complete. Average quality: {np.mean(quality_scores):.3f}")
+            logger.info(f"[TARGET] Training data acquisition complete. Average quality: {np.mean(quality_scores):.3f}")
             return training_data
             
         except Exception as e:
-            logger.error(f"❌ Training data acquisition failed: {e}")
+            logger.error(f"[FAIL] Training data acquisition failed: {e}")
             return {}
     
     async def _acquire_planetary_data(self, n_samples: int) -> List[PlanetaryData]:
@@ -365,7 +365,7 @@ class SurrogateDataManager:
                                 target_mode: str = "scalar") -> Dict[str, torch.Tensor]:
         """Preprocess enterprise-acquired data for surrogate model training"""
         
-        logger.info(f"🔄 Preprocessing data for surrogate model (mode: {target_mode})")
+        logger.info(f"[PROC] Preprocessing data for surrogate model (mode: {target_mode})")
         
         processed_data = {}
         
@@ -435,11 +435,11 @@ class SurrogateDataManager:
                 if spectral_targets:
                     processed_data["spectral_targets"] = torch.stack(spectral_targets)
             
-            logger.info(f"✅ Data preprocessing complete for {target_mode} mode")
-            logger.info(f"📊 Processed shapes: {[(k, v.shape) for k, v in processed_data.items() if isinstance(v, torch.Tensor)]}")
+            logger.info(f"[OK] Data preprocessing complete for {target_mode} mode")
+            logger.info(f"[DATA] Processed shapes: {[(k, v.shape) for k, v in processed_data.items() if isinstance(v, torch.Tensor)]}")
             
         except Exception as e:
-            logger.error(f"❌ Data preprocessing failed: {e}")
+            logger.error(f"[FAIL] Data preprocessing failed: {e}")
         
         return processed_data
     

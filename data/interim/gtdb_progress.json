@@ -1,0 +1,16 @@
+{
+  "downloads": {
+    "bacteria": {
+      "bac120_metadata": "data\\raw\\gtdb\\cache\\bac120_metadata.tsv.gz",
+      "bac120_taxonomy": "data\\raw\\gtdb\\cache\\bac120_taxonomy.tsv",
+      "bac120_tree_gz": "data\\raw\\gtdb\\cache\\bac120.tree.gz"
+    },
+    "archaea": {
+      "ar53_metadata": "data\\raw\\gtdb\\cache\\ar53_metadata.tsv.gz",
+      "ar53_taxonomy": "data\\raw\\gtdb\\cache\\ar53_taxonomy.tsv",
+      "ar53_tree_gz": "data\\raw\\gtdb\\cache\\ar53.tree.gz"
+    }
+  },
+  "processing": {},
+  "last_updated": "2025-07-17T05:28:53.003928+00:00"
+}

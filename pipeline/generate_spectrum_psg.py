@@ -55,7 +55,7 @@ class PSGInterface:
             self.data_priority = DataPriority.HIGH  # PSG is critical for spectrum generation
             
             # Note: URL registration is deferred until first use to avoid async issues during init
-            _LOG.info("✅ PSG interface integrated with enterprise URL system")
+            _LOG.info("[OK] PSG interface integrated with enterprise URL system")
             
         except Exception as e:
             _LOG.warning(f"Failed to initialize enterprise URL system for PSG: {e}")
