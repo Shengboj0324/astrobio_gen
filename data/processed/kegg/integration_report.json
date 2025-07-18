@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-07-18T02:15:17.719268+00:00",
+  "download_results": {
+    "downloaded_pathways": 0,
+    "failed_pathways": 0,
+    "total_pathways": 0
+  },
+  "export_results": {
+    "output_files": {
+      "pathways": "data\\processed\\kegg\\kegg_pathways.csv",
+      "reactions": "data\\processed\\kegg\\kegg_reactions.csv",
+      "compounds": "data\\processed\\kegg\\kegg_compounds.csv",
+      "network": "data\\processed\\kegg\\kegg_network.csv",
+      "organisms": "data\\processed\\kegg\\kegg_organisms.csv",
+      "drugs": "data\\processed\\kegg\\kegg_drugs.csv",
+      "statistics": "data\\processed\\kegg\\kegg_statistics.json"
+    },
+    "statistics": {
+      "total_pathways": 0,
+      "total_reactions": 0,
+      "total_compounds": 0,
+      "total_organisms": 11008,
+      "total_drugs": 0,
+      "total_pathway_reactions": 0,
+      "total_pathway_compounds": 0,
+      "total_reaction_compounds": 0,
+      "avg_reactions_per_pathway": 0,
+      "avg_compounds_per_pathway": 0,
+      "avg_enzymes_per_pathway": 0,
+      "top_pathways": [],
+      "pathway_classes": [],
+      "timestamp": "2025-07-18T02:15:17.718276+00:00"
+    }
+  },
+  "status": "completed"
+}

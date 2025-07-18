@@ -3,8 +3,9 @@
     "sprot_bacteria": "data\\raw\\uniprot\\cache\\uniprot_sprot_bacteria.dat.gz",
     "sprot_archaea": "data\\raw\\uniprot\\cache\\uniprot_sprot_archaea.dat.gz",
     "trembl_archaea": "data\\raw\\uniprot\\cache\\uniprot_trembl_archaea.dat.gz",
-    "sprot_fungi": "data\\raw\\uniprot\\cache\\uniprot_sprot_fungi.dat.gz"
+    "sprot_fungi": "data\\raw\\uniprot\\cache\\uniprot_sprot_fungi.dat.gz",
+    "trembl_fungi": "data\\raw\\uniprot\\cache\\uniprot_trembl_fungi.dat.gz"
   },
   "processing": {},
-  "last_updated": "2025-07-17T05:26:54.451483+00:00"
+  "last_updated": "2025-07-18T02:12:05.835231+00:00"
 }

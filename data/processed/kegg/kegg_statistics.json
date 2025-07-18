@@ -1,0 +1,16 @@
+{
+  "total_pathways": 0,
+  "total_reactions": 0,
+  "total_compounds": 0,
+  "total_organisms": 11008,
+  "total_drugs": 0,
+  "total_pathway_reactions": 0,
+  "total_pathway_compounds": 0,
+  "total_reaction_compounds": 0,
+  "avg_reactions_per_pathway": 0,
+  "avg_compounds_per_pathway": 0,
+  "avg_enzymes_per_pathway": 0,
+  "top_pathways": [],
+  "pathway_classes": [],
+  "timestamp": "2025-07-18T02:15:17.718276+00:00"
+}
