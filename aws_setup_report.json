@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-07-17T23:33:18.244544",
+  "aws_account": "785269091904",
+  "region": "us-east-1",
+  "buckets_created": {
+    "primary": "astrobio-data-primary-20250717",
+    "backup": "astrobio-data-backup-20250717",
+    "zarr": "astrobio-zarr-cubes-20250717",
+    "logs": "astrobio-logs-metadata-20250717"
+  },
+  "estimated_costs": {
+    "storage_per_tb_per_month": 23,
+    "requests_per_1000": 0.4,
+    "data_transfer_per_gb": 0.09
+  },
+  "next_steps": [
+    "Run comprehensive data acquisition",
+    "Set up billing alerts in AWS Console",
+    "Configure EC2 instances for training",
+    "Set up monitoring dashboard"
+  ]
+}

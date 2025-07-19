@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-07-17T23:42:44.033500",
+  "tests": {
+    "ssl_configuration": {
+      "status": "PASSED",
+      "details": {
+        "certifi_available": true,
+        "cert_bundle_path": "C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\astrobio_venv\\Lib\\site-packages\\certifi\\cacert.pem",
+        "ssl_context_working": true,
+        "external_api_accessible": true
+      }
+    },
+    "url_system_api": {
+      "status": "PASSED",
+      "details": {
+        "session_created": true,
+        "health_check_ran": true,
+        "url_management_working": true
+      }
+    },
+    "process_metadata": {
+      "status": "SKIPPED",
+      "details": "Database not found - run process metadata collection first"
+    },
+    "pytorch_compatibility": {
+      "status": "PASSED",
+      "details": {
+        "torch_version": "2.4.0+cpu",
+        "torchvision_version": "0.19.0+cpu",
+        "nms_operator_working": true
+      }
+    },
+    "data_acquisition": {
+      "status": "PASSED",
+      "details": {
+        "kegg_integration_imports": true,
+        "gtdb_integration_imports": true,
+        "requests_available": true
+      }
+    }
+  },
+  "overall_status": "PASSED",
+  "success_rate": 80.0,
+  "summary": "\nIntegration Fixes Validation Results\n===================================\nOverall Status: PASSED\nSuccess Rate: 80.0% (4/5 tests passed)\n\nTest Results:\n  \u2705 ssl_configuration: PASSED\n  \u2705 url_system_api: PASSED\n  \u26a0\ufe0f process_metadata: SKIPPED\n  \u2705 pytorch_compatibility: PASSED\n  \u2705 data_acquisition: PASSED\n\nTimestamp: 2025-07-17T23:42:44.033500"
+}
