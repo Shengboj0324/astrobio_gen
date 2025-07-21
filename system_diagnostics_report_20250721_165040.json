@@ -1,0 +1,97 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-07-21T16:50:40.372956",
+    "total_diagnostics_runs": 1,
+    "system_diagnostics_version": "1.0.0"
+  },
+  "latest_diagnostics": {
+    "timestamp": "2025-07-21 16:50:40.363640",
+    "diagnostics_time_ms": 190.38240000372753,
+    "system_health": {
+      "status": "no_data",
+      "message": "No monitoring data available"
+    },
+    "integration_health": {
+      "dependency_health": {
+        "total_dependencies": 0,
+        "healthy_dependencies": 0,
+        "broken_dependencies": [],
+        "status": "unknown"
+      }
+    },
+    "memory_analysis": {
+      "total_memory_gb": 31.360702514648438,
+      "available_memory_gb": 11.911247253417969,
+      "used_memory_gb": 19.44945526123047,
+      "memory_percent": 62.0,
+      "swap_usage": 3.3,
+      "pytorch_gpu_memory": {
+        "allocated_gb": 0.0,
+        "reserved_gb": 0.0,
+        "max_allocated_gb": 0.0
+      },
+      "optimization_suggestions": []
+    },
+    "performance_recommendations": [
+      "Enable mixed precision training for 2x memory reduction",
+      "Use torch.compile() for improved inference performance",
+      "Consider gradient accumulation for large batch training"
+    ],
+    "system_info": {
+      "python_version": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+      "pytorch_version": "2.5.1+cu121",
+      "cuda_available": true,
+      "cuda_version": "12.1",
+      "gpu_count": 1,
+      "cpu_count": 24,
+      "platform": "win32",
+      "process_count": 362
+    }
+  },
+  "diagnostics_history": [
+    {
+      "timestamp": "2025-07-21 16:50:40.363640",
+      "diagnostics_time_ms": 190.38240000372753,
+      "system_health": {
+        "status": "no_data",
+        "message": "No monitoring data available"
+      },
+      "integration_health": {
+        "dependency_health": {
+          "total_dependencies": 0,
+          "healthy_dependencies": 0,
+          "broken_dependencies": [],
+          "status": "unknown"
+        }
+      },
+      "memory_analysis": {
+        "total_memory_gb": 31.360702514648438,
+        "available_memory_gb": 11.911247253417969,
+        "used_memory_gb": 19.44945526123047,
+        "memory_percent": 62.0,
+        "swap_usage": 3.3,
+        "pytorch_gpu_memory": {
+          "allocated_gb": 0.0,
+          "reserved_gb": 0.0,
+          "max_allocated_gb": 0.0
+        },
+        "optimization_suggestions": []
+      },
+      "performance_recommendations": [
+        "Enable mixed precision training for 2x memory reduction",
+        "Use torch.compile() for improved inference performance",
+        "Consider gradient accumulation for large batch training"
+      ],
+      "system_info": {
+        "python_version": "3.11.6 (tags/v3.11.6:8b6ee5b, Oct  2 2023, 14:57:12) [MSC v.1935 64 bit (AMD64)]",
+        "pytorch_version": "2.5.1+cu121",
+        "cuda_available": true,
+        "cuda_version": "12.1",
+        "gpu_count": 1,
+        "cpu_count": 24,
+        "platform": "win32",
+        "process_count": 362
+      }
+    }
+  ]
+}

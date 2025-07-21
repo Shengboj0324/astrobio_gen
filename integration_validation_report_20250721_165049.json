@@ -1,0 +1,24 @@
+{
+  "validation_timestamp": "2025-07-21T16:50:49.846126",
+  "summary": {
+    "total_components": 3,
+    "healthy_components": 2,
+    "warning_components": 0,
+    "failed_components": 1,
+    "total_tests": 4,
+    "passed_tests": 3,
+    "failed_tests": 1,
+    "warning_tests": 0,
+    "overall_health_score": 75.0
+  },
+  "critical_failures": [
+    "demo_enhanced_cnn"
+  ],
+  "recommendations": [
+    "Address 1 failed tests immediately"
+  ],
+  "performance_summary": {
+    "total_validation_time_ms": 0.08030000026337802,
+    "average_test_time_ms": 0.0011250012903474271,
+    "slowest_tests": [
+      
