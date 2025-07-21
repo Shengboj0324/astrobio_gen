@@ -1,0 +1,479 @@
+# Master Training Configuration - All Models, All Data, All Features
+# Unified Comprehensive Training for Astrobiology Platform
+training_mode: "unified_comprehensive"
+experiment_name: "astrobio_master_training"
+
+# Global Training Settings
+global:
+  max_epochs: 200
+  batch_size: 8  # Auto-adjusted based on available memory
+  learning_rate: 1e-4
+  weight_decay: 1e-5
+  use_mixed_precision: true
+  use_distributed: true
+  use_physics_constraints: true
+  physics_weight: 0.2
+  use_wandb: true
+  use_tensorboard: true
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 1
+  val_check_interval: 1.0
+  log_every_n_steps: 50
+
+# Model Configuration - All Models Trained Together
+models:
+  # Enhanced 5D Datacube U-Net (Advanced CNN with Attention)
+  enhanced_5d_datacube:
+    enabled: true
+    n_input_vars: 5
+    n_output_vars: 5
+    input_variables: ["temperature", "pressure", "humidity", "velocity_u", "velocity_v"]
+    output_variables: ["temperature", "pressure", "humidity", "velocity_u", "velocity_v"]
+    base_features: 64
+    depth: 5
+    use_attention: true
+    use_transformer: true
+    use_separable_conv: true
+    use_gradient_checkpointing: true
+    use_mixed_precision: true
+    model_scaling: "efficient"
+    use_physics_constraints: true
+    physics_weight: 0.2
+    learning_rate: 2e-4
+    weight_decay: 1e-4
+
+  # Enhanced Surrogate Transformer (Multi-Modal Transformer)
+  enhanced_surrogate:
+    enabled: true
+    multimodal_config:
+      use_datacube: true
+      use_scalar_params: true
+      use_spectral_data: true
+      use_temporal_sequences: true
+      fusion_strategy: "cross_attention"
+      num_attention_heads: 8
+      hidden_dim: 256
+    use_uncertainty: true
+    use_dynamic_selection: true
+    use_mixed_precision: true
+    learning_rate: 1e-4
+    # Transformer-specific settings
+    transformer_config:
+      dim: 256
+      depth: 8
+      heads: 8
+      dropout: 0.1
+      use_rotary_embeddings: true
+      use_flash_attention: true
+
+  # Surrogate Transformer (Original Implementation)
+  surrogate_transformer:
+    enabled: true
+    dim: 256
+    depth: 8
+    heads: 8
+    n_inputs: 8
+    mode: "scalar"
+    dropout: 0.1
+    use_physics_informed: true
+    uncertainty_quantification: true
+
+  # Evolutionary Process Tracker (Advanced CNN + RNN)
+  evolutionary_process_tracker:
+    enabled: true
+    use_5d_processing: true
+    metabolic_evolution: true
+    atmospheric_evolution: true
+    geological_constraints: true
+    temporal_modeling: true
+    cnn_backbone: "enhanced_unet"
+    rnn_type: "lstm"
+    attention_mechanism: true
+
+  # Uncertainty Emergence System (Bayesian Neural Networks)
+  uncertainty_emergence_system:
+    enabled: true
+    uncertainty_types: ["statistical", "model", "epistemic", "aleatory", "emergence", "fundamental", "temporal", "complexity"]
+    emergence_detection: true
+    path_dependence: true
+    bayesian_layers: true
+    mc_dropout: true
+    ensemble_size: 5
+
+  # Neural Architecture Search (Meta-Learning + Evolution)
+  neural_architecture_search:
+    enabled: true
+    search_space_size: 1000
+    search_epochs: 50
+    multi_objective: true
+    search_strategy: "evolutionary"
+    performance_predictor: true
+
+  # Meta-Learning System (MAML + Prototypical Networks)
+  meta_learning_system:
+    enabled: true
+    episodes_per_epoch: 100
+    support_shots: 5
+    query_shots: 15
+    adaptation_steps: 5
+    meta_lr: 1e-3
+    inner_lr: 1e-2
+    use_maml: true
+    use_prototypical: true
+
+  # PEFT LLM Integration (LoRA + QLoRA)
+  peft_llm_integration:
+    enabled: true
+    model_name: "microsoft/DialoGPT-medium"
+    use_lora: true
+    lora_rank: 16
+    lora_alpha: 32
+    use_qlora: true
+    use_knowledge_retrieval: true
+    use_voice_over: true
+    max_length: 512
+    temperature: 0.7
+    # LLM-specific training
+    llm_training:
+      learning_rate: 5e-5
+      warmup_steps: 100
+      weight_decay: 0.01
+      gradient_checkpointing: true
+
+  # Advanced Graph Neural Network (GAT + GCN + Graph Transformer)
+  advanced_graph_neural_network:
+    enabled: true
+    use_gat: true
+    use_gcn: true
+    use_spectral_conv: true
+    use_hierarchical_pooling: true
+    use_graph_transformer: true
+    hidden_dim: 256
+    num_layers: 4
+    num_heads: 8
+    dropout: 0.1
+
+  # Domain Specific Encoders (Multi-Modal Encoders)
+  domain_specific_encoders:
+    enabled: true
+    climate_encoder: true
+    biology_encoder: true
+    spectroscopy_encoder: true
+    shared_latent_space: true
+    cross_attention_fusion: true
+    encoder_dim: 512
+    fusion_dim: 256
+
+  # Graph VAE (Variational Autoencoder for Graphs)
+  graph_vae:
+    enabled: true
+    latent_dim: 64
+    hidden_dim: 128
+    num_layers: 3
+    use_attention: true
+
+  # Fusion Transformer (Multi-Modal Fusion)
+  fusion_transformer:
+    enabled: true
+    hidden_dim: 256
+    num_layers: 6
+    num_heads: 8
+    fusion_strategy: "cross_attention"
+    modality_encoders: true
+
+# Data Configuration - All Data Sources
+data_sources:
+  # Scientific Data Sources
+  kegg_data:
+    enabled: true
+    pathways: true
+    compounds: true
+    reactions: true
+    modules: true
+    orthology: true
+    use_real_time_updates: true
+
+  ncbi_data:
+    enabled: true
+    genomes: true
+    proteins: true
+    taxonomy: true
+    agora2_integration: true
+    pubmed_integration: true
+
+  nasa_data:
+    enabled: true
+    exoplanet_archive: true
+    stellar_spectra: true
+    atmospheric_models: true
+    mission_data: true
+
+  uniprot_data:
+    enabled: true
+    reference_proteomes: true
+    functional_annotations: true
+    protein_interactions: true
+
+  jgi_data:
+    enabled: true
+    genomes: true
+    metagenomes: true
+    environmental_samples: true
+
+  gtdb_data:
+    enabled: true
+    taxonomic_tree: true
+    genome_representatives: true
+
+  # Advanced Data Processing
+  customer_data:
+    enabled: true
+    quantum_enhanced_processing: true
+    privacy_preserving: true
+    federated_analytics: true
+    homomorphic_encryption: true
+
+  real_time_data:
+    enabled: true
+    streaming_observations: true
+    telescope_feeds: true
+    satellite_data: true
+
+  synthetic_data:
+    enabled: true
+    physics_based_generation: true
+    augmentation_enabled: true
+
+# Advanced Training Techniques
+advanced_techniques:
+  # Physics-Informed Training
+  physics_informed_training:
+    enabled: true
+    energy_conservation: true
+    mass_conservation: true
+    momentum_conservation: true
+    thermodynamic_consistency: true
+    temporal_consistency: true
+    geological_consistency: true
+    hydrostatic_balance: true
+    radiative_transfer: true
+
+  # Multi-Modal Learning
+  multi_modal_learning:
+    enabled: true
+    cross_attention_fusion: true
+    modality_specific_losses: true
+    consistency_enforcement: true
+    adaptive_weighting: true
+    shared_representations: true
+
+  # Uncertainty Quantification
+  uncertainty_quantification:
+    enabled: true
+    bayesian_inference: true
+    ensemble_methods: true
+    mc_dropout: true
+    calibration_metrics: true
+    aleatoric_uncertainty: true
+    epistemic_uncertainty: true
+
+  # Curriculum Learning
+  curriculum_learning:
+    enabled: true
+    progressive_complexity: true
+    resolution_scheduling: true
+    physics_aware_augmentation: true
+    adaptive_pacing: true
+
+  # Federated Learning
+  federated_learning:
+    enabled: true
+    num_participants: 10
+    federation_rounds: 100
+    local_epochs: 5
+    aggregation_strategy: "fedavg"
+    privacy_mechanism: "differential_privacy"
+    byzantine_robust: true
+
+  # Self-Supervised Learning
+  self_supervised_learning:
+    enabled: true
+    contrastive_learning: true
+    masked_modeling: true
+    reconstruction_tasks: true
+
+  # Adversarial Training
+  adversarial_training:
+    enabled: false  # Optional, can be resource intensive
+    epsilon: 0.01
+    num_steps: 5
+
+# Performance Optimization
+performance:
+  # Memory Optimization
+  memory_optimization:
+    gradient_checkpointing: true
+    mixed_precision: true
+    dynamic_batching: true
+    memory_profiling: true
+    offload_optimizer: false
+    cpu_offload: false
+
+  # Computational Optimization
+  computational_optimization:
+    distributed_training: true
+    data_parallel: true
+    model_parallel: false  # Enable for very large models
+    tensor_parallel: false
+    pipeline_parallel: false
+    use_deepspeed: false
+    use_fairscale: false
+
+  # Data Pipeline Optimization
+  data_pipeline_optimization:
+    prefetching: true
+    pin_memory: true
+    persistent_workers: true
+    async_loading: true
+    num_workers: 4
+    batch_sampler: "dynamic"
+
+  # Compilation Optimization
+  compilation:
+    torch_compile: false  # PyTorch 2.0 compilation
+    jit_compile: false
+    tensorrt_optimization: false
+
+# Monitoring and Logging
+monitoring:
+  system_diagnostics: true
+  performance_profiling: true
+  quality_monitoring: true
+  real_time_metrics: true
+  gpu_monitoring: true
+  memory_tracking: true
+  
+  loggers:
+    wandb:
+      enabled: true
+      project: "astrobio-unified-training"
+      entity: null
+      tags: ["unified", "comprehensive", "physics-informed"]
+    
+    tensorboard:
+      enabled: true
+      log_dir: "lightning_logs/unified"
+      log_graph: true
+    
+    custom_metrics: true
+    csv_logger: true
+
+  callbacks:
+    model_checkpoint:
+      enabled: true
+      monitor: "val/total_loss"
+      mode: "min"
+      save_top_k: 3
+      every_n_epochs: 10
+    
+    early_stopping:
+      enabled: true
+      monitor: "val/total_loss"
+      patience: 20
+      mode: "min"
+    
+    learning_rate_monitor: true
+    device_stats_monitor: true
+    model_summary: true
+    stochastic_weight_averaging: true
+
+# Training Strategies
+training_strategies:
+  # Loss Strategy
+  loss_strategy: "physics_informed"
+  loss_weights:
+    reconstruction: 1.0
+    physics: 0.2
+    uncertainty: 0.1
+    consistency: 0.05
+    
+  # Optimization Strategy
+  optimization_strategy: "adamw_cosine"
+  scheduler_config:
+    T_0: 50
+    T_mult: 2
+    eta_min: 1e-7
+
+  # Regularization
+  regularization:
+    dropout: 0.1
+    weight_decay: 1e-5
+    gradient_clip_val: 1.0
+    label_smoothing: 0.0
+
+# Output Configuration
+output:
+  save_models: true
+  save_checkpoints: true
+  save_metrics: true
+  save_diagnostics: true
+  generate_reports: true
+  save_predictions: true
+  
+  output_formats:
+    - "pytorch"
+    - "onnx"
+    - "tensorrt"
+  
+  export_config:
+    onnx_dynamic_axes: true
+    onnx_opset_version: 14
+    tensorrt_precision: "fp16"
+
+# Validation and Testing
+validation:
+  validation_split: 0.2
+  test_split: 0.1
+  cross_validation: false
+  k_folds: 5
+  
+  metrics:
+    - "mse"
+    - "mae"
+    - "r2_score"
+    - "physics_compliance"
+    - "uncertainty_calibration"
+    - "multi_modal_consistency"
+
+# Hardware Configuration
+hardware:
+  device: "auto"  # auto-detect GPU/CPU
+  precision: "16-mixed"
+  devices: "auto"
+  accelerator: "auto"
+  strategy: "auto"
+  
+  distributed:
+    backend: "nccl"
+    find_unused_parameters: true
+    static_graph: false
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: false  # Set to true for full reproducibility
+  benchmark: true  # Set to false for deterministic behavior
+
+# Resource Limits
+resource_limits:
+  max_memory_gb: null  # null for auto-detection
+  max_time_hours: 48
+  checkpoint_every_n_hours: 2
+  
+# Integration Settings
+integration:
+  data_quality_system: true
+  url_management_system: true
+  metadata_system: true
+  diagnostics_system: true
+  customer_data_system: true 
