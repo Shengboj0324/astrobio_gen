@@ -18,7 +18,7 @@ tokenizers>=0.15.0
 
 # Knowledge retrieval and vector search
 faiss-cpu>=1.7.4
-# faiss-gpu>=1.7.4  # Uncomment for GPU acceleration
+faiss-gpu>=1.7.4  # ✅ ENABLED - GPU acceleration for vector operations
 
 # TTS and audio processing
 pyttsx3>=2.90

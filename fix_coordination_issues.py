@@ -39,24 +39,21 @@ def fix_torchvision_issues():
         logger.error(f"❌ TorchVision fix failed: {e}")
         return False
 
-def fix_enhanced_cnn_initialization():
-    """Fix Enhanced CNN initialization issues"""
-    logger.info("🔧 Fixing Enhanced CNN initialization...")
+def fix_enhanced_cnn():
+    """Fix Enhanced CNN issues"""
+    logger.info("🔧 Fixing Enhanced CNN...")
     
     try:
-        # Safe import and initialization
-        sys.path.append(str(Path(__file__).parent))
-        
         from models.enhanced_datacube_unet import EnhancedCubeUNet
         
-        # Create with safe parameters
+        # Create with full advanced parameters - all features enabled
         enhanced_cnn = EnhancedCubeUNet(
             n_input_vars=5,
             n_output_vars=5,
-            base_features=32,  # Reduced for stability
-            depth=3,           # Reduced for stability
+            base_features=64,  # Restored to full capacity
+            depth=5,           # Restored to full capacity
             use_attention=True,
-            use_transformer=False,  # Temporarily disabled
+            use_transformer=True,  # ✅ RE-ENABLED - Advanced transformer features
             use_separable_conv=True,
             use_physics_constraints=True,
             dropout=0.1,
@@ -68,7 +65,7 @@ def fix_enhanced_cnn_initialization():
         with torch.no_grad():
             output = enhanced_cnn(test_input)
         
-        logger.info("✅ Enhanced CNN initialization fixed")
+        logger.info("✅ Enhanced CNN initialization fixed - all features enabled")
         return True, enhanced_cnn
         
     except Exception as e:
@@ -82,26 +79,27 @@ def fix_surrogate_integration():
     try:
         from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration, MultiModalConfig
         
-        # Safe configuration
+        # Full advanced configuration - all features enabled
         config = MultiModalConfig(
             use_datacube=True,
             use_scalar_params=True,
-            use_spectral_data=False,      # Temporarily disabled
-            use_temporal_sequences=False,  # Temporarily disabled
-            fusion_strategy="concatenation",  # Simpler fusion
-            hidden_dim=128
+            use_spectral_data=True,      # ✅ RE-ENABLED - Spectral data processing
+            use_temporal_sequences=True, # ✅ RE-ENABLED - Temporal sequence processing
+            fusion_strategy="cross_attention",  # Advanced fusion strategy
+            num_attention_heads=8,
+            hidden_dim=256  # Increased for better performance
         )
         
-        # Create with safe parameters
+        # Create with full advanced parameters
         surrogate_integration = EnhancedSurrogateIntegration(
             multimodal_config=config,
-            use_uncertainty=False,        # Temporarily disabled
-            use_dynamic_selection=False,  # Temporarily disabled
-            use_mixed_precision=False,    # Temporarily disabled
+            use_uncertainty=True,        # ✅ RE-ENABLED - Uncertainty quantification
+            use_dynamic_selection=True,  # ✅ RE-ENABLED - Dynamic model selection
+            use_mixed_precision=True,    # ✅ RE-ENABLED - Mixed precision training
             learning_rate=1e-4
         )
         
-        logger.info("✅ Surrogate Integration fixed")
+        logger.info("✅ Surrogate Integration fixed - all advanced features enabled")
         return True, surrogate_integration
         
     except Exception as e:
@@ -144,7 +142,7 @@ def test_coordinated_operation():
     
     try:
         # Test Enhanced CNN
-        cnn_success, enhanced_cnn = fix_enhanced_cnn_initialization()
+        cnn_success, enhanced_cnn = fix_enhanced_cnn()
         
         # Test Surrogate Integration
         surrogate_success, surrogate_integration = fix_surrogate_integration()

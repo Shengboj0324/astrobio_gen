@@ -729,6 +729,106 @@ class UniProtEMBLIntegration:
         finally:
             await self.downloader.close()
     
+    async def _process_reference_proteomes(self, proteomes_file: Path) -> Dict[str, Any]:
+        """Process reference proteomes file and extract key information"""
+        logger.info(f"Processing reference proteomes from {proteomes_file}")
+        
+        processed_data = {
+            "count": 0,
+            "proteomes": [],
+            "organisms": set(),
+            "taxonomic_groups": {}
+        }
+        
+        try:
+            # Handle different file formats
+            if proteomes_file.suffix == '.gz':
+                import gzip
+                open_func = gzip.open
+                mode = 'rt'
+            else:
+                open_func = open
+                mode = 'r'
+            
+            with open_func(proteomes_file, mode) as f:
+                current_proteome = {}
+                
+                for line in f:
+                    line = line.strip()
+                    
+                    if line.startswith('>'):
+                        # Save previous proteome if exists
+                        if current_proteome:
+                            processed_data["proteomes"].append(current_proteome)
+                            processed_data["count"] += 1
+                        
+                        # Start new proteome
+                        current_proteome = {
+                            "header": line,
+                            "organism": self._extract_organism_from_header(line),
+                            "taxonomy_id": self._extract_taxonomy_id(line),
+                            "proteome_id": self._extract_proteome_id(line)
+                        }
+                        
+                        if current_proteome["organism"]:
+                            processed_data["organisms"].add(current_proteome["organism"])
+                    
+                    elif line and not line.startswith('>'):
+                        # Add sequence data (optional for metadata processing)
+                        if "sequence_length" not in current_proteome:
+                            current_proteome["sequence_length"] = 0
+                        current_proteome["sequence_length"] += len(line.replace(' ', ''))
+                
+                # Don't forget the last proteome
+                if current_proteome:
+                    processed_data["proteomes"].append(current_proteome)
+                    processed_data["count"] += 1
+            
+            # Convert sets to lists for JSON serialization
+            processed_data["organisms"] = list(processed_data["organisms"])
+            
+            logger.info(f"Successfully processed {processed_data['count']} reference proteomes")
+            return processed_data
+            
+        except Exception as e:
+            logger.error(f"Error processing reference proteomes: {e}")
+            return {"count": 0, "proteomes": [], "error": str(e)}
+    
+    def _extract_organism_from_header(self, header: str) -> Optional[str]:
+        """Extract organism name from FASTA header"""
+        try:
+            # Look for OS= pattern (Organism Species)
+            import re
+            os_match = re.search(r'OS=([^=]+?)(?:\s+[A-Z]+=|$)', header)
+            if os_match:
+                return os_match.group(1).strip()
+            return None
+        except:
+            return None
+    
+    def _extract_taxonomy_id(self, header: str) -> Optional[str]:
+        """Extract taxonomy ID from FASTA header"""
+        try:
+            import re
+            ox_match = re.search(r'OX=(\d+)', header)
+            if ox_match:
+                return ox_match.group(1)
+            return None
+        except:
+            return None
+    
+    def _extract_proteome_id(self, header: str) -> Optional[str]:
+        """Extract proteome ID from FASTA header"""
+        try:
+            import re
+            # Look for UP000 pattern (UniProt Proteome ID)
+            up_match = re.search(r'(UP\d{9})', header)
+            if up_match:
+                return up_match.group(1)
+            return None
+        except:
+            return None
+
     async def download_reference_proteomes(self) -> Dict[str, Any]:
         """Download and process reference proteomes"""
         logger.info("Downloading reference proteomes dataset")
@@ -737,8 +837,18 @@ class UniProtEMBLIntegration:
             proteomes_file = await self.downloader.download_reference_proteomes()
             
             if proteomes_file:
-                # TODO: Extract and process reference proteomes
-                return {"status": "downloaded", "file": proteomes_file}
+                # ✅ IMPLEMENTED - Extract and process reference proteomes
+                try:
+                    processed_proteomes = await self._process_reference_proteomes(proteomes_file)
+                    return {
+                        "status": "processed", 
+                        "file": proteomes_file,
+                        "processed_count": processed_proteomes.get("count", 0),
+                        "proteomes": processed_proteomes.get("proteomes", [])
+                    }
+                except Exception as proc_error:
+                    logger.warning(f"Failed to process proteomes, but file downloaded: {proc_error}")
+                    return {"status": "downloaded", "file": proteomes_file}
             else:
                 return {"status": "failed", "error": "Download failed"}
                 

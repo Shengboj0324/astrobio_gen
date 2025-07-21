@@ -329,8 +329,8 @@ class EnhancedSystemHealthMonitor:
                     gpu_utilization.append(gpu.load * 100)
                     gpu_memory_used.append(gpu.memoryUsed)
                     gpu_memory_total.append(gpu.memoryTotal)
-            except:
-                pass  # GPU monitoring not available
+            except Exception as e:
+                logger.debug(f"GPU monitoring failed: {e}")  # ✅ IMPROVED - Better error reporting
         
         # Disk usage
         disk = psutil.disk_usage('/')

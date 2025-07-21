@@ -793,7 +793,8 @@ class PredictiveURLDiscovery:
                 async with session.get(doc_url, timeout=10) as response:
                     if response.status == 200:
                         doc_urls.append(doc_url)
-            except:
+            except Exception as e:
+                logger.debug(f"Failed to access documentation URL {doc_url}: {e}")  # ✅ IMPROVED - Better error reporting
                 continue
         
         return doc_urls

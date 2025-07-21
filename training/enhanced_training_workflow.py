@@ -730,8 +730,8 @@ if __name__ == "__main__":
             learning_rate=1e-3,
             loss_strategy=LossStrategy.ADAPTIVE,
             optimization_strategy=OptimizationStrategy.ADAMW,
-            use_mixed_precision=False,  # Disable for CPU testing
-            use_wandb=False,  # Disable for testing
+            use_mixed_precision=True,  # ✅ RE-ENABLED - Mixed precision for better performance
+            use_wandb=True,  # ✅ RE-ENABLED - Weights & Biases logging for monitoring
             patience=10
         )
         

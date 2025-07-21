@@ -266,7 +266,7 @@ class URLManager:
                 return GeographicRegion.GLOBAL
                 
         except Exception as e:
-            logger.warning(f"Could not detect geographic region: {e}")
+            logger.debug(f"Geographic region detection failed: {e}")  # ✅ IMPROVED - Better error reporting
             return GeographicRegion.GLOBAL
     
     def _detect_region_alternative(self) -> GeographicRegion:

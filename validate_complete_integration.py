@@ -252,7 +252,8 @@ class IntegrationValidator:
             try:
                 from datamodules.cube_dm import CubeDM
                 datamodule_available = True
-            except:
+            except ImportError as e:
+                logger.debug(f"CubeDM datamodule import failed: {e}")  # ✅ IMPROVED - Better error reporting
                 datamodule_available = False
             
             self.validation_results["datacube_system"] = {
