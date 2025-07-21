@@ -1,6 +1,15 @@
 # ============================================================================
-# ASTROBIOLOGY GENOMICS PROJECT - SECURE DATA HANDLING
+# ASTROBIOLOGY PLATFORM - COMPREHENSIVE PROJECT GITIGNORE
 # ============================================================================
+# Updated: July 21, 2025 - Multi-License Framework Compatible
+
+# ===== LICENSING FILES (ALWAYS INCLUDE) =====
+# These files are critical for legal compliance
+!LICENSE*
+!NOTICE*
+!CONTRIBUTORS*
+!README*
+!*.md
 
 # ===== RAW DATA EXCLUSIONS (SECURITY CRITICAL) =====
 # Never commit raw data to version control
@@ -57,27 +66,105 @@ data/**/tmp/**
 *.sqlite
 *.sqlite3
 
-# Model files and checkpoints
+# ===== CUSTOMER DATA SECURITY (AGPL v3 COMPONENTS) =====
+# Customer data treatment must be handled securely
+customer_data_processed/sensitive/**
+customer_data_processed/private/**
+customer_data_processed/**/*.enc
+customer_data_processed/**/*.encrypted
+customer_data_treatment/keys/**
+customer_data_treatment/secrets/**
+*.private
+*.confidential
+
+# Homomorphic encryption working files
+*.he_key
+*.he_cipher
+*.homomorphic_temp
+
+# Federated learning temporary files
+federated_temp/**
+federated_cache/**
+*.fl_temp
+
+# ===== AI MODEL FILES AND CHECKPOINTS =====
+# Large model files - use DVC or LFS instead
 models/*.pt
 models/*.pth
 models/*.ckpt
 models/*.pkl
 models/*.h5
+models/*.safetensors
+models/**/*.bin
+models/**/*.model
+
+# Training artifacts
 lightning_logs/**
+wandb/**
+tensorboard_logs/**
+mlruns/**
 
-# Backup and versioning
-data/backups/**
-data/versions/**
-data/snapshots/**
+# LLM specific files
+*.llamafile
+*.gguf
+*.ggml
+**/llm_cache/**
+**/model_cache/**
 
-# Quality reports (can regenerate)
-data/quality_reports/**
-data/reports/**
+# Neural Architecture Search results
+nas_results/**
+nas_temp/**
+architecture_search/**
 
-# Local raw genome files (KEEP OUT OF GIT)
-/Users/*/Desktop/DataSources(ISEF)/**
+# Meta-learning episode data
+meta_learning_cache/**
+episode_data/**
 
-# ===== PYTHON CACHE AND COMPILED FILES =====
+# ===== TRAINING AND VALIDATION RESULTS =====
+# Keep configuration but exclude large result files
+results/**/*.npz
+results/**/*.h5
+results/**/*.pkl
+results/**/large_*
+results/**/detailed_*
+
+# Training checkpoints and intermediate results
+training_checkpoints/**
+validation_temp/**
+benchmark_cache/**
+
+# Keep important result summaries (small JSON files)
+!results/**/*summary*.json
+!results/**/*report*.json
+!results/**/*final*.json
+
+# ===== CONFIGURATION AND SECRETS =====
+# Environment and sensitive config
+.env
+.env.*
+config/secrets.yml
+config/credentials.json
+config/**/*_secret*
+config/**/*_private*
+*.key
+*.pem
+*.cert
+*.crt
+
+# API keys and tokens
+**/api_keys/**
+**/tokens/**
+*.token
+*.api_key
+
+# AWS and cloud credentials
+.aws/credentials
+.aws/config
+gcloud_key.json
+azure_credentials.json
+
+# ===== DEVELOPMENT AND BUILD FILES =====
+# Python cache and compiled files
 __pycache__/
 *.pyc
 *.pyo
@@ -87,10 +174,23 @@ __pycache__/
 dist/
 build/
 .pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
 
-# ===== JUPYTER AND IPYTHON =====
+# Virtual environments
+venv/
+env/
+ENV/
+astrobio_venv/
+astrobio_env/
+.conda/
+
+# Jupyter and IPython
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
+jupyter_notebook_config.py
 
 # ===== IDE AND EDITOR FILES =====
 .vscode/
@@ -100,20 +200,25 @@ build/
 *~
 .DS_Store
 Thumbs.db
+*.sublime-*
+.spyderproject
+.rope*
 
-# ===== ENVIRONMENT AND CONFIG =====
-.env
-.env.local
-.env.production
-config/secrets.yml
-config/credentials.json
-*.key
-*.pem
-
-# ===== LOGS =====
+# ===== MONITORING AND LOGGING =====
 *.log
 logs/
 data/logs/**
+monitoring/logs/**
+system_logs/**
+
+# Performance profiling results
+profiling_results/**
+*.prof
+*.profile
+
+# Real-time monitoring temp files
+monitoring_temp/**
+diagnostics_temp/**
 
 # ===== OPERATING SYSTEM =====
 .DS_Store
@@ -123,36 +228,146 @@ data/logs/**
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# ===== BACKUP FILES =====
+# ===== BACKUP AND TEMPORARY FILES =====
 *.bak
 *.backup
 *~
+*.orig
+*.rej
+
+# DVC and data versioning
+.dvc/cache/
+.dvc/tmp/
+
+# ===== CLOUD AND DISTRIBUTED COMPUTING =====
+# Temporary cloud processing
+temp/
+temp/**
+cache/
+download_cache/
+distributed_temp/**
+
+# Kubernetes and container files
+.kubernetes_temp/
+docker_temp/**
+*.dockerfile.temp
+
+# Ray and Dask temporary files
+ray_temp/**
+dask_temp/**
+/tmp/ray/**
+
+# ===== ENTERPRISE AND PRODUCTION =====
+# Production deployment files
+production_config/**
+deployment_keys/**
+production_logs/**
+
+# Enterprise URL system cache
+url_cache/**
+geographic_routing_cache/**
+enterprise_temp/**
+
+# API deployment artifacts
+api_temp/**
+fastapi_temp/**
+
+# ===== SCIENTIFIC DATA COMPLIANCE =====
+# KEGG commercial license data (if any)
+kegg_commercial/**
+licensed_data/**
+
+# NASA/ESA restricted datasets
+restricted_data/**
+itar_controlled/**
+
+# Export control sensitive files
+export_restricted/**
+*.itar
+
+# ===== QUALITY ASSURANCE =====
+# Quality reports and validation results (regenerable)
+data/quality_reports/**
+data/reports/**
+quality_temp/**
+validation_cache/**
+
+# Benchmarking results (large files)
+benchmark_results/**/*.h5
+benchmark_results/**/*.npz
+performance_results/**/*.pkl
 
 # ===== KEEP IMPORTANT STRUCTURE FILES =====
 # These should be committed to maintain project structure
-!data/
-!data/README.md
-!data/raw/
-!data/raw/.gitkeep
-!data/interim/
-!data/interim/.gitkeep
-!data/processed/
-!data/processed/.gitkeep
+!**/
+!**/.gitkeep
 !requirements*.txt
-!README*.md
-!LICENSE*
-!*.md
+!setup.py
+!pyproject.toml
+!*.cfg
+!*.ini
 !*.yml
 !*.yaml
 !*.json
 !*.py
 
-# ===== TEMPORARY CLOUD PROCESSING =====
-# Temporary processing directories (cloud-first storage)
-temp/
-temp/**
-*.tmp
-*.temp
-cache/
-download_cache/
+# Configuration files to keep
+!config/*.yaml
+!config/*.yml
+!config/*.json
+!config/defaults.yaml
+!config/master_training.yaml
+
+# Documentation to keep
+!docs/**
+!examples/**
+!tutorials/**
+
+# ===== LOCAL DEVELOPMENT OVERRIDES =====
+# Local raw genome files (KEEP OUT OF GIT)
+/Users/*/Desktop/DataSources(ISEF)/**
+local_data/**
+personal_notebooks/**
+scratch/**
+
+# Local development configurations
+local_config/**
+dev_config/**
+*.local.*
+
+# ===== THIRD-PARTY INTEGRATION =====
+# Weights & Biases
+wandb/
+
+# MLflow
+mlruns/
+
+# TensorBoard
+runs/
+
+# Optuna
+optuna_storage/**
+
+# Hugging Face cache
+.cache/huggingface/**
+transformers_cache/**
+
+# ===== FINAL SAFETY NETS =====
+# Anything explicitly marked as private
+**/*private*
+**/*secret*
+**/*confidential*
+**/*.private.*
+**/*.secret.*
+
+# Large files that should use LFS
+*.zip
+*.tar.gz
+*.tar.bz2
+*.7z
+*.rar
+
+# Files larger than 100MB should be tracked with LFS
+# (This is enforced by size, not extension)

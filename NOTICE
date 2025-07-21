@@ -1,0 +1,147 @@
+Astrobiology Platform - NOTICE
+===============================
+
+Copyright (c) 2025 Astrobiology Platform Contributors
+
+This product includes software and data from various sources, each with their own licensing terms.
+Please see LICENSE.md for the comprehensive licensing information for different components.
+
+THIRD-PARTY SOFTWARE COMPONENTS
+===============================
+
+PyTorch and PyTorch Lightning
+- License: BSD-3-Clause
+- Copyright: Facebook, Inc. and its affiliates; PyTorch Lightning team
+- Website: https://pytorch.org, https://lightning.ai
+
+Hugging Face Transformers
+- License: Apache 2.0
+- Copyright: Hugging Face, Inc.
+- Website: https://huggingface.co/transformers
+
+Microsoft DialoGPT
+- License: MIT License
+- Copyright: Microsoft Corporation
+- Website: https://github.com/microsoft/DialoGPT
+
+NumPy, SciPy, pandas
+- License: BSD-3-Clause
+- Copyright: NumPy Developers, SciPy Developers, pandas development team
+- Website: https://numpy.org, https://scipy.org, https://pandas.pydata.org
+
+FastAPI
+- License: MIT License
+- Copyright: Sebastián Ramírez
+- Website: https://fastapi.tiangolo.com
+
+Weights & Biases
+- License: MIT License
+- Copyright: Weights & Biases, Inc.
+- Website: https://wandb.ai
+
+SCIENTIFIC DATA SOURCES
+=======================
+
+KEGG (Kyoto Encyclopedia of Genes and Genomes)
+- License: Academic use free, commercial licensing required
+- Copyright: Kanehisa Laboratories
+- Website: https://www.kegg.jp
+- Citation: Kanehisa, M. and Goto, S.; KEGG: Kyoto Encyclopedia of Genes and Genomes. Nucleic Acids Res. 28, 27-30 (2000).
+
+NCBI Databases
+- License: Public Domain (U.S. Government work)
+- Source: National Center for Biotechnology Information
+- Website: https://www.ncbi.nlm.nih.gov
+- Citation: NCBI Resource Coordinators. Database resources of the National Center for Biotechnology Information. Nucleic Acids Res. 2018;46(D1):D8-D13.
+
+NASA Exoplanet Archive
+- License: Public Domain (U.S. Government work)
+- Source: NASA Exoplanet Science Institute
+- Website: https://exoplanetarchive.ipac.caltech.edu
+- Citation: Akeson, R.L., et al. The NASA Exoplanet Archive: Data and Tools for Exoplanet Research. PASP 125, 989 (2013).
+
+UniProt
+- License: CC BY 4.0
+- Copyright: UniProt Consortium
+- Website: https://www.uniprot.org
+- Citation: UniProt Consortium. UniProt: the universal protein knowledgebase in 2021. Nucleic Acids Res. 49, D480-D489 (2021).
+
+JGI (Joint Genome Institute)
+- License: Varies by dataset, generally open for research
+- Source: U.S. Department of Energy Joint Genome Institute
+- Website: https://jgi.doe.gov
+- Citation: Varies by specific dataset
+
+GTDB (Genome Taxonomy Database)
+- License: CC BY-SA 4.0
+- Copyright: GTDB Development Team
+- Website: https://gtdb.ecogenomic.org
+- Citation: Parks, D.H., et al. A standardized bacterial taxonomy based on genome phylogeny substantially revises the tree of life. Nat. Biotechnol. 36, 996-1004 (2018).
+
+AGORA2 Metabolic Models
+- License: CC BY 4.0
+- Copyright: Thiele Laboratory, National University of Ireland Galway
+- Website: https://www.vmh.life
+- Citation: Heinken, A., et al. AGORA2: Large scale reconstruction of the microbiome highlights wide-spread drug-metabolising capacities. bioRxiv (2020).
+
+ADDITIONAL ACKNOWLEDGMENTS
+=========================
+
+Physics-Informed Neural Networks
+- Based on concepts from: Raissi, M., Perdikaris, P., and Karniadakis, G.E. Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. J. Comput. Phys. 378, 686-707 (2019).
+
+Transformer Architecture
+- Based on: Vaswani, A., et al. Attention is all you need. Advances in Neural Information Processing Systems 30 (2017).
+
+Graph Neural Networks
+- Based on concepts from: Kipf, T.N. and Welling, M. Semi-supervised classification with graph convolutional networks. ICLR (2017).
+
+Meta-Learning (MAML)
+- Based on: Finn, C., Abbeel, P., and Levine, S. Model-agnostic meta-learning for fast adaptation of deep networks. ICML (2017).
+
+Uncertainty Quantification
+- Based on concepts from: Gal, Y. and Ghahramani, Z. Dropout as a Bayesian approximation: Representing model uncertainty in deep learning. ICML (2016).
+
+COMPUTATIONAL RESOURCES
+=======================
+
+This research was supported by computational resources and services provided by:
+- High-performance computing facilities
+- Cloud computing platforms (AWS, Azure, Google Cloud)
+- GPU computing resources (NVIDIA)
+
+INSTITUTIONAL ACKNOWLEDGMENTS
+============================
+
+We acknowledge the scientific community's contributions to the datasets, algorithms, and theoretical frameworks that enable this research, including:
+
+- NASA Goddard Space Flight Center
+- Space Telescope Science Institute
+- SETI Institute
+- European Space Agency (ESA)
+- National Science Foundation (NSF)
+- Department of Energy (DOE)
+- Various international research institutions and collaborators
+
+DATA USAGE COMPLIANCE
+=====================
+
+Users of this platform must comply with the licensing terms of all incorporated data sources:
+
+1. Provide appropriate attribution for all data sources
+2. Respect usage restrictions for commercial applications
+3. Acknowledge data providers in publications
+4. Check specific dataset licenses before redistribution
+5. Comply with export control regulations where applicable
+
+For complete licensing information, see LICENSE.md in the project root.
+
+CONTACT INFORMATION
+==================
+
+For licensing questions or attribution clarifications:
+- General: See project repository
+- Commercial licensing: See LICENSE.md
+- Academic partnerships: See LICENSE.md
+
+Last Updated: July 21, 2025 

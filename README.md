@@ -368,7 +368,18 @@ We welcome collaborations with academic institutions, space agencies, and resear
 
 ## License and Citation
 
-This project is developed for advancing astrobiology research and scientific understanding. Please cite appropriately in academic publications and acknowledge the comprehensive methodology when building upon this work.
+This project employs a comprehensive multi-license framework to address the diverse nature of its components. Please see `LICENSE.md` for detailed licensing information for each component.
+
+**Quick License Summary:**
+- **Core AI Models & Training**: Apache 2.0 (enterprise-friendly with patent protection)
+- **Data Processing**: MIT License (maximum research compatibility)
+- **Customer Data Treatment**: AGPL v3 (ensures privacy-preserving derivatives remain open)
+- **Documentation**: CC BY 4.0 (promotes scientific education)
+- **Scientific Datasets**: CC BY-SA 4.0 (attribution with share-alike)
+
+**Third-Party Compliance:** All third-party data sources and software components maintain their original licensing terms. See `NOTICE` file for complete attribution and `LICENSE.md` for compliance requirements.
+
+**Citation:** Please cite appropriately in academic publications and acknowledge the comprehensive methodology when building upon this work. Specific citation information will be provided upon publication of associated research papers.
 
 ## Acknowledgments
 
