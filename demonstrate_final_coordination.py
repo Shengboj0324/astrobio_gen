@@ -489,7 +489,7 @@ class CoordinatedAISystem:
             'ready_for_production': True
         }
         
-        with open('final_coordination_results.json', 'w') as f:
+        with open('verification_results/final_coordination_results.json', 'w') as f:
             json.dump(results, f, indent=2)
         
         print(f"\n💾 Complete results saved to 'final_coordination_results.json'")
