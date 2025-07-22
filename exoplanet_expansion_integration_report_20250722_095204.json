@@ -1,0 +1,529 @@
+{
+  "integration_summary": {
+    "timestamp": "2025-07-22T09:52:04.140223",
+    "total_sources_processed": 44,
+    "successful_integrations": 7,
+    "failed_integrations": 9,
+    "conflicts_detected": 766,
+    "sources_skipped": 28,
+    "validation_success_rate": 0.38636363636363635
+  },
+  "expansion_statistics": {
+    "total_sources": 44,
+    "sources_by_category": {
+      "ground_based_surveys": 8,
+      "space_missions": 4,
+      "atmospheric_characterization": 7,
+      "stellar_hosts": 4,
+      "follow_up_observations": 4,
+      "theoretical_models": 3,
+      "comparative_planetology": 2,
+      "direct_imaging": 3,
+      "radial_velocity_databases": 2,
+      "specialized_archives": 4,
+      "photometric_surveys": 3
+    },
+    "sources_by_priority": {
+      "1": 30,
+      "2": 14
+    },
+    "estimated_total_size_gb": 33475.0,
+    "data_types_covered": "{'direct_imaging', 'photometry', 'theoretical', 'spectroscopy', 'radial_velocity'}",
+    "missions_covered": "{'SPHERE', 'TESS', 'Kepler', 'CoRoT', 'GPI', 'JWST', 'HST', 'Spitzer', 'HARPS'}",
+    "geographic_coverage": "{'global'}",
+    "quality_score_distribution": {
+      "0.9": 24,
+      "0.8": 20
+    },
+    "temporal_coverage": "{'1995-2025'}"
+  },
+  "data_coverage_enhancement": {
+    "estimated_additional_size_gb": 33475.0,
+    "new_data_types": [
+      "direct_imaging",
+      "photometry",
+      "theoretical",
+      "spectroscopy",
+      "radial_velocity"
+    ],
+    "new_missions": [
+      "SPHERE",
+      "TESS",
+      "Kepler",
+      "CoRoT",
+      "GPI",
+      "JWST",
+      "HST",
+      "Spitzer",
+      "HARPS"
+    ],
+    "geographic_expansion": [
+      "global"
+    ],
+    "temporal_expansion": [
+      "1995-2025"
+    ]
+  },
+  "quality_assurance": {
+    "conflict_detection": {
+      "conflicts_found": 766,
+      "conflict_details": [
+        {
+          "new_source": "hires_survey",
+          "existing_source": "astrobiology_open_exoplanet_catalogue",
+          "conflict_types": [
+            "endpoint"
+          ],
+          "new_source_data": {
+            "name": "HIRES Keck Exoplanet Survey",
+            "domain": "exoplanets",
+            "primary_url": "https://exoplanets.caltech.edu/data/hires",
+            "api_endpoint": "/data/",
+            "mirror_urls": [
+              "https://archive.stsci.edu/hires",
+              "https://koa.ipac.caltech.edu/cgi-bin/KOA/nph-KOAQuery"
+            ],
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 650.0,
+              "quality_score": 0.94,
+              "description": "Keck HIRES high-resolution spectroscopy exoplanet archive",
+              "planets_discovered": "50+",
+              "resolution": "R=67,000"
+            }
+          },
+          "existing_source_data": {
+            "name": "Open Exoplanet Catalogue",
+            "domain": "astrobiology",
+            "primary_url": "https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue",
+            "api_endpoint": "/data/",
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 25.0,
+              "quality_score": 0.92
+            }
+          }
+        },
+        {
+          "new_source": "hires_survey",
+          "existing_source": "astrobiology_habitable_exoplanets_catalog",
+          "conflict_types": [
+            "endpoint"
+          ],
+          "new_source_data": {
+            "name": "HIRES Keck Exoplanet Survey",
+            "domain": "exoplanets",
+            "primary_url": "https://exoplanets.caltech.edu/data/hires",
+            "api_endpoint": "/data/",
+            "mirror_urls": [
+              "https://archive.stsci.edu/hires",
+              "https://koa.ipac.caltech.edu/cgi-bin/KOA/nph-KOAQuery"
+            ],
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 650.0,
+              "quality_score": 0.94,
+              "description": "Keck HIRES high-resolution spectroscopy exoplanet archive",
+              "planets_discovered": "50+",
+              "resolution": "R=67,000"
+            }
+          },
+          "existing_source_data": {
+            "name": "Habitable Exoplanets Catalog",
+            "domain": "astrobiology",
+            "primary_url": "http://phl.upr.edu/projects/habitable-exoplanets-catalog",
+            "api_endpoint": "/data/",
+            "priority": 2,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 35.0,
+              "quality_score": 0.86
+            }
+          }
+        },
+        {
+          "new_source": "hires_survey",
+          "existing_source": "astrobiology_astrobiology_society",
+          "conflict_types": [
+            "endpoint"
+          ],
+          "new_source_data": {
+            "name": "HIRES Keck Exoplanet Survey",
+            "domain": "exoplanets",
+            "primary_url": "https://exoplanets.caltech.edu/data/hires",
+            "api_endpoint": "/data/",
+            "mirror_urls": [
+              "https://archive.stsci.edu/hires",
+              "https://koa.ipac.caltech.edu/cgi-bin/KOA/nph-KOAQuery"
+            ],
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 650.0,
+              "quality_score": 0.94,
+              "description": "Keck HIRES high-resolution spectroscopy exoplanet archive",
+              "planets_discovered": "50+",
+              "resolution": "R=67,000"
+            }
+          },
+          "existing_source_data": {
+            "name": "International Astrobiology Society Database",
+            "domain": "astrobiology",
+            "primary_url": "https://www.astrobiology.org",
+            "api_endpoint": "/data/",
+            "priority": 3,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 30.0,
+              "quality_score": 0.81
+            }
+          }
+        },
+        {
+          "new_source": "hires_survey",
+          "existing_source": "climate_merra2_reanalysis",
+          "conflict_types": [
+            "endpoint"
+          ],
+          "new_source_data": {
+            "name": "HIRES Keck Exoplanet Survey",
+            "domain": "exoplanets",
+            "primary_url": "https://exoplanets.caltech.edu/data/hires",
+            "api_endpoint": "/data/",
+            "mirror_urls": [
+              "https://archive.stsci.edu/hires",
+              "https://koa.ipac.caltech.edu/cgi-bin/KOA/nph-KOAQuery"
+            ],
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 650.0,
+              "quality_score": 0.94,
+              "description": "Keck HIRES high-resolution spectroscopy exoplanet archive",
+              "planets_discovered": "50+",
+              "resolution": "R=67,000"
+            }
+          },
+          "existing_source_data": {
+            "name": "MERRA-2 NASA Global Reanalysis",
+            "domain": "climate_science",
+            "primary_url": "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2",
+            "api_endpoint": "/data/",
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 30000.0,
+              "quality_score": 0.95
+            }
+          }
+        },
+        {
+          "new_source": "hires_survey",
+          "existing_source": "climate_modis_atmosphere_products",
+          "conflict_types": [
+            "endpoint"
+          ],
+          "new_source_data": {
+            "name": "HIRES Keck Exoplanet Survey",
+            "domain": "exoplanets",
+            "primary_url": "https://exoplanets.caltech.edu/data/hires",
+            "api_endpoint": "/data/",
+            "mirror_urls": [
+              "https://archive.stsci.edu/hires",
+              "https://koa.ipac.caltech.edu/cgi-bin/KOA/nph-KOAQuery"
+            ],
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 650.0,
+              "quality_score": 0.94,
+              "description": "Keck HIRES high-resolution spectroscopy exoplanet archive",
+              "planets_discovered": "50+",
+              "resolution": "R=67,000"
+            }
+          },
+          "existing_source_data": {
+            "name": "MODIS Atmosphere Products",
+            "domain": "climate_science",
+            "primary_url": "https://modis-atmosphere.gsfc.nasa.gov",
+            "api_endpoint": "/data/",
+            "priority": 1,
+            "status": "active",
+            "metadata": {
+              "estimated_size_gb": 25000.0,
+              "quality_score": 0.93
+            }
+          }
+        }
+      ]
+    },
+    "accessibility_validation": {
+      "total_sources_tested": 44,
+      "accessible_sources": 17,
+      "average_response_time_ms": 2140.600000000559
+    }
+  },
+  "integration_details": {
+    "successful_integrations": [
+      {
+        "source_key": "harps_survey",
+        "source_name": "HARPS Exoplanet Survey Archive",
+        "category": "ground_based_surveys",
+        "priority": 1,
+        "estimated_size_gb": 850.0
+      },
+      {
+        "source_key": "plato_simulation",
+        "source_name": "PLATO Mission Simulation Data",
+        "category": "space_missions",
+        "priority": 1,
+        "estimated_size_gb": 1800.0
+      },
+      {
+        "source_key": "hsttrans_archive",
+        "source_name": "HST Transmission Spectroscopy Archive",
+        "category": "atmospheric_characterization",
+        "priority": 1,
+        "estimated_size_gb": 1500.0
+      },
+      {
+        "source_key": "exofop_tess",
+        "source_name": "ExoFOP-TESS (Follow-up Observing Program)",
+        "category": "follow_up_observations",
+        "priority": 1,
+        "estimated_size_gb": 950.0
+      },
+      {
+        "source_key": "exofop_kepler",
+        "source_name": "ExoFOP-Kepler Archive",
+        "category": "follow_up_observations",
+        "priority": 1,
+        "estimated_size_gb": 1200.0
+      },
+      {
+        "source_key": "sphere_survey",
+        "source_name": "SPHERE Direct Imaging Survey",
+        "category": "direct_imaging",
+        "priority": 1,
+        "estimated_size_gb": 1200.0
+      },
+      {
+        "source_key": "gpi_survey",
+        "source_name": "Gemini Planet Imager Survey",
+        "category": "direct_imaging",
+        "priority": 1,
+        "estimated_size_gb": 950.0
+      }
+    ],
+    "failed_integrations": [
+      {
+        "source_key": "coralie_survey",
+        "source_name": "CORALIE Exoplanet Survey",
+        "reason": "source_not_accessible",
+        "error": null
+      },
+      {
+        "source_key": "most_mission",
+        "source_name": "MOST (Microvariability and Oscillations of STars)",
+        "reason": "source_not_accessible",
+        "error": null
+      },
+      {
+        "source_key": "spitzer_exoplanets",
+        "source_name": "Spitzer Exoplanet Archive",
+        "reason": "source_not_accessible",
+        "error": "Cannot connect to host archive.spitzer.caltech.edu:443 ssl:default [getaddrinfo failed]"
+      },
+      {
+        "source_key": "exoplanet_host_stars",
+        "source_name": "Exoplanet Host Star Database",
+        "reason": "source_not_accessible",
+        "error": ""
+      },
+      {
+        "source_key": "stellar_activity_db",
+        "source_name": "Exoplanet Host Star Activity Database",
+        "reason": "source_not_accessible",
+        "error": "Cannot connect to host www.stellar-activity.org:443 ssl:default [getaddrinfo failed]"
+      },
+      {
+        "source_key": "exoplanet_formation",
+        "source_name": "Exoplanet Formation Models",
+        "reason": "source_not_accessible",
+        "error": "Cannot connect to host formation.exoplanets.org:443 ssl:default [getaddrinfo failed]"
+      },
+      {
+        "source_key": "young_exoplanets",
+        "source_name": "Young Exoplanets Database",
+        "reason": "source_not_accessible",
+        "error": "Cannot connect to host young-exoplanets.org:443 ssl:default [getaddrinfo failed]"
+      },
+      {
+        "source_key": "ultra_short_period",
+        "source_name": "Ultra-Short Period Planets Database",
+        "reason": "source_not_accessible",
+        "error": "Cannot connect to host uspplanets.org:443 ssl:default [getaddrinfo failed]"
+      },
+      {
+        "source_key": "free_floating_planets",
+        "source_name": "Free-Floating Planets Database",
+        "reason": "source_not_accessible",
+        "error": "Cannot connect to host freefloating.exoplanets.org:443 ssl:default [getaddrinfo failed]"
+      }
+    ],
+    "skipped_due_to_conflicts": [
+      {
+        "source_key": "hires_survey",
+        "source_name": "HIRES Keck Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "sophie_survey",
+        "source_name": "SOPHIE Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "hat_survey",
+        "source_name": "HATNet & HATSouth Transit Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "wasp_survey",
+        "source_name": "WASP (Wide Angle Search for Planets)",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "tres_survey",
+        "source_name": "TrES (Trans-atlantic Exoplanet Survey)",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "qatar_survey",
+        "source_name": "Qatar Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "corot_mission",
+        "source_name": "CoRoT Mission Archive",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "brite_constellation",
+        "source_name": "BRITE Constellation",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "exomolecules",
+        "source_name": "ExoMolecules Database",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "exocross_database",
+        "source_name": "ExoCross Molecular Database",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "exomol_database",
+        "source_name": "ExoMol Database",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "taurex_models",
+        "source_name": "TauREx Atmospheric Models",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "petitradtrans",
+        "source_name": "petitRADTRANS Model Library",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "sweet_cat",
+        "source_name": "SWEET-Cat (Stars With ExoplanETs Catalogue)",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "spocs_catalog",
+        "source_name": "SPOCS (Stellar Parameters of Confirmed planetS)",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "carmenes_survey",
+        "source_name": "CARMENES Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "minerva_survey",
+        "source_name": "MINERVA Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "exoplanet_models",
+        "source_name": "Theoretical Exoplanet Models Database",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "bern_models",
+        "source_name": "Bern Exoplanet Population Synthesis",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "solar_system_analogs",
+        "source_name": "Solar System Analog Database",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "ttv_database",
+        "source_name": "Transit Timing Variations Database",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "nici_survey",
+        "source_name": "NICI Direct Imaging Campaign",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "rdb_radial_velocity",
+        "source_name": "Radial Velocity Database (RVdb)",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "systemic_console",
+        "source_name": "Systemic Console Archive",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "circumbinary_planets",
+        "source_name": "Circumbinary Exoplanets Archive",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "kelt_survey",
+        "source_name": "KELT Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "mascara_survey",
+        "source_name": "MASCARA Exoplanet Survey",
+        "reason": "conflicts_with_existing_source"
+      },
+      {
+        "source_key": "tess_data_for_asteroseismology",
+        "source_name": "TESS Data for Asteroseismology (TDA)",
+        "reason": "conflicts_with_existing_source"
+      }
+    ],
+    "integration_timestamp": "2025-07-22T09:52:04.130708",
+    "total_processed": 44
+  },
+  "next_steps": [
+    "Monitor integrated sources for continued accessibility",
+    "Schedule regular data acquisition from new sources",
+    "Implement quality monitoring for incoming data",
+    "Update data acquisition workflows to include new sources",
+    "Configure geographic routing for optimal performance"
+  ]
+}

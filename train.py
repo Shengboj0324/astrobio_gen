@@ -88,7 +88,7 @@ try:
     )
     ENHANCED_TRAINING_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"Enhanced training not available: {e}")
+    warnings.warn(f"Enhanced training not available: {e}")
     ENHANCED_TRAINING_AVAILABLE = False
 
 try:
@@ -104,7 +104,7 @@ try:
     )
     ENHANCED_MODULES_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"Enhanced training modules not available: {e}")
+    warnings.warn(f"Enhanced training modules not available: {e}")
     ENHANCED_MODULES_AVAILABLE = False
 
 # Legacy imports for backward compatibility
@@ -786,7 +786,7 @@ async def main_legacy(args) -> Dict[str, Any]:
     ]
 
     start_time = time.time()
-    
+
     if cfg["model"]["type"] == "graph_vae":
         ds = [random_graph() for _ in range(cfg["data"]["synthetic_size"])]
         dl = GeometricDataLoader(ds, batch_size=cfg["trainer"]["batch_size"], shuffle=True)

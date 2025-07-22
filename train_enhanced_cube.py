@@ -188,7 +188,7 @@ class PhysicsInformedDataAugmentation:
         x_aug = x_aug * scale_factor
         
         return x_aug
-
+    
 class CurriculumLearningDataModule(pl.LightningDataModule):
     """Data module with curriculum learning for progressive training complexity"""
     

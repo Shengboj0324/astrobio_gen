@@ -1,0 +1,136 @@
+metadata:
+  version: 2.0.0
+  integration_date: '2025-07-22T09:52:04.131225'
+  total_sources_added: 7
+  integration_strategy: additive_expansion
+  conflicts_resolved: 766
+exoplanet_sources:
+  ground_based_surveys:
+    harps_survey:
+      name: HARPS Exoplanet Survey Archive
+      domain: exoplanets
+      primary_url: https://www.eso.org/sci/facilities/lasilla/instruments/harps
+      api_endpoint: /data/harps/
+      mirror_urls:
+      - https://archive.eso.org/wdb/wdb/adp/phase3_main/query
+      - https://www.eso.org/rm/api/v1/public/releaseDescriptions
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 850.0
+        quality_score: 0.96
+        description: High-precision radial velocity measurements from ESO La Silla
+        planets_discovered: 100+
+        precision: 0.97 m/s
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.131225'
+        validation_status: verified
+        response_time_ms: 3546.9999999913853
+        working_mirrors: 1
+  space_missions:
+    plato_simulation:
+      name: PLATO Mission Simulation Data
+      domain: exoplanets
+      primary_url: https://platomission.com
+      api_endpoint: /simulations/
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 1800.0
+        quality_score: 0.89
+        description: ESA PLATO mission preparatory simulations
+        launch_date: '2026'
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.132341'
+        validation_status: verified
+        response_time_ms: 1187.999999994645
+        working_mirrors: 1
+  atmospheric_characterization:
+    hsttrans_archive:
+      name: HST Transmission Spectroscopy Archive
+      domain: exoplanets
+      primary_url: https://archive.stsci.edu/hst
+      api_endpoint: /search.php?sci_target_name=exoplanet
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 1500.0
+        quality_score: 0.96
+        description: Hubble Space Telescope exoplanet transmission spectra
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.132855'
+        validation_status: verified
+        response_time_ms: 2125.0
+        working_mirrors: 1
+  stellar_hosts: {}
+  follow_up_observations:
+    exofop_tess:
+      name: ExoFOP-TESS (Follow-up Observing Program)
+      domain: exoplanets
+      primary_url: https://exofop.ipac.caltech.edu/tess
+      api_endpoint: /summary/
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 950.0
+        quality_score: 0.95
+        description: TESS Objects of Interest follow-up observations
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.133371'
+        validation_status: verified
+        response_time_ms: 2562.000000005355
+        working_mirrors: 1
+    exofop_kepler:
+      name: ExoFOP-Kepler Archive
+      domain: exoplanets
+      primary_url: https://exofop.ipac.caltech.edu/kepler
+      api_endpoint: /summary/
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 1200.0
+        quality_score: 0.93
+        description: Kepler Objects of Interest follow-up database
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.133371'
+        validation_status: verified
+        response_time_ms: 1922.000000020489
+        working_mirrors: 1
+  theoretical_models: {}
+  comparative_planetology: {}
+  direct_imaging:
+    sphere_survey:
+      name: SPHERE Direct Imaging Survey
+      domain: exoplanets
+      primary_url: https://www.eso.org/sci/facilities/paranal/instruments/sphere
+      api_endpoint: /exoplanets/
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 1200.0
+        quality_score: 0.93
+        description: VLT SPHERE high-contrast imaging exoplanet survey
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.133886'
+        validation_status: verified
+        response_time_ms: 2296.9999999913853
+        working_mirrors: 1
+    gpi_survey:
+      name: Gemini Planet Imager Survey
+      domain: exoplanets
+      primary_url: https://www.gemini.edu/instrumentation/gpi
+      api_endpoint: /exoplanets/
+      priority: 1
+      status: active
+      metadata:
+        estimated_size_gb: 950.0
+        quality_score: 0.92
+        description: Direct imaging survey for young giant exoplanets
+      integration_metadata:
+        added_date: '2025-07-22T09:52:04.133886'
+        validation_status: verified
+        response_time_ms: 3297.000000020489
+        working_mirrors: 1
+  radial_velocity_databases: {}
+  specialized_archives: {}
+  photometric_surveys: {}

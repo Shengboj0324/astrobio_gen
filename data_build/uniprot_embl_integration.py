@@ -848,7 +848,7 @@ class UniProtEMBLIntegration:
                     }
                 except Exception as proc_error:
                     logger.warning(f"Failed to process proteomes, but file downloaded: {proc_error}")
-                    return {"status": "downloaded", "file": proteomes_file}
+                return {"status": "downloaded", "file": proteomes_file}
             else:
                 return {"status": "failed", "error": "Download failed"}
                 
