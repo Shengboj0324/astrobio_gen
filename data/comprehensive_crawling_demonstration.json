@@ -1,0 +1,179 @@
+{
+  "timestamp": "2025-07-22T12:03:51.388466",
+  "system_capabilities": {
+    "kegg_pathways": "Enhanced categorization across all pathway types",
+    "ncbi_organisms": "Complete organism category support (14 categories)",
+    "file_types": "Comprehensive file type support (25+ types)",
+    "quality_control": "Advanced quality parsing (FCS, ANI, BUSCO, CheckM)",
+    "expression_data": "RNA-seq and gene ontology support",
+    "real_time_quality": "NASA-grade quality monitoring"
+  },
+  "web_crawl_discoveries": {
+    "kegg_categories": [
+      "Metabolism (Carbohydrate, Lipid, Amino acid, etc.)",
+      "Environmental Information Processing",
+      "Genetic Information Processing",
+      "Cellular Processes",
+      "Human Diseases",
+      "Drug Development",
+      "Organism-specific pathways"
+    ],
+    "ncbi_organism_categories": [
+      "archaea",
+      "bacteria",
+      "fungi",
+      "invertebrate",
+      "metagenomes",
+      "mitochondrion",
+      "plant",
+      "plasmid",
+      "plastid",
+      "protozoa",
+      "unknown",
+      "vertebrate_mammalian",
+      "vertebrate_other",
+      "viral"
+    ],
+    "ncbi_file_types": [
+      "Quality control: FCS reports, ANI analysis, contamination screening",
+      "Assembly: reports, statistics, regions",
+      "Sequences: genomic FASTA, proteins, CDS, RNA",
+      "Annotations: GFF3, GTF, GenBank flat files",
+      "Features: feature tables, counts",
+      "Expression: RNA-seq counts, TPM normalized",
+      "Ontology: Gene Ontology annotations",
+      "Quality metrics: BUSCO, CheckM, RepeatMasker"
+    ]
+  },
+  "demo_results": {
+    "kegg_crawling": {
+      "pathway_categories": {},
+      "pathway_subcategories": {},
+      "total_pathways_sampled": 0,
+      "quality_metrics": {
+        "overall_score": 0.12000000000000001,
+        "completeness": 0.0,
+        "accuracy": 0.0,
+        "consistency": 0.0,
+        "issue_count": 1
+      }
+    },
+    "ncbi_crawling": {
+      "organism_categories": {
+        "bacteria": {
+          "total_assemblies": 436240,
+          "sample_organisms": [
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown"
+          ]
+        },
+        "archaea": {
+          "total_assemblies": 2615,
+          "sample_organisms": [
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown"
+          ]
+        },
+        "fungi": {
+          "total_assemblies": 659,
+          "sample_organisms": [
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown"
+          ]
+        },
+        "vertebrate_mammalian": {
+          "total_assemblies": 246,
+          "sample_organisms": [
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown",
+            "Unknown"
+          ]
+        }
+      },
+      "supported_file_types": {
+        "total_file_types": 26,
+        "quality_control_files": [
+          "fcs_report",
+          "ani_report",
+          "ani_contam_ranges"
+        ],
+        "sequence_files": [
+          "genomic_fna",
+          "genomic_gbff",
+          "genomic_gff",
+          "genomic_gtf",
+          "protein_faa",
+          "protein_gpff",
+          "cds_from_genomic",
+          "rna_from_genomic",
+          "genomic_gaps"
+        ],
+        "annotation_files": [
+          "genomic_gff",
+          "genomic_gtf"
+        ],
+        "expression_files": [
+          "gene_expression_counts",
+          "normalized_expression",
+          "rnaseq_alignment_summary",
+          "rnaseq_runs"
+        ],
+        "feature_files": [
+          "feature_table",
+          "feature_count"
+        ]
+      },
+      "quality_control_demo": {
+        "fcs_report": {
+          "total_regions": 0,
+          "total_contaminated_length": 0,
+          "quality_score": 1.0
+        },
+        "ani_report": {
+          "average_ani": 95.5,
+          "quality_score": 0.955
+        },
+        "assembly_stats": {
+          "scaffold-N50": 150000,
+          "quality_score": 0.95
+        }
+      }
+    },
+    "quality_system": {
+      "quality_assessments": {
+        "kegg": {
+          "overall_score": 0.8281892204007177,
+          "level": "good",
+          "issues": 0,
+          "compliance": {
+            "nasa_grade": false,
+            "research_grade": false,
+            "production_ready": true
+          }
+        },
+        "ncbi": {
+          "overall_score": 0.8312119279579293,
+          "level": "good",
+          "issues": 0,
+          "compliance": {
+            "nasa_grade": false,
+            "research_grade": false,
+            "production_ready": true
+          }
+        }
+      },
+      "ncbi_quality_analysis": {}
+    }
+  }
+}

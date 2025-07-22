@@ -1,0 +1,740 @@
+[
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004115215.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_015852505.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_048593235.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_902635505.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028372415.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011100635.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030445035.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_950295315.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000313985.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000325575.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014176215.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_021234435.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_019186645.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_022682495.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_020740605.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027406575.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011100555.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009761245.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000955945.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_037993035.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003339765.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_043159975.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_008728515.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003255815.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000951045.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028878055.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_029281585.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_029289425.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028858775.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028885625.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028885655.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000001405.40"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009914755.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000002285.5"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011100685.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014441545.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_048418805.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_020975775.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_023065955.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002007445.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_902655055.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_922984935.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030435805.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011764305.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_018350175.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_018350215.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028533385.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_024362965.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_018350195.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003327715.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009762305.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000321225.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_012393455.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000349705.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011800145.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_029215605.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004348235.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_949987515.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_963455315.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_937001465.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011762595.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_963924675.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002288925.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002837175.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028021215.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_949987535.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009873245.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030014295.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_041296235.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_041296265.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_037783145.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000003025.6"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_048773025.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_036321535.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_910594005.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_023699985.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_963930625.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_032452875.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002263795.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_029378745.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_001704415.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_016772045.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_040802235.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030435755.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_033115175.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_964237555.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_001458135.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_021218885.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003426925.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000151885.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000223135.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003668045.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_017639785.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004664715.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030254825.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_900094665.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000001635.27"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_900095145.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_036323735.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011064425.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_947179515.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_034190915.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000260255.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000247695.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027887165.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028564815.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_949774975.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_026419965.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014108415.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_015220235.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_048565385.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000299155.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_023721935.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_017311325.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027574615.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002201575.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_900497805.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003369695.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_033118175.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_048564905.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000165445.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000181295.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_902686445.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027475565.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_019393635.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000276665.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_032405125.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_905146905.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003265705.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004028035.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_008632895.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009829155.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_016509475.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_006229205.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_042477335.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_023091745.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030222135.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002099425.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_903995425.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_016432865.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_005190385.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_016906955.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_008692025.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027595985.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_949786415.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_016881025.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000754665.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_018350155.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_907164565.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_025265405.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014898055.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014108235.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_020740685.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_047511655.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009764315.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000147115.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014108245.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004115265.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_036850765.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014754425.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_047675955.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_903995435.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_011762505.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_007474595.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_022079265.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_022837055.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028018385.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_001698545.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_007565055.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_006542625.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_029834395.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_022376915.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027580195.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000283155.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_010015895.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_022355385.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_020826845.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000317375.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009828535.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_039906515.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_021613505.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_036562045.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_019923935.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004126475.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_037893015.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_047511675.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_024711535.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003009895.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_963259705.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_024166365.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014885135.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_019054845.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_024139225.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000412655.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_943737965.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_027409185.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_018167655.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000442215.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000243295.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_017591425.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000151845.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_902729225.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_048164855.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030020395.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000260355.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028538775.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000296735.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_001890085.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_016433145.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014824575.3"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_023159225.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000327345.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003704035.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000334495.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_036850995.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_024542745.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_950005125.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003254725.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_001595765.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000951035.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000956105.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002288905.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_009834535.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_902806735.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_020171115.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000696425.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_004785775.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_018345385.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_007827085.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_030028045.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_002776525.5"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_041146395.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_012274545.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000622305.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_903992535.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000298275.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_019320065.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_014898765.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003031525.2"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_000164805.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_021234165.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_001604975.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028023285.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_028583685.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_029407905.1"
+  },
+  {
+    "See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for a description of the columns in this file.": "GCF_003676395.1"
+  }
+]
