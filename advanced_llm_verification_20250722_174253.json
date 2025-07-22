@@ -1,0 +1,99 @@
+{
+  "verification_summary": {
+    "total_verification_time": 17.301372289657593,
+    "overall_success_rate": 0.16666666666666666,
+    "phase_success_rates": {
+      "phase1_multimodal_llm": 0.3333333333333333,
+      "phase2_cnn_integration": 0.5,
+      "phase3_customer_data": 0.0,
+      "phase4_optimization": 0.0,
+      "integration_testing": 0.0
+    },
+    "timestamp": "2025-07-22T17:42:53.621775",
+    "system_status": "NEEDS_ATTENTION"
+  },
+  "detailed_results": {
+    "phase1_components": {
+      "advanced_llm": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      },
+      "vision_processing": {
+        "status": "success",
+        "image_processing_time": 0.003001689910888672,
+        "models_available": [
+          "clip",
+          "scientific",
+          "astronomical"
+        ],
+        "processing_success": true
+      },
+      "cross_modal_fusion": {
+        "status": "error",
+        "error": "mat1 and mat2 shapes cannot be multiplied (6x768 and 512x768)"
+      }
+    },
+    "phase2_components": {
+      "cnn_llm_integration": {
+        "status": "error",
+        "error": "'performance_metrics'"
+      },
+      "physics_attention": {
+        "status": "success",
+        "processing_time": 0.015000581741333008,
+        "output_shapes": [
+          [
+            2,
+            10,
+            1024
+          ],
+          [
+            2,
+            10,
+            1024
+          ]
+        ],
+        "physics_constraints": true
+      }
+    },
+    "phase3_components": {
+      "customer_pipeline": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      },
+      "data_preprocessor": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      }
+    },
+    "phase4_components": {
+      "optimization_engine": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      },
+      "memory_manager": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      }
+    },
+    "integration_status": {
+      "multimodal_processor": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      },
+      "backward_compatibility": {
+        "status": "error",
+        "error": "Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):\nFailed to import transformers.modeling_tf_utils because of the following error (look up to see its traceback):\nYour currently installed version of Keras is Keras 3, but this is not yet supported in Transformers. Please install the backwards-compatible tf-keras package with `pip install tf-keras`."
+      }
+    }
+  },
+  "performance_metrics": {
+    "phase1_components": {
+      "vision_processing_image_processing_time": 0.003001689910888672
+    },
+    "phase2_components": {
+      "physics_attention_processing_time": 0.015000581741333008
+    }
+  },
+  "error_log": []
+}
