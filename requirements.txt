@@ -216,8 +216,8 @@ psutil>=5.9.0
 gputil>=1.4.0
 
 # AWS Integration (using boto3 instead of awscli to avoid dependency conflicts)
-boto3==1.39.4              # AWS SDK for Python (pinned for compatibility)
-botocore==1.39.4           # Core AWS library (pinned for compatibility)
-s3fs==2024.10.0            # S3 filesystem interface for easier file operations
+boto3>=1.35.16,<1.35.37    # AWS SDK for Python (compatible with aiobotocore 2.15.2)
+botocore>=1.35.16,<1.35.37 # Core AWS library (compatible with aiobotocore 2.15.2)
+s3fs>=2024.10.0            # S3 filesystem interface for easier file operations
 aiofiles>=24.1.0           # Async file operations for data acquisition
-aiobotocore==2.15.2        # ✅ ENABLED - Async boto3 support for better performance
+aiobotocore>=2.15.2        # ✅ ENABLED - Async boto3 support for better performance
