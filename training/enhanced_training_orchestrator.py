@@ -62,6 +62,13 @@ from collections import defaultdict, deque
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Configure logging early to avoid logger undefined errors
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # PyTorch Lightning components
 from pytorch_lightning.callbacks import (
     ModelCheckpoint, EarlyStopping, LearningRateMonitor,
@@ -137,13 +144,6 @@ try:
 except ImportError as e:
     logger.warning(f"Monitoring systems not available: {e}")
     MONITORING_AVAILABLE = False
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 class TrainingMode(Enum):
     """Training modes supported by the orchestrator"""

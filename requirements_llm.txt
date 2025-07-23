@@ -1,46 +1,58 @@
-# PEFT LLM Integration Requirements
-# Parameter-Efficient Fine-tuning dependencies
+# Enhanced Foundation LLM Requirements - Tier 1 Improvements
+# Advanced LLM capabilities with scientific reasoning and optimization
 
-# Core transformers and PEFT
-transformers>=4.35.0
-peft>=0.7.0
-accelerate>=0.25.0
-bitsandbytes>=0.41.0
+# Core transformers and PEFT - Enhanced
+transformers>=4.35.0       # Latest transformers with advanced features
+peft>=0.7.0               # Parameter-Efficient Fine-tuning with MoE support
+accelerate>=0.25.0        # Model acceleration and distributed training
+bitsandbytes>=0.41.0      # Advanced quantization (4-bit, 8-bit)
 
-# PyTorch (if not already installed)
-torch>=2.0.0
-torchvision>=0.15.0
-torchaudio>=2.0.0
+# PyTorch (ensure compatibility)
+torch>=2.0.0              # Minimum PyTorch for advanced features
+torchvision>=0.15.0       # Vision components
+torchaudio>=2.0.0         # Audio processing
 
-# Text processing and embeddings
-sentence-transformers>=2.2.2
-tokenizers>=0.15.0
+# Enhanced Text Processing and Embeddings
+sentence-transformers>=2.2.2   # Scientific embedding models
+tokenizers>=0.15.0             # Fast tokenization
 
-# Knowledge retrieval and vector search
-faiss-cpu>=1.7.4
-faiss-gpu>=1.7.4  # ✅ ENABLED - GPU acceleration for vector operations
+# Knowledge Retrieval and Vector Search - Enhanced
+faiss-cpu>=1.7.4          # CPU vector search
+faiss-gpu>=1.7.4          # GPU-accelerated vector operations for production
+chromadb>=0.4.0           # Advanced vector database
+pinecone-client>=2.2.4    # Production vector database option
 
-# TTS and audio processing
-pyttsx3>=2.90
-gTTS>=2.4.0
-SpeechRecognition>=3.10.0
+# Neural Architecture Search and Optimization
+optuna>=3.4.0             # Advanced hyperparameter optimization
+ray[tune]>=2.8.0          # Distributed optimization
+ax-platform>=0.3.5       # Bayesian optimization
 
-# Additional ML utilities
-scikit-learn>=1.3.0
-numpy>=1.24.0
-scipy>=1.10.0
+# TTS and Audio Processing - Enhanced
+pyttsx3>=2.90             # Text-to-speech
+gTTS>=2.4.0               # Google Text-to-Speech
+SpeechRecognition>=3.10.0 # Speech recognition capabilities
+librosa>=0.10.0           # Audio analysis for scientific applications
 
-# Data processing
-pandas>=2.0.0
-datasets>=2.14.0
+# Scientific Computing Enhanced
+scikit-learn>=1.3.0       # Machine learning utilities
+numpy>=1.24.0             # Numerical computing
+scipy>=1.10.0             # Scientific computing
+pandas>=2.0.0             # Data manipulation
 
-# Configuration and utilities
-omegaconf>=2.3.0
-hydra-core>=1.3.0
-wandb>=0.16.0  # For experiment tracking
+# Data Processing and Streaming
+datasets>=2.14.0          # HuggingFace datasets
+apache-beam>=2.50.0       # Stream processing
+kafka-python>=2.0.2       # Real-time data streaming
 
-# Development and testing
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-black>=23.0.0
-flake8>=6.0.0 
+# Configuration and Utilities
+omegaconf>=2.3.0          # Advanced configuration management
+hydra-core>=1.3.0         # Configuration framework
+wandb>=0.16.0             # Experiment tracking and monitoring
+tensorboard>=2.15.0       # TensorBoard logging
+
+# Development and Testing
+pytest>=7.4.0            # Testing framework
+pytest-asyncio>=0.21.0   # Async testing
+black>=24.3.0             # Code formatting  
+flake8>=6.0.0             # Code linting
+mypy>=1.7.0               # Type checking 

@@ -1,6 +1,7 @@
 #########################################################
 # NASA-Grade Astrobiology Research Platform Requirements
 # Comprehensive unified requirements for all project components
+# Enhanced with Tier 1 Improvements Dependencies
 #########################################################
 
 #########################################################
@@ -22,6 +23,15 @@ torch==2.4.0              # Core PyTorch
 torchvision==0.19.0       # Computer vision utilities (compatible with PyTorch 2.4)
 torchaudio==2.4.0         # Audio processing (for biosignatures)
 pytorch-lightning==2.4.0  # High-level PyTorch training framework
+
+# ---- Enhanced ML for Tier 1 ----
+transformers>=4.35.0      # Enhanced Foundation LLM
+peft>=0.7.0              # Parameter-Efficient Fine-tuning
+accelerate>=0.25.0       # Model acceleration
+bitsandbytes>=0.41.0     # Quantization for efficiency
+sentence-transformers>=2.2.2  # Embeddings for knowledge retrieval
+optuna>=3.4.0            # Neural architecture search and optimization
+ray[tune]>=2.8.0         # Distributed hyperparameter optimization
 
 # ---- Graph Neural Networks ----
 torch_geometric>=2.5      # Graph neural networks for metabolic pathways
@@ -76,12 +86,35 @@ urllib3>=2.0.0            # HTTP library with connection pooling
 # ======  DATA STORAGE & PERSISTENCE  ================= #
 #########################################################
 h5py>=3.11                # HDF5 file format support
+boto3>=1.34.0             # AWS SDK for cloud storage
+botocore>=1.34.0          # Low-level AWS interface
+
+#########################################################
+# ======  REAL-TIME STREAMING & PRODUCTION  =========== #
+#########################################################
+# ---- Production Deployment ----
+kafka-python>=2.0.2       # Apache Kafka client
+redis>=5.0.0              # In-memory data structure store
+kubernetes>=29.0.0        # Kubernetes client
+prometheus-client>=0.19.0 # Prometheus metrics
+websockets>=12.0          # WebSocket support for real-time updates
+
+# ---- Model Serving & Optimization ----
+onnxruntime>=1.16.0       # ONNX runtime for optimized inference  
+tensorrt>=8.6.1           # NVIDIA TensorRT for GPU optimization (if available)
+tritonclient[all]>=2.40.0 # NVIDIA Triton client for model serving
+
+# ---- Monitoring & Observability ----
+jaeger-client>=4.8.0      # Distributed tracing
+grafana-api>=1.0.3        # Grafana integration
+psycopg2-binary>=2.9.0    # PostgreSQL adapter
 
 #########################################################
 # ======  ASYNC & CONCURRENCY  ======================== #
 #########################################################
 asyncpg>=0.29.0           # Async PostgreSQL driver
 schedule>=1.2.0           # Task scheduling
+aiofiles>=23.2.1          # Async file operations
 
 #########################################################
 # ======  SECURITY & ENCRYPTION  ====================== #

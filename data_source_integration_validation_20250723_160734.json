@@ -1,0 +1,114 @@
+{
+  "validation_timestamp": "2025-07-23T16:07:34.139307",
+  "validation_duration_seconds": 10.070361,
+  "integration_summary": {
+    "total_sources": 58,
+    "accessible_sources": 47,
+    "high_quality_sources": 58,
+    "production_ready_sources": 47,
+    "domains_covered": 15,
+    "integration_success_rate": 0.8103448275862069,
+    "overall_status": "needs_improvement"
+  },
+  "system_validation": {
+    "initialization_results": {
+      "limited_mode": true
+    },
+    "url_system_validation": {
+      "status": "not_available",
+      "error": "URL system not initialized"
+    },
+    "quality_control_validation": {
+      "status": "not_available"
+    },
+    "metadata_integration_validation": {
+      "status": "not_available"
+    },
+    "pipeline_compatibility_validation": {
+      "status": "not_available"
+    }
+  },
+  "accessibility_validation": {
+    "status": "completed",
+    "validation_results": [
+      "ValidationResult(source_name='NASA Exoplanet Archive', domain='astrobiology_exoplanets', url='https://exoplanetarchive.ipac.caltech.edu', api_endpoint='/TAP/', accessibility_score=0.1, response_time_ms=0.0, data_quality_score=1.0, integration_status='timeout', error_messages=['Connection timeout'], metadata_complete=True, pipeline_compatible=True, production_ready=False)",
+      "ValidationResult(source_name='ESA Gaia Archive', domain='astrobiology_exoplanets', url='https://gea.esac.esa.int/archive', api_endpoint='/tap-server/tap/', accessibility_score=0.8, response_time_ms=2157.85813331604, data_quality_score=1.0, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='JWST MAST Archive', domain='astrobiology_exoplanets', url='https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html', api_endpoint='/api/v0.1/', accessibility_score=1.0, response_time_ms=1769.1335678100586, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NCBI GenBank', domain='genomics_molecular', url='https://www.ncbi.nlm.nih.gov/genbank/', api_endpoint='/entrez/eutils/', accessibility_score=1.0, response_time_ms=1447.1662044525146, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Ensembl Genomes', domain='genomics_molecular', url='https://ensemblgenomes.org/', api_endpoint='/rest/', accessibility_score=1.0, response_time_ms=2115.628480911255, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='UniProt Knowledgebase', domain='genomics_molecular', url='https://www.uniprot.org/', api_endpoint='/uniprot/', accessibility_score=1.0, response_time_ms=2024.7690677642822, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NASA Giovanni', domain='atmospheric_climate', url='https://giovanni.gsfc.nasa.gov/giovanni/', api_endpoint='/daac-bin/giovanni/', accessibility_score=1.0, response_time_ms=4169.213771820068, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='ESA Climate Data Store', domain='atmospheric_climate', url='https://cds.climate.copernicus.eu/', api_endpoint='/api/v2/', accessibility_score=1.0, response_time_ms=2068.014621734619, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NOAA Climate Data Online', domain='atmospheric_climate', url='https://www.ncdc.noaa.gov/cdo-web/', api_endpoint='/api/v2/', accessibility_score=1.0, response_time_ms=2094.9413776397705, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='USGS Mineral Resources', domain='geochemistry_mineralogy', url='https://mrdata.usgs.gov/', api_endpoint='/api/', accessibility_score=1.0, response_time_ms=2086.538314819336, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='EarthChem Portal', domain='geochemistry_mineralogy', url='http://www.earthchem.org/', api_endpoint='/portal/api/', accessibility_score=0.8, response_time_ms=1094.1026210784912, data_quality_score=1.0, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Cambridge Structural Database', domain='geochemistry_mineralogy', url='https://www.ccdc.cam.ac.uk/', api_endpoint='/structures/', accessibility_score=1.0, response_time_ms=1896.3546752929688, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Hipparcos-Tycho Catalog', domain='astrophysics_stellar', url='https://www.cosmos.esa.int/web/hipparcos', api_endpoint='/hipparcos-data/', accessibility_score=0.0, response_time_ms=0.0, data_quality_score=1.0, integration_status='connection_failed', error_messages=[\"Connection error: Cannot connect to host www.cosmos.esa.int:443 ssl:True [SSLCertVerificationError: (1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1006)')]\"], metadata_complete=True, pipeline_compatible=True, production_ready=False)",
+      "ValidationResult(source_name='Gaia Data Release 3', domain='astrophysics_stellar', url='https://gea.esac.esa.int/archive/', api_endpoint='/tap-server/tap/', accessibility_score=1.0, response_time_ms=2147.080421447754, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Sloan Digital Sky Survey', domain='astrophysics_stellar', url='https://www.sdss.org/', api_endpoint='/dr17/en/tools/search/', accessibility_score=1.0, response_time_ms=1330.1467895507812, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NRAO Science Data Archive', domain='radio_astronomy', url='https://archive.nrao.edu/', api_endpoint='/archive/', accessibility_score=1.0, response_time_ms=2067.5101280212402, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='ALMA Science Archive', domain='radio_astronomy', url='https://almascience.eso.org/aq/', api_endpoint='/tap/', accessibility_score=1.0, response_time_ms=2231.6813468933105, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='ATNF Pulsar Catalog', domain='radio_astronomy', url='https://www.atnf.csiro.au/research/pulsar/psrcat/', api_endpoint='/psrcat/', accessibility_score=1.0, response_time_ms=6040.366172790527, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Chandra Data Archive', domain='high_energy', url='https://cda.harvard.edu/chaser/', api_endpoint='/srservices/', accessibility_score=1.0, response_time_ms=1669.853925704956, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='XMM-Newton Science Archive', domain='high_energy', url='https://www.cosmos.esa.int/web/xmm-newton/xsa', api_endpoint='/xsa/', accessibility_score=0.0, response_time_ms=0.0, data_quality_score=1.0, integration_status='connection_failed', error_messages=[\"Connection error: Cannot connect to host www.cosmos.esa.int:443 ssl:True [SSLCertVerificationError: (1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1006)')]\"], metadata_complete=True, pipeline_compatible=True, production_ready=False)",
+      "ValidationResult(source_name='Fermi LAT Catalog', domain='high_energy', url='https://fermi.gsfc.nasa.gov/ssc/data/', api_endpoint='/catalog/', accessibility_score=1.0, response_time_ms=2440.673351287842, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NASA PDS Atmospheres Node', domain='solar_system', url='https://atmos.nmsu.edu/', api_endpoint='/data/', accessibility_score=1.0, response_time_ms=2000.5838871002197, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NASA PDS Geosciences Node', domain='solar_system', url='https://pds-geosciences.wustl.edu/', api_endpoint='/search/', accessibility_score=1.0, response_time_ms=1853.3995151519775, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Mars Global Surveyor Archive', domain='solar_system', url='https://pds-geosciences.wustl.edu/missions/mgs/', api_endpoint='/data/', accessibility_score=1.0, response_time_ms=1834.8214626312256, data_quality_score=0.99, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='NIST Atomic Spectra Database', domain='laboratory_astrophysics', url='https://physics.nist.gov/PhysRefData/ASD/Html/asd.html', api_endpoint='/asd/', accessibility_score=0.3, response_time_ms=2535.0589752197266, data_quality_score=1.0, integration_status='limited_access', error_messages=['HTTP 404'], metadata_complete=True, pipeline_compatible=True, production_ready=False)",
+      "ValidationResult(source_name='HITRAN Molecular Database', domain='laboratory_astrophysics', url='https://hitran.org/', api_endpoint='/lbl/', accessibility_score=1.0, response_time_ms=1459.9616527557373, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Laboratory Astrophysics Database', domain='laboratory_astrophysics', url='https://plasma-gate.weizmann.ac.il/Labs/', api_endpoint='/data/', accessibility_score=0.8, response_time_ms=1834.327220916748, data_quality_score=0.98, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Penn State Astrostatistics', domain='astrostatistics', url='https://astrostatistics.psu.edu/', api_endpoint='/data/', accessibility_score=0.1, response_time_ms=0.0, data_quality_score=0.97, integration_status='timeout', error_messages=['Connection timeout'], metadata_complete=True, pipeline_compatible=True, production_ready=False)",
+      "ValidationResult(source_name='Galaxy Zoo Classifications', domain='astrostatistics', url='https://www.galaxyzoo.org/', api_endpoint='/data/', accessibility_score=0.8, response_time_ms=1718.090295791626, data_quality_score=1.0, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Millennium Simulation', domain='theoretical_astrophysics', url='https://www.mpa-garching.mpg.de/galform/virgo/millennium/', api_endpoint='/data/', accessibility_score=0.8, response_time_ms=2168.9844131469727, data_quality_score=1.0, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Geneva Stellar Evolution Grids', domain='theoretical_astrophysics', url='https://www.unige.ch/sciences/astro/evolution/en/', api_endpoint='/grids/', accessibility_score=0.8, response_time_ms=2401.7250537872314, data_quality_score=1.0, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Gravitational Wave Transient Catalog', domain='multi_messenger', url='https://www.gw-openscience.org/eventapi/', api_endpoint='/catalog/', accessibility_score=0.8, response_time_ms=2144.8726654052734, data_quality_score=1.0, integration_status='accessible_with_issues', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='IceCube Neutrino Observatory', domain='multi_messenger', url='https://icecube.wisc.edu/', api_endpoint='/data/', accessibility_score=1.0, response_time_ms=2105.1220893859863, data_quality_score=1.0, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Zooniverse Astrophysics Projects', domain='citizen_science', url='https://www.zooniverse.org/', api_endpoint='/projects/', accessibility_score=1.0, response_time_ms=2191.622018814087, data_quality_score=0.95, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='AAVSO Database', domain='citizen_science', url='https://www.aavso.org/', api_endpoint='/data/', accessibility_score=1.0, response_time_ms=1795.0446605682373, data_quality_score=0.98, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Digitized Sky Survey', domain='archival_legacy', url='https://archive.stsci.edu/dss/', api_endpoint='/cgi-bin/dss_search', accessibility_score=1.0, response_time_ms=2175.086498260498, data_quality_score=0.99, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Harvard Plate Collection', domain='archival_legacy', url='https://platestacks.cfa.harvard.edu/', api_endpoint='/search/', accessibility_score=1.0, response_time_ms=1862.6604080200195, data_quality_score=0.96, integration_status='accessible', error_messages=[], metadata_complete=True, pipeline_compatible=True, production_ready=True)",
+      "ValidationResult(source_name='Global Quantum Sensor Networks', domain='emerging_technologies', url='https://www.quantum-sensors.org/', api_endpoint='/data/', accessibility_score=0.0, response_time_ms=0.0, data_quality_score=0.9199999999999999, integration_status='connection_failed', error_messages=['Connection error: Cannot connect to host www.quantum-sensors.org:443 ssl:default [[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1006)]'], metadata_complete=True, pipeline_compatible=True, production_ready=False)",
+      "ValidationResult(source_name='ML Astronomical Survey Data', domain='emerging_technologies', url='https://ml-astro.org/', api_endpoint='/datasets/', accessibility_score=0.0, response_time_ms=0.0, data_quality_score=1.0, integration_status='connection_failed', error_messages=['Connection error: Cannot connect to host ml-astro.org:443 ssl:default [getaddrinfo failed]'], metadata_complete=True, pipeline_compatible=True, production_ready=False)"
+    ],
+    "summary_statistics": {
+      "total_tested": 39,
+      "accessible_sources": 32,
+      "high_quality_sources": 39,
+      "production_ready_sources": 32,
+      "average_response_time_ms": 2149.466478463375,
+      "average_quality_score": 0.9933333333333334
+    }
+  },
+  "production_assessment": {
+    "readiness_score": 0.4,
+    "overall_status": "needs_improvement",
+    "readiness_criteria": {
+      "accessibility_threshold_met": false,
+      "quality_threshold_met": "True",
+      "response_time_acceptable": "True",
+      "integration_success_rate_met": false,
+      "all_components_operational": false
+    },
+    "performance_metrics": {
+      "accessibility_rate": 0.8103448275862069,
+      "quality_rate": 1.0,
+      "production_ready_rate": 0.8103448275862069,
+      "average_response_time_ms": 2149.466478463375,
+      "average_quality_score": 0.9933333333333334
+    },
+    "recommendations": [
+      "Improve data source accessibility - check URL validity and network connectivity",
+      "Review and fix integration issues with data sources",
+      "Ensure all data management components are properly initialized"
+    ]
+  },
+  "performance_metrics": {
+    "average_response_time_ms": 2149.466478463375,
+    "average_quality_score": 0.9933333333333334,
+    "accessibility_rate": 0.8103448275862069,
+    "quality_compliance_rate": 1.0
+  },
+  "validation_status": "needs_attention",
+  "zero_error_tolerance_met": false
+}
