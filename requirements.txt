@@ -100,7 +100,7 @@ prometheus-client>=0.19.0 # Prometheus metrics
 websockets>=12.0          # WebSocket support for real-time updates
 
 # ---- Model Serving & Optimization ----
-onnxruntime>=1.16.0       # ONNX runtime for optimized inference  
+onnxruntime>=1.16.0       # ONNX runtime for optimized inference
 tensorrt>=8.6.1           # NVIDIA TensorRT for GPU optimization (if available)
 tritonclient[all]>=2.40.0 # NVIDIA Triton client for model serving
 
@@ -179,7 +179,7 @@ pre-commit>=3.7           # Pre-commit hooks
 #########################################################
 # For GPU support, install PyTorch with CUDA:
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-# 
+#
 # For graph neural networks after PyTorch:
 # pip install torch_geometric torch_sparse
 # pip install torch-scatter -f https://data.pyg.org/whl/torch-2.2.0+cu118.html

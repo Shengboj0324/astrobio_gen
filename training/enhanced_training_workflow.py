@@ -72,13 +72,8 @@ class LossStrategy(Enum):
     UNCERTAINTY = "uncertainty"       # Uncertainty-based weighting
     GRADIENT_NORM = "gradient_norm"    # Gradient norm balancing
 
-class OptimizationStrategy(Enum):
-    """Optimization strategies"""
-    ADAMW = "adamw"
-    SGD = "sgd"
-    ADAMW_COSINE = "adamw_cosine"
-    ADAMW_ONECYCLE = "adamw_onecycle"
-
+# OptimizationStrategy moved to enhanced_training_orchestrator.py
+from .enhanced_training_orchestrator import OptimizationStrategy
 @dataclass
 class TrainingConfig:
     """Configuration for enhanced training"""

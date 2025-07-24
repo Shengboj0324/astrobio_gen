@@ -1,0 +1,243 @@
+{
+  "timestamp": "2025-07-24T11:47:10.851915",
+  "ssl_manager_available": true,
+  "url_system_available": true,
+  "total_sources_processed": 5,
+  "ssl_issues_fixed": 3,
+  "sources_preserved": 5,
+  "fallback_configurations": 1,
+  "success_rate": 60.0,
+  "detailed_results": {
+    "ssl_issues_found": [],
+    "ssl_fixes_applied": [
+      {
+        "source_name": "ESA Cosmos Database",
+        "domain": "www.cosmos.esa.int",
+        "config_used": "self_signed_certificate",
+        "fallback_used": true,
+        "response_time_ms": 3234.0000000040163
+      },
+      {
+        "source_name": "NASA Exoplanet Archive",
+        "domain": "exoplanetarchive.ipac.caltech.edu",
+        "config_used": "default",
+        "fallback_used": false,
+        "response_time_ms": 3360.000000000582
+      },
+      {
+        "source_name": "NCBI GenBank",
+        "domain": "www.ncbi.nlm.nih.gov",
+        "config_used": "default",
+        "fallback_used": false,
+        "response_time_ms": 2218.0000000007567
+      }
+    ],
+    "failed_sources": [
+      {
+        "source_name": "Quantum Sensor Networks",
+        "domain": "www.quantum-sensors.org",
+        "error": "No working SSL configuration found"
+      },
+      {
+        "source_name": "ML Astronomical Survey",
+        "domain": "ml-astro.org",
+        "error": "No working SSL configuration found"
+      }
+    ],
+    "preserved_sources": [
+      {
+        "source_name": "ESA Cosmos Database",
+        "preserved": true,
+        "ssl_working": true,
+        "fallback_configured": true
+      },
+      {
+        "source_name": "Quantum Sensor Networks",
+        "preserved": true,
+        "ssl_working": false,
+        "fallback_configured": true,
+        "note": "Preserved with relaxed SSL configuration"
+      },
+      {
+        "source_name": "ML Astronomical Survey",
+        "preserved": true,
+        "ssl_working": false,
+        "fallback_configured": true,
+        "note": "Preserved with relaxed SSL configuration"
+      },
+      {
+        "source_name": "NASA Exoplanet Archive",
+        "preserved": true,
+        "ssl_working": true,
+        "fallback_configured": false
+      },
+      {
+        "source_name": "NCBI GenBank",
+        "preserved": true,
+        "ssl_working": true,
+        "fallback_configured": false
+      }
+    ],
+    "validation_results": {
+      "total_sources": 5,
+      "successful_ssl_configs": 3,
+      "failed_ssl_configs": 2,
+      "sources_with_fallbacks": 1,
+      "detailed_results": [
+        {
+          "source_name": "ESA Cosmos Database",
+          "domain": "www.cosmos.esa.int",
+          "url": "https://www.cosmos.esa.int",
+          "ssl_working": true,
+          "config_used": "self_signed_certificate",
+          "fallback_used": true,
+          "error_message": null,
+          "response_time_ms": 3234.0000000040163
+        },
+        {
+          "source_name": "Quantum Sensor Networks",
+          "domain": "www.quantum-sensors.org",
+          "url": "https://www.quantum-sensors.org",
+          "ssl_working": false,
+          "config_used": null,
+          "fallback_used": false,
+          "error_message": "No working SSL configuration found",
+          "response_time_ms": null
+        },
+        {
+          "source_name": "ML Astronomical Survey",
+          "domain": "ml-astro.org",
+          "url": "https://ml-astro.org",
+          "ssl_working": false,
+          "config_used": null,
+          "fallback_used": false,
+          "error_message": "No working SSL configuration found",
+          "response_time_ms": null
+        },
+        {
+          "source_name": "NASA Exoplanet Archive",
+          "domain": "exoplanetarchive.ipac.caltech.edu",
+          "url": "https://exoplanetarchive.ipac.caltech.edu",
+          "ssl_working": true,
+          "config_used": "default",
+          "fallback_used": false,
+          "error_message": null,
+          "response_time_ms": 3360.000000000582
+        },
+        {
+          "source_name": "NCBI GenBank",
+          "domain": "www.ncbi.nlm.nih.gov",
+          "url": "https://www.ncbi.nlm.nih.gov",
+          "ssl_working": true,
+          "config_used": "default",
+          "fallback_used": false,
+          "error_message": null,
+          "response_time_ms": 2218.0000000007567
+        }
+      ]
+    }
+  },
+  "ssl_configuration_status": {
+    "certifi_available": true,
+    "cert_bundle_path": "C:\\Users\\sjham\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\certifi\\cacert.pem",
+    "ssl_context_working": true,
+    "external_api_accessible": true,
+    "enhanced_ssl_available": true,
+    "enhanced_ssl_domains_configured": 3,
+    "enhanced_ssl_status": {
+      "total_domain_configs": 3,
+      "problematic_domains": {
+        "www.cosmos.esa.int": [
+          "self_signed_certificate"
+        ],
+        "www.quantum-sensors.org": [
+          "handshake_failure"
+        ],
+        "ml-astro.org": [
+          "certificate_verify_failed"
+        ],
+        "legacy-databases.org": [
+          "protocol_error"
+        ],
+        "self-signed-apis.edu": [
+          "self_signed_certificate"
+        ]
+      },
+      "successful_configs": 0,
+      "cached_sessions": 0,
+      "domain_configs": {
+        "www.cosmos.esa.int": {
+          "verify_ssl": false,
+          "allow_self_signed": true,
+          "issue_type": "self_signed_certificate",
+          "fallback_enabled": true
+        },
+        "www.quantum-sensors.org": {
+          "verify_ssl": true,
+          "allow_self_signed": false,
+          "issue_type": "handshake_failure",
+          "fallback_enabled": true
+        },
+        "self-signed-apis.edu": {
+          "verify_ssl": false,
+          "allow_self_signed": true,
+          "issue_type": "self_signed_certificate",
+          "fallback_enabled": true
+        }
+      }
+    }
+  },
+  "ssl_manager_status": {
+    "total_domain_configs": 3,
+    "problematic_domains": {
+      "www.cosmos.esa.int": [
+        "self_signed_certificate"
+      ],
+      "www.quantum-sensors.org": [
+        "handshake_failure"
+      ],
+      "ml-astro.org": [
+        "certificate_verify_failed"
+      ],
+      "legacy-databases.org": [
+        "protocol_error"
+      ],
+      "self-signed-apis.edu": [
+        "self_signed_certificate"
+      ]
+    },
+    "successful_configs": 0,
+    "cached_sessions": 0,
+    "domain_configs": {
+      "www.cosmos.esa.int": {
+        "verify_ssl": false,
+        "allow_self_signed": true,
+        "issue_type": "self_signed_certificate",
+        "fallback_enabled": true
+      },
+      "www.quantum-sensors.org": {
+        "verify_ssl": true,
+        "allow_self_signed": false,
+        "issue_type": "handshake_failure",
+        "fallback_enabled": true
+      },
+      "self-signed-apis.edu": {
+        "verify_ssl": false,
+        "allow_self_signed": true,
+        "issue_type": "self_signed_certificate",
+        "fallback_enabled": true
+      }
+    }
+  },
+  "updated_config_file": "ssl_fixes_applied_config_20250724_114722.yaml",
+  "summary_statistics": {
+    "total_sources_processed": 5,
+    "ssl_issues_identified": 0,
+    "ssl_fixes_successful": 3,
+    "fallback_configurations_used": 1,
+    "sources_with_working_ssl": 3,
+    "sources_with_fallbacks": 3,
+    "sources_preserved_rate": 100.0,
+    "ssl_success_rate": 60.0
+  }
+}
