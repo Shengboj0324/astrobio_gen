@@ -61,38 +61,7 @@ import math
 
 warnings.filterwarnings('ignore')
 
-# Import all system components
-try:
-    # Galactic and Tier 5 Systems
-    from models.galactic_research_network import GalacticResearchNetworkOrchestrator, CelestialBodyType
-    from models.galactic_tier5_integration import GalacticTier5Integration
-    from models.tier5_autonomous_discovery_orchestrator import Tier5AutonomousDiscoveryOrchestrator
-    
-    # LLM Systems
-    from models.peft_llm_integration import SurrogateOutputs, LLMConfig
-    from models.enhanced_foundation_llm import EnhancedFoundationLLM, EnhancedLLMConfig
-    
-    # Surrogate Models
-    from models.surrogate_transformer import SurrogateTransformer, UncertaintyQuantification
-    from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration, MultiModalConfig
-    
-    # CNN and U-Net Models
-    from models.datacube_unet import CubeUNet
-    from models.enhanced_datacube_unet import EnhancedCubeUNet
-    from models.evolutionary_process_tracker import EvolutionaryProcessTracker, FiveDimensionalDatacube
-    
-    # Specialized Models
-    from models.spectral_surrogate import SpectralSurrogate
-    from models.graph_vae import GVAE
-    from models.metabolism_model import MetabolismGenerator
-    
-    COMPONENTS_AVAILABLE = True
-    logger.info("✅ All components successfully imported")
-except ImportError as e:
-    logger.warning(f"Some components not available: {e}")
-    COMPONENTS_AVAILABLE = False
-
-# Configure advanced logging
+# Configure advanced logging first
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -102,6 +71,108 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Import system components with dynamic loading to avoid circular imports
+COMPONENTS_AVAILABLE = {}
+
+def get_galactic_network():
+    """Dynamically import and return galactic network"""
+    try:
+        from models.galactic_research_network import GalacticResearchNetworkOrchestrator
+        return GalacticResearchNetworkOrchestrator
+    except ImportError:
+        return None
+
+def get_discovery_pipeline():
+    """Dynamically import and return discovery pipeline"""
+    try:
+        from models.real_time_discovery_pipeline import RealTimeDiscoveryPipeline
+        return RealTimeDiscoveryPipeline
+    except ImportError:
+        return None
+
+def get_research_agents():
+    """Dynamically import and return research agents"""
+    try:
+        from models.autonomous_research_agents import MultiAgentResearchOrchestrator
+        return MultiAgentResearchOrchestrator
+    except ImportError:
+        return None
+
+def get_surrogate_models():
+    """Dynamically import surrogate models"""
+    models = {}
+    try:
+        from models.surrogate_transformer import SurrogateTransformer
+        models['surrogate_transformer'] = SurrogateTransformer
+    except ImportError:
+        pass
+    
+    try:
+        from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration
+        models['enhanced_surrogate'] = EnhancedSurrogateIntegration
+    except ImportError:
+        pass
+    
+    return models
+
+def get_cnn_models():
+    """Dynamically import CNN models"""
+    models = {}
+    try:
+        from models.datacube_unet import CubeUNet
+        models['datacube_unet'] = CubeUNet
+    except ImportError:
+        pass
+    
+    try:
+        from models.enhanced_datacube_unet import EnhancedCubeUNet
+        models['enhanced_unet'] = EnhancedCubeUNet
+    except ImportError:
+        pass
+    
+    return models
+
+def get_specialized_models():
+    """Dynamically import specialized models"""
+    models = {}
+    try:
+        from models.spectral_surrogate import SpectralSurrogate
+        models['spectral_surrogate'] = SpectralSurrogate
+    except ImportError:
+        pass
+    
+    try:
+        from models.graph_vae import GVAE
+        models['graph_vae'] = GVAE
+    except ImportError:
+        pass
+    
+    return models
+
+# Test component availability
+COMPONENTS_AVAILABLE = {
+    'galactic_network': get_galactic_network() is not None,
+    'discovery_pipeline': get_discovery_pipeline() is not None,
+    'research_agents': get_research_agents() is not None,
+    'surrogate_models': len(get_surrogate_models()) > 0,
+    'cnn_models': len(get_cnn_models()) > 0,
+    'specialized_models': len(get_specialized_models()) > 0
+}
+
+logger.info(f"Component availability: {COMPONENTS_AVAILABLE}")
+
+class ComponentType(Enum):
+    """Types of components in the unified system"""
+    GALACTIC_NETWORK = "galactic_network"
+    TIER5_SYSTEM = "tier5_system"
+    LLM_FOUNDATION = "llm_foundation"
+    SURROGATE_TRANSFORMER = "surrogate_transformer"
+    DATACUBE_UNET = "datacube_unet"
+    ENHANCED_CNN = "enhanced_cnn"
+    SPECTRAL_SURROGATE = "spectral_surrogate"
+    GRAPH_VAE = "graph_vae"
+    METABOLISM_MODEL = "metabolism_model"
 
 class IntegrationPhase(Enum):
     """Integration and training phases"""
