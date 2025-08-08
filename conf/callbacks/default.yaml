@@ -1,0 +1,43 @@
+model_checkpoint:
+  _target_: lightning.pytorch.callbacks.ModelCheckpoint
+  monitor: val_loss
+  mode: min
+  save_top_k: 3
+  save_last: true
+  save_weights_only: false
+  filename: "epoch_{epoch:03d}_val_loss_{val_loss:.4f}"
+  auto_insert_metric_name: false
+  every_n_train_steps: null
+  every_n_epochs: 1
+  save_on_train_epoch_end: null
+
+early_stopping:
+  _target_: lightning.pytorch.callbacks.EarlyStopping
+  monitor: val_loss
+  mode: min
+  patience: 10
+  min_delta: 1e-4
+  check_finite: true
+  stopping_threshold: null
+  divergence_threshold: null
+  check_on_train_epoch_end: null
+
+learning_rate_monitor:
+  _target_: lightning.pytorch.callbacks.LearningRateMonitor
+  logging_interval: step
+  log_momentum: false
+
+rich_progress_bar:
+  _target_: lightning.pytorch.callbacks.RichProgressBar
+  refresh_rate: 1
+  leave: true
+
+model_summary:
+  _target_: lightning.pytorch.callbacks.RichModelSummary
+  max_depth: 1
+
+timer:
+  _target_: lightning.pytorch.callbacks.Timer
+  duration: null
+  interval: epoch
+  verbose: false

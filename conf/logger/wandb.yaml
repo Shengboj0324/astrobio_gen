@@ -1,0 +1,18 @@
+wandb:
+  _target_: lightning.pytorch.loggers.WandbLogger
+  project: astrobio-gen
+  name: null
+  save_dir: ${output_dir}
+  offline: false
+  id: null
+  anonymous: null
+  version: null
+  log_model: false
+  prefix: ""
+  job_type: "train"
+  group: null
+  tags: 
+    - astrobio-gen
+    - production
+    - world-class
+  notes: "Astrobio-Gen world-class training run"

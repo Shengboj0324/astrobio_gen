@@ -1,6 +1,8 @@
-from bs4 import BeautifulSoup
+import csv
+import re
 from pathlib import Path
-import csv, re
+
+from bs4 import BeautifulSoup
 
 html = Path("data/raw/map01220.html").read_text(encoding="utf-8")
 soup = BeautifulSoup(html, "lxml")

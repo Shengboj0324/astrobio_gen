@@ -1,0 +1,99 @@
+stages:
+  download_raw:
+    cmd: python -m astrobio_gen.data.download --sources all --output-dir data/raw
+    deps:
+      - config/data_sources/comprehensive_100_sources.yaml
+      - src/astrobio_gen/data/download.py
+    outs:
+      - data/raw:
+          cache: false
+          persist: true
+    desc: "Download raw scientific data from all configured sources"
+    
+  validate_raw:
+    cmd: python -m astrobio_gen.data.validate --input-dir data/raw --output-dir data/validated
+    deps:
+      - data/raw
+      - src/astrobio_gen/data/validate.py
+    outs:
+      - data/validated
+      - data/quality_reports/raw_validation.json
+    metrics:
+      - data/quality_reports/raw_validation.json:
+          cache: false
+    desc: "Validate raw data quality and completeness"
+    
+  preprocess:
+    cmd: python -m astrobio_gen.data.preprocess --input-dir data/validated --output-dir data/processed --format zarr
+    deps:
+      - data/validated
+      - src/astrobio_gen/data/preprocess.py
+      - config/preprocessing.yaml
+    outs:
+      - data/processed
+    params:
+      - preprocessing.normalization
+      - preprocessing.augmentation
+      - preprocessing.chunk_size
+    desc: "Preprocess and standardize scientific data"
+    
+  create_datacubes:
+    cmd: python -m astrobio_gen.data.datacube --input-dir data/processed --output-dir data/datacubes --dimensions 5
+    deps:
+      - data/processed
+      - src/astrobio_gen/data/datacube.py
+    outs:
+      - data/datacubes
+    desc: "Create 5D datacubes for training"
+    
+  tensor_cache:
+    cmd: python -m astrobio_gen.data.tensorize --input-dir data/datacubes --output-dir data/tensors --batch-size 32
+    deps:
+      - data/datacubes
+      - src/astrobio_gen/data/tensorize.py
+    outs:
+      - data/tensors
+    desc: "Convert to optimized tensor format for training"
+    
+  train_baseline:
+    cmd: python -m astrobio_gen.cli train --experiment baseline_5d --config conf/config.yaml
+    deps:
+      - data/tensors
+      - conf/config.yaml
+      - conf/experiment/baseline_5d.yaml
+      - src/astrobio_gen/models/enhanced_datacube_unet.py
+      - src/astrobio_gen/training/
+    outs:
+      - outputs/models/baseline_5d:
+          cache: false
+          persist: true
+    metrics:
+      - outputs/models/baseline_5d/metrics.json:
+          cache: false
+    desc: "Train baseline 5D enhanced datacube model"
+    
+  evaluate_baseline:
+    cmd: python -m astrobio_gen.cli eval --model baseline_5d --checkpoint outputs/models/baseline_5d/last.ckpt --dataset test
+    deps:
+      - outputs/models/baseline_5d/last.ckpt
+      - data/tensors
+    outs:
+      - outputs/evaluation/baseline_5d_results.json
+    metrics:
+      - outputs/evaluation/baseline_5d_results.json:
+          cache: false
+    desc: "Evaluate baseline model performance"
+
+plots:
+  - training_metrics:
+      x: epoch
+      y:
+        - outputs/models/baseline_5d/metrics.json:train_loss
+        - outputs/models/baseline_5d/metrics.json:val_loss
+      title: "Training Progress"
+      
+  - model_performance:
+      template: confusion_matrix
+      x: outputs/evaluation/baseline_5d_results.json:y_true
+      y: outputs/evaluation/baseline_5d_results.json:y_pred
+      title: "Model Performance"

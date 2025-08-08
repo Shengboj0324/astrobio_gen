@@ -7,8 +7,12 @@ output → data/interim/genome_samples.csv
 columns: sample,population,coverage,file
 """
 
-import os, re, csv, sys
+import csv
+import os
+import re
+import sys
 from pathlib import Path
+
 import pysam
 
 GEN_DIR = Path(os.getenv("ASTROBIO_GENOME_DIR", ""))
@@ -27,6 +31,7 @@ bam_files = list(GEN_DIR.glob("*.bam")) + list(GEN_DIR.glob("*.cram"))
 if not bam_files:
     sys.exit(f"No BAM/CRAM files found in {GEN_DIR}")
 
+
 def guess_pop(sample_id: str) -> str:
     """
     Rough population guess from 1000 G naming convention.
@@ -35,20 +40,17 @@ def guess_pop(sample_id: str) -> str:
     m = re.match(r"([A-Z]{3})", sample_id)
     return m.group(1) if m else "UNK"
 
+
 for path in bam_files:
     try:
-        bam = pysam.AlignmentFile(path, "rc" if path.suffix==".cram" else "rb")
+        bam = pysam.AlignmentFile(path, "rc" if path.suffix == ".cram" else "rb")
     except Exception as e:
         print(f"⚠  skip {path.name}: {e}")
         continue
 
     hd = bam.header.to_dict()
     # sample name from RG.SM or fall back to filename stem
-    sid = (
-        hd.get("RG", [{}])[0].get("SM")
-        or hd.get("PG", [{}])[0].get("ID")
-        or path.stem
-    )
+    sid = hd.get("RG", [{}])[0].get("SM") or hd.get("PG", [{}])[0].get("ID") or path.stem
     pop = guess_pop(sid)
     coverage = round(bam.mapped / 3_000_000, 1)  # crude ≈× coverage
 
@@ -56,8 +58,6 @@ for path in bam_files:
     bam.close()
 
 with OUT.open("w", newline="") as fh:
-    csv.writer(fh).writerows(
-        [("sample", "population", "coverage", "file")] + rows
-    )
+    csv.writer(fh).writerows([("sample", "population", "coverage", "file")] + rows)
 
 print(f"✔  wrote {OUT}  ({len(rows)} samples)")

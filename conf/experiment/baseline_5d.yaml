@@ -1,0 +1,105 @@
+# @package _global_
+defaults:
+  - /model: enhanced_datacube
+  - /trainer: gpu_light
+  - /data: cube_dm
+
+# Experiment metadata
+name: baseline_5d
+description: "Baseline 5D Enhanced Datacube U-Net experiment with physics constraints"
+tags: [baseline, 5d, enhanced, physics_informed]
+
+# Override global settings for this experiment
+max_epochs: 100
+batch_size: 32
+learning_rate: 1e-4
+
+# Model specific overrides
+model:
+  name: enhanced_datacube_5d
+  n_input_vars: 5
+  n_output_vars: 5
+  input_variables: ["temperature", "pressure", "humidity", "velocity_u", "velocity_v"]
+  output_variables: ["temperature", "pressure", "humidity", "velocity_u", "velocity_v"] 
+  base_features: 64
+  depth: 4
+  use_attention: true
+  use_transformer: false
+  use_physics_constraints: true
+  physics_weight: 0.2
+  use_separable_conv: true
+  use_mixed_precision: true
+  model_scaling: efficient
+
+# Trainer overrides
+trainer:
+  max_epochs: ${max_epochs}
+  precision: 16-mixed
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 1
+  val_check_interval: 1.0
+  check_val_every_n_epoch: 1
+
+# Data overrides  
+data:
+  batch_size: ${batch_size}
+  num_workers: 4
+  pin_memory: true
+  shuffle: true
+  drop_last: true
+
+# Callbacks
+callbacks:
+  model_checkpoint:
+    monitor: val_loss
+    mode: min
+    save_top_k: 3
+    save_last: true
+    filename: "baseline_5d_epoch_{epoch:03d}_val_loss_{val_loss:.4f}"
+  
+  early_stopping:
+    monitor: val_loss
+    mode: min
+    patience: 15
+    min_delta: 1e-4
+
+# Logger
+logger:
+  wandb:
+    name: "${experiment.name}_${now:%Y%m%d_%H%M%S}"
+    project: astrobio-gen-experiments
+    tags: ${experiment.tags}
+    notes: ${experiment.description}
+
+# Optimizer
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: ${learning_rate}
+  weight_decay: ${weight_decay}
+  betas: [0.9, 0.999]
+  eps: 1e-8
+
+# Scheduler
+scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: ${max_epochs}
+  eta_min: 1e-6
+
+# Loss function
+loss:
+  _target_: torch.nn.MSELoss
+  reduction: mean
+
+# Physics constraints
+physics:
+  enable: ${model.use_physics_constraints}
+  weight: ${model.physics_weight}
+  constraints:
+    - mass_conservation
+    - energy_conservation
+    - momentum_conservation
+
+# Reproducibility
+seed: ${seed}
+deterministic: false
+benchmark: true

@@ -7,10 +7,10 @@ import shutil
 import urllib.request
 from typing import Any, Dict, List
 
-
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DATA.mkdir(exist_ok=True)
+
 
 def load_dummy_planets(file: str | pathlib.Path | None = None) -> List[Dict[str, Any]]:
     """
@@ -24,6 +24,7 @@ def load_dummy_planets(file: str | pathlib.Path | None = None) -> List[Dict[str,
 def load_dummy_metabolism(file: str | pathlib.Path | None = None) -> Dict[str, Any]:
     path = pathlib.Path(file) if file else DATA / "dummy_metabolism.json"
     return json.loads(path.read_text())
+
 
 def download(url: str, dest: str | pathlib.Path, overwrite=False, desc=None) -> pathlib.Path:
     dest = pathlib.Path(dest)

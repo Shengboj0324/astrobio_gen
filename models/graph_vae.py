@@ -2,10 +2,14 @@
 Uses PyTorch Geometric; trains on *synthetic* random graphs so you can debug the
 training loop right now, then swap in KEGG later.
 """
+
 from __future__ import annotations
-import torch, torch.nn as nn
-from torch_geometric.nn import GCNConv, global_mean_pool
+
+import torch
+import torch.nn as nn
 from torch_geometric.data import Data
+from torch_geometric.nn import GCNConv, global_mean_pool
+
 
 class GVAE(nn.Module):
     def __init__(self, in_channels=1, hidden=32, z_dim=8, latent=8):

@@ -10,11 +10,13 @@ Both endpoints are tiny (plain text) and require no API key.
 """
 
 import csv
-import requests
 from pathlib import Path
+
+import requests
 
 RAW_DIR = Path("data/raw")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def fetch(url: str, out_csv: Path, headers: list[str]):
     print(f"⇢ Fetching {url}")
@@ -25,6 +27,7 @@ def fetch(url: str, out_csv: Path, headers: list[str]):
         w.writerow(headers)
         w.writerows(rows)
     print("  saved →", out_csv, f"({len(rows)} rows)")
+
 
 if __name__ == "__main__":
     # 1) list of all KEGG pathways

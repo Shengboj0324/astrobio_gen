@@ -6,9 +6,13 @@ sample_id, population, platform, file_path
 Only the first 7 columns of each .index are needed,
 so memory stays low (≈ 200 MB parse, 20 MB output).
 """
-import pandas as pd
+
+import csv
+import gzip
+import re
 from pathlib import Path, PurePosixPath
-import re, gzip, csv
+
+import pandas as pd
 
 IND_DIR = Path("data/raw/1000g_indices")
 out = Path("data/interim/1000g_sample_table.csv")

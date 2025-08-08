@@ -1,16 +1,22 @@
-
-import json, random
+import json
+import random
 from pathlib import Path
+
 from pipeline.generate_metabolism import generate_metabolism
-from pipeline.simulate_atmosphere import simulate_atmosphere
 from pipeline.generate_spectrum import generate_spectrum
 from pipeline.score_detectability import score_spectrum
+from pipeline.simulate_atmosphere import simulate_atmosphere
 
 BASE_ATM = {"N2": 0.78, "O2": 0.21, "CO2": 0.01}
-DUMMY_PLANETS = {
-    p["name"]: p
-    for p in json.load(open(Path("data/dummy_planets.csv").with_suffix(".json"), "r"))
-} if (Path("data/dummy_planets.csv").with_suffix(".json")).exists() else {}
+DUMMY_PLANETS = (
+    {
+        p["name"]: p
+        for p in json.load(open(Path("data/dummy_planets.csv").with_suffix(".json"), "r"))
+    }
+    if (Path("data/dummy_planets.csv").with_suffix(".json")).exists()
+    else {}
+)
+
 
 def simulate_planet(planet: str, methanogenic_flux: float = 0.1):
     p = DUMMY_PLANETS.get(planet, {"name": planet})
@@ -26,6 +32,7 @@ def simulate_planet(planet: str, methanogenic_flux: float = 0.1):
         "flux": flux,
         "detectability": round(D, 3),
     }
+
 
 # metadata JSON the LLM will see
 simulate_planet.openai_tool = {

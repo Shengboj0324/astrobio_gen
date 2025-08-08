@@ -12,10 +12,12 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Tuple
 
+import duckdb
 import pandas as pd
+import pendulum
 import requests
 from astroquery.nasa_exoplanet_archive import NasaExoplanetArchive
-import duckdb, pendulum
+
 DB = duckdb.connect("data/astro.db")
 # ---------------------------------------------------------------------------
 # CONFIGURABLE CONSTANTS – tweak to raise / tighten planet selection criteria
@@ -58,6 +60,7 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout),
     ],
 )
+
 
 # ---------------------------------------------------------------------------
 # Helper functions

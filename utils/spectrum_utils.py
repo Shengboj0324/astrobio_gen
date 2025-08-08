@@ -5,9 +5,11 @@ spectrum_utils.py
 Convenience functions for plotting and quick spectral operations.
 Keeps heavy libs (specutils, astropy) out of the critical path.
 """
+
 from __future__ import annotations
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 __all__ = ["plot_spectrum", "equivalent_width"]
 

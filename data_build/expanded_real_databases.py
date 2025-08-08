@@ -8,21 +8,24 @@ with high-quality, peer-reviewed scientific databases.
 """
 
 import asyncio
-import aiohttp
 import json
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
+import aiohttp
 import pandas as pd
-from dataclasses import dataclass
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class DatabaseSource:
     """Real database source configuration"""
+
     name: str
     description: str
     base_url: str
@@ -33,13 +36,14 @@ class DatabaseSource:
     update_frequency: str
     metadata: Dict[str, Any]
 
+
 class ExpandedRealDatabases:
     """Manager for expanded real database connections"""
-    
+
     def __init__(self):
         self.databases = self._initialize_database_sources()
         self.session = None
-    
+
     def _initialize_database_sources(self) -> List[DatabaseSource]:
         """Initialize expanded list of real database sources"""
         return [
@@ -53,21 +57,27 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="critical",
                 update_frequency="weekly",
-                metadata={"focus": "astrobiology", "quality": "peer_reviewed", "coverage": "comprehensive"}
+                metadata={
+                    "focus": "astrobiology",
+                    "quality": "peer_reviewed",
+                    "coverage": "comprehensive",
+                },
             ),
-            
             DatabaseSource(
                 name="ESA Astrobiology Database",
                 description="European Space Agency astrobiology mission data and research findings",
                 base_url="https://www.esa.int/astrobiology",
                 api_endpoint="/data/api",
                 data_type="space_mission_data",
-                access_method="REST_API", 
+                access_method="REST_API",
                 priority="high",
                 update_frequency="monthly",
-                metadata={"focus": "space_missions", "quality": "mission_validated", "coverage": "european"}
+                metadata={
+                    "focus": "space_missions",
+                    "quality": "mission_validated",
+                    "coverage": "european",
+                },
             ),
-            
             # Genomics and metagenomics databases
             DatabaseSource(
                 name="JGI Integrated Microbial Genomes (IMG)",
@@ -78,9 +88,12 @@ class ExpandedRealDatabases:
                 access_method="WEB_API",
                 priority="critical",
                 update_frequency="monthly",
-                metadata={"focus": "microbial_genomes", "quality": "sequenced_validated", "coverage": "global"}
+                metadata={
+                    "focus": "microbial_genomes",
+                    "quality": "sequenced_validated",
+                    "coverage": "global",
+                },
             ),
-            
             DatabaseSource(
                 name="SILVA Ribosomal RNA Database",
                 description="Comprehensive database of aligned ribosomal RNA sequences",
@@ -90,9 +103,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="quarterly",
-                metadata={"focus": "rRNA_sequences", "quality": "curated", "coverage": "comprehensive"}
+                metadata={
+                    "focus": "rRNA_sequences",
+                    "quality": "curated",
+                    "coverage": "comprehensive",
+                },
             ),
-            
             DatabaseSource(
                 name="Greengenes2 Database",
                 description="16S ribosomal RNA gene database for microbial phylogeny",
@@ -102,10 +118,13 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="quarterly",
-                metadata={"focus": "microbial_phylogeny", "quality": "curated", "coverage": "taxonomic"}
+                metadata={
+                    "focus": "microbial_phylogeny",
+                    "quality": "curated",
+                    "coverage": "taxonomic",
+                },
             ),
-            
-            # Biogeochemistry databases  
+            # Biogeochemistry databases
             DatabaseSource(
                 name="Global Biogeochemical Cycles Database",
                 description="Data on global biogeochemical processes and elemental cycles",
@@ -115,9 +134,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="monthly",
-                metadata={"focus": "biogeochemical_cycles", "quality": "research_grade", "coverage": "global"}
+                metadata={
+                    "focus": "biogeochemical_cycles",
+                    "quality": "research_grade",
+                    "coverage": "global",
+                },
             ),
-            
             DatabaseSource(
                 name="PANGAEA Earth & Environmental Science Database",
                 description="World data center for earth and environmental science data",
@@ -127,9 +149,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="critical",
                 update_frequency="daily",
-                metadata={"focus": "earth_environmental", "quality": "peer_reviewed", "coverage": "global"}
+                metadata={
+                    "focus": "earth_environmental",
+                    "quality": "peer_reviewed",
+                    "coverage": "global",
+                },
             ),
-            
             # Exoplanet and atmospheric databases
             DatabaseSource(
                 name="TRAPPIST Atmospheric Database",
@@ -139,10 +164,13 @@ class ExpandedRealDatabases:
                 data_type="exoplanet_atmospheres",
                 access_method="REST_API",
                 priority="critical",
-                update_frequency="monthly", 
-                metadata={"focus": "exoplanet_atmospheres", "quality": "observational", "coverage": "trappist_system"}
+                update_frequency="monthly",
+                metadata={
+                    "focus": "exoplanet_atmospheres",
+                    "quality": "observational",
+                    "coverage": "trappist_system",
+                },
             ),
-            
             DatabaseSource(
                 name="Habitable Exoplanet Catalog",
                 description="University of Puerto Rico catalog of potentially habitable exoplanets",
@@ -152,9 +180,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="critical",
                 update_frequency="monthly",
-                metadata={"focus": "habitability", "quality": "research_validated", "coverage": "confirmed_exoplanets"}
+                metadata={
+                    "focus": "habitability",
+                    "quality": "research_validated",
+                    "coverage": "confirmed_exoplanets",
+                },
             ),
-            
             # Spectroscopic databases
             DatabaseSource(
                 name="HITRAN Molecular Spectroscopic Database",
@@ -165,9 +196,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="critical",
                 update_frequency="annual",
-                metadata={"focus": "molecular_absorption", "quality": "laboratory_validated", "coverage": "comprehensive"}
+                metadata={
+                    "focus": "molecular_absorption",
+                    "quality": "laboratory_validated",
+                    "coverage": "comprehensive",
+                },
             ),
-            
             DatabaseSource(
                 name="GEISA Spectroscopic Database",
                 description="Management and study of atmospheric spectra database",
@@ -177,9 +211,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="annual",
-                metadata={"focus": "atmospheric_spectra", "quality": "laboratory_validated", "coverage": "atmospheric_molecules"}
+                metadata={
+                    "focus": "atmospheric_spectra",
+                    "quality": "laboratory_validated",
+                    "coverage": "atmospheric_molecules",
+                },
             ),
-            
             # Marine and extremophile databases
             DatabaseSource(
                 name="Ocean Biogeographic Information System (OBIS)",
@@ -190,9 +227,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="weekly",
-                metadata={"focus": "marine_life", "quality": "taxonomically_validated", "coverage": "global_oceans"}
+                metadata={
+                    "focus": "marine_life",
+                    "quality": "taxonomically_validated",
+                    "coverage": "global_oceans",
+                },
             ),
-            
             DatabaseSource(
                 name="Extremophiles Database",
                 description="Database of organisms living in extreme environments",
@@ -202,9 +242,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="critical",
                 update_frequency="monthly",
-                metadata={"focus": "extreme_environments", "quality": "research_validated", "coverage": "all_domains"}
+                metadata={
+                    "focus": "extreme_environments",
+                    "quality": "research_validated",
+                    "coverage": "all_domains",
+                },
             ),
-            
             # Crystallographic and mineralogical databases
             DatabaseSource(
                 name="International Centre for Diffraction Data (ICDD)",
@@ -215,9 +258,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="quarterly",
-                metadata={"focus": "mineral_identification", "quality": "experimentally_validated", "coverage": "comprehensive"}
+                metadata={
+                    "focus": "mineral_identification",
+                    "quality": "experimentally_validated",
+                    "coverage": "comprehensive",
+                },
             ),
-            
             DatabaseSource(
                 name="MINDAT Mineralogy Database",
                 description="Comprehensive database of mineral data and localities",
@@ -227,9 +273,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="daily",
-                metadata={"focus": "mineralogy", "quality": "expert_curated", "coverage": "global_localities"}
+                metadata={
+                    "focus": "mineralogy",
+                    "quality": "expert_curated",
+                    "coverage": "global_localities",
+                },
             ),
-            
             # Climate and paleoclimate databases
             DatabaseSource(
                 name="NOAA Paleoclimatology Database",
@@ -240,9 +289,12 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="critical",
                 update_frequency="monthly",
-                metadata={"focus": "paleoclimate", "quality": "research_grade", "coverage": "global_historical"}
+                metadata={
+                    "focus": "paleoclimate",
+                    "quality": "research_grade",
+                    "coverage": "global_historical",
+                },
             ),
-            
             DatabaseSource(
                 name="Antarctic Ice Core Database",
                 description="Data from Antarctic ice core drilling projects",
@@ -252,158 +304,163 @@ class ExpandedRealDatabases:
                 access_method="REST_API",
                 priority="high",
                 update_frequency="annual",
-                metadata={"focus": "ice_cores", "quality": "measurement_validated", "coverage": "antarctic"}
-            )
+                metadata={
+                    "focus": "ice_cores",
+                    "quality": "measurement_validated",
+                    "coverage": "antarctic",
+                },
+            ),
         ]
-    
+
     async def get_session(self):
         """Get HTTP session for API calls"""
         if self.session is None or self.session.closed:
             timeout = aiohttp.ClientTimeout(total=30)
             self.session = aiohttp.ClientSession(
-                timeout=timeout,
-                headers={'User-Agent': 'Astrobiology-Research-Platform/1.0'}
+                timeout=timeout, headers={"User-Agent": "Astrobiology-Research-Platform/1.0"}
             )
         return self.session
-    
+
     async def test_database_connectivity(self, database: DatabaseSource) -> Dict[str, Any]:
         """Test connectivity to a database source"""
         result = {
-            'database': database.name,
-            'status': 'unknown',
-            'response_time': None,
-            'error': None,
-            'accessible': False
+            "database": database.name,
+            "status": "unknown",
+            "response_time": None,
+            "error": None,
+            "accessible": False,
         }
-        
+
         try:
             session = await self.get_session()
             start_time = datetime.now()
-            
+
             # Test basic connectivity (HEAD request to avoid large downloads)
             async with session.head(database.base_url, timeout=10) as response:
                 end_time = datetime.now()
-                result['response_time'] = (end_time - start_time).total_seconds()
-                result['status'] = f"HTTP_{response.status}"
-                result['accessible'] = response.status < 400
-                
+                result["response_time"] = (end_time - start_time).total_seconds()
+                result["status"] = f"HTTP_{response.status}"
+                result["accessible"] = response.status < 400
+
         except Exception as e:
-            result['error'] = str(e)
-            result['status'] = 'error'
-            result['accessible'] = False
-        
+            result["error"] = str(e)
+            result["status"] = "error"
+            result["accessible"] = False
+
         return result
-    
+
     async def validate_all_databases(self) -> Dict[str, Any]:
         """Validate connectivity to all expanded databases"""
         logger.info("Validating connectivity to expanded databases...")
-        
+
         validation_results = {
-            'timestamp': datetime.now(timezone.utc).isoformat(),
-            'total_databases': len(self.databases),
-            'accessible_databases': 0,
-            'inaccessible_databases': 0,
-            'connectivity_rate': 0.0,
-            'database_results': []
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "total_databases": len(self.databases),
+            "accessible_databases": 0,
+            "inaccessible_databases": 0,
+            "connectivity_rate": 0.0,
+            "database_results": [],
         }
-        
+
         # Test all databases
         tasks = [self.test_database_connectivity(db) for db in self.databases]
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # Process results
         for result in results:
             if isinstance(result, dict):
-                validation_results['database_results'].append(result)
-                if result['accessible']:
-                    validation_results['accessible_databases'] += 1
+                validation_results["database_results"].append(result)
+                if result["accessible"]:
+                    validation_results["accessible_databases"] += 1
                 else:
-                    validation_results['inaccessible_databases'] += 1
-        
+                    validation_results["inaccessible_databases"] += 1
+
         # Calculate connectivity rate
-        if validation_results['total_databases'] > 0:
-            validation_results['connectivity_rate'] = (
-                validation_results['accessible_databases'] / validation_results['total_databases']
+        if validation_results["total_databases"] > 0:
+            validation_results["connectivity_rate"] = (
+                validation_results["accessible_databases"] / validation_results["total_databases"]
             ) * 100
-        
-        logger.info(f"Database validation completed: {validation_results['accessible_databases']}/{validation_results['total_databases']} accessible")
-        
+
+        logger.info(
+            f"Database validation completed: {validation_results['accessible_databases']}/{validation_results['total_databases']} accessible"
+        )
+
         return validation_results
-    
+
     def get_database_registry(self) -> Dict[str, Any]:
         """Get registry of all expanded databases"""
         registry = {
-            'metadata': {
-                'creation_date': datetime.now(timezone.utc).isoformat(),
-                'total_databases': len(self.databases),
-                'categories': {}
+            "metadata": {
+                "creation_date": datetime.now(timezone.utc).isoformat(),
+                "total_databases": len(self.databases),
+                "categories": {},
             },
-            'databases': {}
+            "databases": {},
         }
-        
+
         # Organize by data type
         for db in self.databases:
             data_type = db.data_type
-            if data_type not in registry['metadata']['categories']:
-                registry['metadata']['categories'][data_type] = 0
-            registry['metadata']['categories'][data_type] += 1
-            
-            registry['databases'][db.name] = {
-                'description': db.description,
-                'base_url': db.base_url,
-                'api_endpoint': db.api_endpoint,
-                'data_type': db.data_type,
-                'access_method': db.access_method,
-                'priority': db.priority,
-                'update_frequency': db.update_frequency,
-                'metadata': db.metadata
+            if data_type not in registry["metadata"]["categories"]:
+                registry["metadata"]["categories"][data_type] = 0
+            registry["metadata"]["categories"][data_type] += 1
+
+            registry["databases"][db.name] = {
+                "description": db.description,
+                "base_url": db.base_url,
+                "api_endpoint": db.api_endpoint,
+                "data_type": db.data_type,
+                "access_method": db.access_method,
+                "priority": db.priority,
+                "update_frequency": db.update_frequency,
+                "metadata": db.metadata,
             }
-        
+
         return registry
-    
+
     async def close(self):
         """Close HTTP session"""
         if self.session and not self.session.closed:
             await self.session.close()
 
+
 async def main():
     """Main function to demonstrate expanded database integration"""
     expanded_db = ExpandedRealDatabases()
-    
+
     try:
         # Get database registry
         registry = expanded_db.get_database_registry()
-        
+
         # Save registry
-        registry_file = Path('expanded_database_registry.json')
-        with open(registry_file, 'w') as f:
+        registry_file = Path("expanded_database_registry.json")
+        with open(registry_file, "w") as f:
             json.dump(registry, f, indent=2)
-        
+
         print(f"[OK] Expanded database registry created: {registry_file}")
         print(f"   Total databases: {registry['metadata']['total_databases']}")
         print(f"   Categories: {list(registry['metadata']['categories'].keys())}")
-        
+
         # Validate connectivity (optional - can be slow)
         print("\n[SEARCH] Testing database connectivity...")
         validation = await expanded_db.validate_all_databases()
-        
+
         # Save validation results
-        validation_file = Path('database_connectivity_validation.json')
-        with open(validation_file, 'w') as f:
+        validation_file = Path("database_connectivity_validation.json")
+        with open(validation_file, "w") as f:
             json.dump(validation, f, indent=2)
-        
+
         print(f"[OK] Connectivity validation completed: {validation_file}")
-        print(f"   Accessible: {validation['accessible_databases']}/{validation['total_databases']}")
+        print(
+            f"   Accessible: {validation['accessible_databases']}/{validation['total_databases']}"
+        )
         print(f"   Success rate: {validation['connectivity_rate']:.1f}%")
-        
-        return {
-            'registry': registry,
-            'validation': validation,
-            'status': 'completed'
-        }
-        
+
+        return {"registry": registry, "validation": validation, "status": "completed"}
+
     finally:
         await expanded_db.close()
 
+
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())

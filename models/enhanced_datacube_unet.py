@@ -19,38 +19,41 @@ Key Features:
 - Curriculum Learning Integration
 """
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import pytorch_lightning as pl
-from typing import Dict, List, Optional, Tuple, Any, Union
 import logging
-import numpy as np
 import math
 from dataclasses import dataclass
-from torch.utils.checkpoint import checkpoint
-import torch.distributed as dist
 from functools import partial
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import pytorch_lightning as pl
+import torch
+import torch.distributed as dist
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class EnhancedPhysicsConstraints:
     """Enhanced physical constraints for advanced climate modeling"""
+
     # Basic conservation laws
     mass_conservation: bool = True
     energy_conservation: bool = True
     momentum_conservation: bool = True
     hydrostatic_balance: bool = True
     thermodynamic_consistency: bool = True
-    
+
     # Advanced atmospheric physics
     radiative_transfer: bool = True
     cloud_microphysics: bool = True
     convective_adjustment: bool = True
     boundary_layer_physics: bool = True
-    
+
     # Physical constants
     specific_heat_air: float = 1004.0  # J/kg/K
     specific_heat_water: float = 4186.0  # J/kg/K
@@ -61,25 +64,26 @@ class EnhancedPhysicsConstraints:
     gravity: float = 9.81  # m/s^2
     earth_radius: float = 6.371e6  # m
     stefan_boltzmann: float = 5.67e-8  # W/m^2/K^4
-    
+
     # Constraint weights
     conservation_weight: float = 1.0
     physics_weight: float = 0.5
     boundary_weight: float = 0.3
     stability_weight: float = 0.2
 
+
 class SpatialAttention3D(nn.Module):
     """3D Spatial Attention mechanism for focusing on important atmospheric regions"""
-    
+
     def __init__(self, channels: int, reduction: int = 8):
         super().__init__()
         self.channels = channels
         self.reduction = reduction
-        
+
         # Global and local feature extractors
         self.global_pool = nn.AdaptiveAvgPool3d(1)
         self.local_conv = nn.Conv3d(channels, channels // reduction, 1)
-        
+
         # Attention computation
         self.attention_conv = nn.Sequential(
             nn.Conv3d(channels, channels // reduction, 1),
@@ -87,107 +91,110 @@ class SpatialAttention3D(nn.Module):
             nn.Conv3d(channels // reduction, channels // reduction, 3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv3d(channels // reduction, 1, 1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply spatial attention to input tensor"""
         # Global context
         global_context = self.global_pool(x)
         global_context = global_context.expand_as(x)
-        
+
         # Combine global and local features
         combined = x + global_context
-        
+
         # Compute attention weights
         attention_weights = self.attention_conv(combined)
-        
+
         # Apply attention
         return x * attention_weights
 
+
 class TemporalAttention3D(nn.Module):
     """3D Temporal Attention for focusing on important time steps in climate evolution"""
-    
+
     def __init__(self, channels: int, temporal_dim: int = 2):
         super().__init__()
         self.channels = channels
         self.temporal_dim = temporal_dim
-        
+
         # Temporal feature extractor
         self.temporal_conv = nn.Conv1d(channels, channels, 3, padding=1)
-        
+
         # Attention mechanism
         self.attention_layer = nn.Sequential(
             nn.Conv1d(channels, channels // 4, 1),
             nn.ReLU(inplace=True),
             nn.Conv1d(channels // 4, channels, 1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply temporal attention to input tensor"""
         # Assume temporal dimension is depth (dim=2)
         b, c, d, h, w = x.shape
-        
+
         # Average across spatial dimensions
         temporal_features = x.mean(dim=[3, 4])  # Shape: (b, c, d)
-        
+
         # Apply temporal convolution
         temporal_features = self.temporal_conv(temporal_features)
-        
+
         # Compute attention weights
         attention_weights = self.attention_layer(temporal_features)
-        
+
         # Expand and apply attention
         attention_weights = attention_weights.unsqueeze(-1).unsqueeze(-1)  # Shape: (b, c, d, 1, 1)
-        
+
         return x * attention_weights
+
 
 class ChannelAttention3D(nn.Module):
     """3D Channel Attention for emphasizing important physical variables"""
-    
+
     def __init__(self, channels: int, reduction: int = 8):
         super().__init__()
         self.channels = channels
         self.reduction = reduction
-        
+
         # Global pooling
         self.global_avg_pool = nn.AdaptiveAvgPool3d(1)
         self.global_max_pool = nn.AdaptiveMaxPool3d(1)
-        
+
         # Shared MLP
         self.shared_mlp = nn.Sequential(
             nn.Conv3d(channels, channels // reduction, 1),
             nn.ReLU(inplace=True),
-            nn.Conv3d(channels // reduction, channels, 1)
+            nn.Conv3d(channels // reduction, channels, 1),
         )
-        
+
         self.sigmoid = nn.Sigmoid()
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply channel attention to input tensor"""
         # Global pooling
         avg_pool = self.global_avg_pool(x)
         max_pool = self.global_max_pool(x)
-        
+
         # Shared MLP
         avg_out = self.shared_mlp(avg_pool)
         max_out = self.shared_mlp(max_pool)
-        
+
         # Combine and apply sigmoid
         attention_weights = self.sigmoid(avg_out + max_out)
-        
+
         return x * attention_weights
+
 
 class CBAM3D(nn.Module):
     """3D Convolutional Block Attention Module combining spatial and channel attention"""
-    
+
     def __init__(self, channels: int, reduction: int = 8):
         super().__init__()
         self.channel_attention = ChannelAttention3D(channels, reduction)
         self.spatial_attention = SpatialAttention3D(channels, reduction)
         self.temporal_attention = TemporalAttention3D(channels)
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply combined attention mechanisms"""
         # Apply attentions in sequence
@@ -196,26 +203,39 @@ class CBAM3D(nn.Module):
         x = self.temporal_attention(x)
         return x
 
+
 class SeparableConv3D(nn.Module):
     """Separable 3D Convolution for performance optimization"""
-    
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 3, 
-                 stride: int = 1, padding: int = 1, bias: bool = False):
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        padding: int = 1,
+        bias: bool = False,
+    ):
         super().__init__()
-        
+
         # Depthwise convolution
         self.depthwise = nn.Conv3d(
-            in_channels, in_channels, kernel_size, stride=stride, 
-            padding=padding, groups=in_channels, bias=bias
+            in_channels,
+            in_channels,
+            kernel_size,
+            stride=stride,
+            padding=padding,
+            groups=in_channels,
+            bias=bias,
         )
-        
+
         # Pointwise convolution
         self.pointwise = nn.Conv3d(in_channels, out_channels, 1, bias=bias)
-        
+
         # Batch normalization
         self.bn = nn.BatchNorm3d(out_channels)
         self.relu = nn.ReLU(inplace=True)
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply separable convolution"""
         x = self.depthwise(x)
@@ -224,48 +244,62 @@ class SeparableConv3D(nn.Module):
         x = self.relu(x)
         return x
 
+
 class AtmosphericAwarePooling3D(nn.Module):
     """Atmospheric-aware pooling based on pressure levels"""
-    
+
     def __init__(self, pressure_levels: Optional[List[float]] = None):
         super().__init__()
         self.pressure_levels = pressure_levels or [
-            1000, 925, 850, 700, 600, 500, 400, 300, 250, 200, 150, 100
+            1000,
+            925,
+            850,
+            700,
+            600,
+            500,
+            400,
+            300,
+            250,
+            200,
+            150,
+            100,
         ]
         self.num_levels = len(self.pressure_levels)
-        
+
         # Learnable pressure-based weights
         self.pressure_weights = nn.Parameter(torch.ones(self.num_levels))
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply atmospheric-aware pooling"""
         b, c, d, h, w = x.shape
-        
+
         # Assume depth dimension corresponds to pressure levels
         if d != self.num_levels:
             # Interpolate to match pressure levels
-            x = F.interpolate(x, size=(self.num_levels, h, w), mode='trilinear', align_corners=False)
-        
+            x = F.interpolate(
+                x, size=(self.num_levels, h, w), mode="trilinear", align_corners=False
+            )
+
         # Apply pressure-based weighting
         weights = self.pressure_weights.view(1, 1, -1, 1, 1)
         weighted_x = x * weights
-        
+
         return weighted_x
+
 
 class TransformerBlock3D(nn.Module):
     """3D Transformer block for long-range dependencies in climate data"""
-    
-    def __init__(self, dim: int, num_heads: int = 8, mlp_ratio: float = 4.0, 
-                 dropout: float = 0.1):
+
+    def __init__(self, dim: int, num_heads: int = 8, mlp_ratio: float = 4.0, dropout: float = 0.1):
         super().__init__()
         self.dim = dim
         self.num_heads = num_heads
-        
+
         # Multi-head self-attention
         self.attention = nn.MultiheadAttention(
             embed_dim=dim, num_heads=num_heads, dropout=dropout, batch_first=True
         )
-        
+
         # MLP
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = nn.Sequential(
@@ -273,44 +307,45 @@ class TransformerBlock3D(nn.Module):
             nn.GELU(),
             nn.Dropout(dropout),
             nn.Linear(mlp_hidden_dim, dim),
-            nn.Dropout(dropout)
+            nn.Dropout(dropout),
         )
-        
+
         # Layer normalization
         self.norm1 = nn.LayerNorm(dim)
         self.norm2 = nn.LayerNorm(dim)
-        
+
         # Dropout
         self.dropout = nn.Dropout(dropout)
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply transformer block"""
         # Reshape for attention: (B, C, D, H, W) -> (B, D*H*W, C)
         b, c, d, h, w = x.shape
         x_reshaped = x.view(b, c, -1).transpose(1, 2)  # (B, D*H*W, C)
-        
+
         # Self-attention
         attn_out, _ = self.attention(
             self.norm1(x_reshaped), self.norm1(x_reshaped), self.norm1(x_reshaped)
         )
         x_reshaped = x_reshaped + self.dropout(attn_out)
-        
+
         # MLP
         mlp_out = self.mlp(self.norm2(x_reshaped))
         x_reshaped = x_reshaped + self.dropout(mlp_out)
-        
+
         # Reshape back to original shape
         x = x_reshaped.transpose(1, 2).view(b, c, d, h, w)
-        
+
         return x
+
 
 class EnhancedConv3DBlock(nn.Module):
     """Enhanced 3D Convolutional block with advanced features"""
-    
+
     def __init__(
-        self, 
-        in_channels: int, 
-        out_channels: int, 
+        self,
+        in_channels: int,
+        out_channels: int,
         kernel_size: int = 3,
         stride: int = 1,
         padding: int = 1,
@@ -319,86 +354,90 @@ class EnhancedConv3DBlock(nn.Module):
         use_attention: bool = True,
         use_transformer: bool = False,
         dropout: float = 0.1,
-        use_gradient_checkpointing: bool = False
+        use_gradient_checkpointing: bool = False,
     ):
         super().__init__()
         self.use_gradient_checkpointing = use_gradient_checkpointing
-        
+
         # Main convolution
         if use_separable and in_channels == out_channels:
             self.conv1 = SeparableConv3D(in_channels, out_channels, kernel_size, stride, padding)
         else:
-            self.conv1 = nn.Conv3d(in_channels, out_channels, kernel_size, stride, padding, groups=groups)
-        
+            self.conv1 = nn.Conv3d(
+                in_channels, out_channels, kernel_size, stride, padding, groups=groups
+            )
+
         self.bn1 = nn.BatchNorm3d(out_channels)
         self.relu1 = nn.ReLU(inplace=True)
-        
+
         # Second convolution
         if use_separable:
             self.conv2 = SeparableConv3D(out_channels, out_channels, kernel_size, 1, padding)
         else:
-            self.conv2 = nn.Conv3d(out_channels, out_channels, kernel_size, 1, padding, groups=groups)
-        
+            self.conv2 = nn.Conv3d(
+                out_channels, out_channels, kernel_size, 1, padding, groups=groups
+            )
+
         self.bn2 = nn.BatchNorm3d(out_channels)
         self.relu2 = nn.ReLU(inplace=True)
-        
+
         # Attention mechanism
         if use_attention:
             self.attention = CBAM3D(out_channels)
         else:
             self.attention = None
-        
+
         # Transformer block
         if use_transformer:
             self.transformer = TransformerBlock3D(out_channels)
         else:
             self.transformer = None
-        
+
         # Dropout
         self.dropout = nn.Dropout3d(dropout) if dropout > 0 else None
-        
+
         # Residual connection
         if in_channels != out_channels or stride != 1:
             self.residual = nn.Conv3d(in_channels, out_channels, 1, stride)
         else:
             self.residual = None
-    
+
     def _forward_impl(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass implementation"""
         identity = x
-        
+
         # First convolution
         out = self.conv1(x)
-        if not hasattr(self.conv1, 'bn'):  # SeparableConv3D has built-in BN
+        if not hasattr(self.conv1, "bn"):  # SeparableConv3D has built-in BN
             out = self.bn1(out)
             out = self.relu1(out)
-        
+
         # Second convolution
         out = self.conv2(out)
-        if not hasattr(self.conv2, 'bn'):  # SeparableConv3D has built-in BN
+        if not hasattr(self.conv2, "bn"):  # SeparableConv3D has built-in BN
             out = self.bn2(out)
-        
+
         # Attention mechanism
         if self.attention is not None:
             out = self.attention(out)
-        
+
         # Transformer block
         if self.transformer is not None:
             out = self.transformer(out)
-        
+
         # Residual connection
         if self.residual is not None:
             identity = self.residual(identity)
-        
+
         out = out + identity
         out = self.relu2(out)
-        
+
         # Dropout
         if self.dropout is not None:
             out = self.dropout(out)
-        
+
         return out
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass with optional gradient checkpointing"""
         if self.use_gradient_checkpointing and self.training:
@@ -406,203 +445,224 @@ class EnhancedConv3DBlock(nn.Module):
         else:
             return self._forward_impl(x)
 
+
 class EnhancedDownSample3D(nn.Module):
     """Enhanced 3D downsampling block with advanced features"""
-    
-    def __init__(self, in_channels: int, out_channels: int, 
-                 use_attention: bool = True, use_separable: bool = False,
-                 dropout: float = 0.1, use_gradient_checkpointing: bool = False):
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        use_attention: bool = True,
+        use_separable: bool = False,
+        dropout: float = 0.1,
+        use_gradient_checkpointing: bool = False,
+    ):
         super().__init__()
         self.conv = EnhancedConv3DBlock(
-            in_channels, out_channels, 
-            use_attention=use_attention, 
+            in_channels,
+            out_channels,
+            use_attention=use_attention,
             use_separable=use_separable,
             dropout=dropout,
-            use_gradient_checkpointing=use_gradient_checkpointing
+            use_gradient_checkpointing=use_gradient_checkpointing,
         )
-        
+
         # Atmospheric-aware pooling
         self.pool = AtmosphericAwarePooling3D()
         self.downsample = nn.MaxPool3d(2, stride=2)
-    
+
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """Forward pass with skip connection output"""
         conv_out = self.conv(x)
-        
+
         # Apply atmospheric-aware pooling if dimensions match
         try:
             pooled = self.pool(conv_out)
         except:
             pooled = conv_out
-        
+
         # Downsample
         pool_out = self.downsample(pooled)
-        
+
         return conv_out, pool_out
+
 
 class EnhancedUpSample3D(nn.Module):
     """Enhanced 3D upsampling block with advanced features"""
-    
-    def __init__(self, in_channels: int, skip_channels: int, out_channels: int,
-                 use_attention: bool = True, use_separable: bool = False,
-                 dropout: float = 0.1, use_gradient_checkpointing: bool = False):
+
+    def __init__(
+        self,
+        in_channels: int,
+        skip_channels: int,
+        out_channels: int,
+        use_attention: bool = True,
+        use_separable: bool = False,
+        dropout: float = 0.1,
+        use_gradient_checkpointing: bool = False,
+    ):
         super().__init__()
         self.upsample = nn.ConvTranspose3d(in_channels, in_channels // 2, 2, stride=2)
         self.conv = EnhancedConv3DBlock(
-            in_channels // 2 + skip_channels, out_channels,
+            in_channels // 2 + skip_channels,
+            out_channels,
             use_attention=use_attention,
             use_separable=use_separable,
             dropout=dropout,
-            use_gradient_checkpointing=use_gradient_checkpointing
+            use_gradient_checkpointing=use_gradient_checkpointing,
         )
-    
+
     def forward(self, x: torch.Tensor, skip: torch.Tensor) -> torch.Tensor:
         """Forward pass with skip connection"""
         x = self.upsample(x)
-        
+
         # Handle size mismatches
         if x.shape[-3:] != skip.shape[-3:]:
-            x = F.interpolate(x, size=skip.shape[-3:], mode='trilinear', align_corners=False)
-        
+            x = F.interpolate(x, size=skip.shape[-3:], mode="trilinear", align_corners=False)
+
         # Concatenate skip connection
         x = torch.cat([x, skip], dim=1)
-        
+
         return self.conv(x)
+
 
 class AdvancedPhysicsRegularizer(nn.Module):
     """Advanced physics-based regularization with differentiable physics"""
-    
+
     def __init__(self, constraints: EnhancedPhysicsConstraints):
         super().__init__()
         self.constraints = constraints
-        
+
         # Learnable physics parameters
-        self.physics_params = nn.ParameterDict({
-            'diffusion_coeff': nn.Parameter(torch.tensor(1e-5)),
-            'viscosity_coeff': nn.Parameter(torch.tensor(1e-5)),
-            'thermal_conductivity': nn.Parameter(torch.tensor(0.025)),
-        })
-    
-    def compute_physics_losses(self, predictions: torch.Tensor, 
-                              inputs: torch.Tensor,
-                              variable_names: List[str]) -> Dict[str, torch.Tensor]:
+        self.physics_params = nn.ParameterDict(
+            {
+                "diffusion_coeff": nn.Parameter(torch.tensor(1e-5)),
+                "viscosity_coeff": nn.Parameter(torch.tensor(1e-5)),
+                "thermal_conductivity": nn.Parameter(torch.tensor(0.025)),
+            }
+        )
+
+    def compute_physics_losses(
+        self, predictions: torch.Tensor, inputs: torch.Tensor, variable_names: List[str]
+    ) -> Dict[str, torch.Tensor]:
         """Compute advanced physics-based losses"""
         losses = {}
-        
+
         # Create variable index mapping
         var_idx = {name: i for i, name in enumerate(variable_names)}
-        
+
         # Mass conservation with advection
-        if 'density' in var_idx and 'velocity_u' in var_idx:
-            density_idx = var_idx['density']
-            velocity_u_idx = var_idx['velocity_u']
-            
+        if "density" in var_idx and "velocity_u" in var_idx:
+            density_idx = var_idx["density"]
+            velocity_u_idx = var_idx["velocity_u"]
+
             density = predictions[:, density_idx]
             velocity_u = predictions[:, velocity_u_idx]
-            
+
             # Compute continuity equation residual
             drho_dt = torch.gradient(density, dim=2)[0]  # Time derivative
             div_rho_v = torch.gradient(density * velocity_u, dim=4)[0]  # Divergence
-            
+
             continuity_residual = drho_dt + div_rho_v
-            losses['mass_conservation'] = torch.mean(continuity_residual ** 2)
-        
+            losses["mass_conservation"] = torch.mean(continuity_residual**2)
+
         # Energy conservation with radiative transfer
-        if 'temperature' in var_idx and 'humidity' in var_idx:
-            temp_idx = var_idx['temperature']
-            humidity_idx = var_idx['humidity']
-            
+        if "temperature" in var_idx and "humidity" in var_idx:
+            temp_idx = var_idx["temperature"]
+            humidity_idx = var_idx["humidity"]
+
             temperature = predictions[:, temp_idx]
             humidity = predictions[:, humidity_idx]
-            
+
             # Compute thermal energy equation
             cp = self.constraints.specific_heat_air
             dT_dt = torch.gradient(temperature, dim=2)[0]
-            
+
             # Radiative cooling (Stefan-Boltzmann)
-            radiative_cooling = self.constraints.stefan_boltzmann * (temperature ** 4)
-            
+            radiative_cooling = self.constraints.stefan_boltzmann * (temperature**4)
+
             # Latent heat release
             dq_dt = torch.gradient(humidity, dim=2)[0]
             latent_heating = self.constraints.latent_heat_vaporization * dq_dt
-            
+
             energy_residual = cp * dT_dt + radiative_cooling - latent_heating
-            losses['energy_conservation'] = torch.mean(energy_residual ** 2)
-        
+            losses["energy_conservation"] = torch.mean(energy_residual**2)
+
         # Momentum conservation (Navier-Stokes)
-        if all(var in var_idx for var in ['velocity_u', 'velocity_v', 'pressure']):
-            u_idx = var_idx['velocity_u']
-            v_idx = var_idx['velocity_v']
-            p_idx = var_idx['pressure']
-            
+        if all(var in var_idx for var in ["velocity_u", "velocity_v", "pressure"]):
+            u_idx = var_idx["velocity_u"]
+            v_idx = var_idx["velocity_v"]
+            p_idx = var_idx["pressure"]
+
             u = predictions[:, u_idx]
             v = predictions[:, v_idx]
             pressure = predictions[:, p_idx]
-            
+
             # Compute momentum equation residuals
             du_dt = torch.gradient(u, dim=2)[0]
             dv_dt = torch.gradient(v, dim=2)[0]
-            
+
             # Pressure gradient
             dp_dx = torch.gradient(pressure, dim=4)[0]
             dp_dy = torch.gradient(pressure, dim=3)[0]
-            
+
             # Viscous terms
-            nu = self.physics_params['viscosity_coeff']
+            nu = self.physics_params["viscosity_coeff"]
             d2u_dx2 = torch.gradient(torch.gradient(u, dim=4)[0], dim=4)[0]
             d2v_dy2 = torch.gradient(torch.gradient(v, dim=3)[0], dim=3)[0]
-            
+
             # Momentum residuals
             momentum_u_residual = du_dt + dp_dx - nu * d2u_dx2
             momentum_v_residual = dv_dt + dp_dy - nu * d2v_dy2
-            
-            losses['momentum_conservation'] = torch.mean(
-                momentum_u_residual ** 2 + momentum_v_residual ** 2
+
+            losses["momentum_conservation"] = torch.mean(
+                momentum_u_residual**2 + momentum_v_residual**2
             )
-        
+
         # Hydrostatic balance with atmospheric stratification
-        if 'pressure' in var_idx and 'temperature' in var_idx:
-            pressure_idx = var_idx['pressure']
-            temp_idx = var_idx['temperature']
-            
+        if "pressure" in var_idx and "temperature" in var_idx:
+            pressure_idx = var_idx["pressure"]
+            temp_idx = var_idx["temperature"]
+
             pressure = predictions[:, pressure_idx]
             temperature = predictions[:, temp_idx]
-            
+
             # Compute hydrostatic balance
             dp_dz = torch.gradient(pressure, dim=2)[0]
-            
+
             # Atmospheric density from ideal gas law
             rho = pressure / (self.constraints.gas_constant_dry_air * temperature)
-            
+
             # Hydrostatic balance residual
             hydrostatic_residual = dp_dz + rho * self.constraints.gravity
-            losses['hydrostatic_balance'] = torch.mean(hydrostatic_residual ** 2)
-        
+            losses["hydrostatic_balance"] = torch.mean(hydrostatic_residual**2)
+
         # Thermodynamic consistency
-        if all(var in var_idx for var in ['temperature', 'pressure', 'humidity']):
-            temp_idx = var_idx['temperature']
-            pressure_idx = var_idx['pressure']
-            humidity_idx = var_idx['humidity']
-            
+        if all(var in var_idx for var in ["temperature", "pressure", "humidity"]):
+            temp_idx = var_idx["temperature"]
+            pressure_idx = var_idx["pressure"]
+            humidity_idx = var_idx["humidity"]
+
             temperature = predictions[:, temp_idx]
             pressure = predictions[:, pressure_idx]
             humidity = predictions[:, humidity_idx]
-            
+
             # Clausius-Clapeyron equation for saturation
             es = 611.2 * torch.exp(17.67 * (temperature - 273.15) / (temperature - 29.65))
-            
+
             # Relative humidity should be physically consistent
             rh = humidity / es * pressure
             consistency_loss = torch.mean(torch.clamp(rh - 1.0, min=0) ** 2)
-            losses['thermodynamic_consistency'] = consistency_loss
-        
+            losses["thermodynamic_consistency"] = consistency_loss
+
         return losses
+
 
 class EnhancedCubeUNet(pl.LightningModule):
     """
     Enhanced 3D U-Net for climate datacube processing with advanced CNN techniques
     """
-    
+
     def __init__(
         self,
         n_input_vars: int = 5,
@@ -621,12 +681,12 @@ class EnhancedCubeUNet(pl.LightningModule):
         use_separable_conv: bool = True,
         use_gradient_checkpointing: bool = False,
         use_mixed_precision: bool = True,
-        model_scaling: str = 'efficient',  # 'efficient', 'wide', 'deep'
-        **kwargs
+        model_scaling: str = "efficient",  # 'efficient', 'wide', 'deep'
+        **kwargs,
     ):
         """
         Initialize Enhanced CubeUNet with advanced CNN techniques
-        
+
         Args:
             n_input_vars: Number of input variables
             n_output_vars: Number of output variables
@@ -648,12 +708,12 @@ class EnhancedCubeUNet(pl.LightningModule):
         """
         super().__init__()
         self.save_hyperparameters()
-        
+
         # Configuration
         self.n_input_vars = n_input_vars
         self.n_output_vars = n_output_vars
-        self.input_variables = input_variables or [f'var_{i}' for i in range(n_input_vars)]
-        self.output_variables = output_variables or [f'var_{i}' for i in range(n_output_vars)]
+        self.input_variables = input_variables or [f"var_{i}" for i in range(n_input_vars)]
+        self.output_variables = output_variables or [f"var_{i}" for i in range(n_output_vars)]
         self.base_features = base_features
         self.depth = depth
         self.dropout = dropout
@@ -667,137 +727,147 @@ class EnhancedCubeUNet(pl.LightningModule):
         self.use_gradient_checkpointing = use_gradient_checkpointing
         self.use_mixed_precision = use_mixed_precision
         self.model_scaling = model_scaling
-        
+
         # Apply model scaling
         self._apply_model_scaling()
-        
+
         # Enhanced physics constraints
         if self.use_physics_constraints:
             self.physics_regularizer = AdvancedPhysicsRegularizer(EnhancedPhysicsConstraints())
-        
+
         # Build enhanced U-Net architecture
         self._build_enhanced_network()
-        
+
         # Loss tracking
         self.train_losses = []
         self.val_losses = []
         self.physics_losses = []
-        
+
         # Curriculum learning
         self.curriculum_stage = 0
         self.max_curriculum_stages = 3
-        
-        logger.info(f"Initialized Enhanced CubeUNet with {n_input_vars} input vars, "
-                   f"{n_output_vars} output vars, depth={depth}, scaling={model_scaling}")
-    
+
+        logger.info(
+            f"Initialized Enhanced CubeUNet with {n_input_vars} input vars, "
+            f"{n_output_vars} output vars, depth={depth}, scaling={model_scaling}"
+        )
+
     def _apply_model_scaling(self):
         """Apply EfficientNet-style model scaling"""
-        if self.model_scaling == 'efficient':
+        if self.model_scaling == "efficient":
             # Balanced scaling
             self.base_features = int(self.base_features * 1.2)
             self.depth = min(self.depth + 1, 6)
-        elif self.model_scaling == 'wide':
+        elif self.model_scaling == "wide":
             # Wider model
             self.base_features = int(self.base_features * 2.0)
-        elif self.model_scaling == 'deep':
+        elif self.model_scaling == "deep":
             # Deeper model
             self.depth = min(self.depth + 2, 8)
-    
+
     def _build_enhanced_network(self):
         """Build the enhanced U-Net architecture"""
         # Encoder (downsampling path)
         self.encoder_blocks = nn.ModuleList()
         self.downsample_blocks = nn.ModuleList()
-        
+
         in_channels = self.n_input_vars
         features = self.base_features
-        
+
         for i in range(self.depth):
             if i == 0:
                 # First block - enhanced convolution
                 self.encoder_blocks.append(
                     EnhancedConv3DBlock(
-                        in_channels, features,
+                        in_channels,
+                        features,
                         use_attention=self.use_attention,
                         use_transformer=self.use_transformer and i > 1,
                         use_separable=self.use_separable_conv,
                         dropout=self.dropout,
-                        use_gradient_checkpointing=self.use_gradient_checkpointing
+                        use_gradient_checkpointing=self.use_gradient_checkpointing,
                     )
                 )
             else:
                 # Downsampling blocks
                 self.downsample_blocks.append(
                     EnhancedDownSample3D(
-                        in_channels, features,
+                        in_channels,
+                        features,
                         use_attention=self.use_attention,
                         use_separable=self.use_separable_conv,
                         dropout=self.dropout,
-                        use_gradient_checkpointing=self.use_gradient_checkpointing
+                        use_gradient_checkpointing=self.use_gradient_checkpointing,
                     )
                 )
-                
+
                 in_channels = features
                 features *= 2
-        
+
         # Bottleneck with transformer
         self.bottleneck = EnhancedConv3DBlock(
-            in_channels, features,
+            in_channels,
+            features,
             use_attention=True,
             use_transformer=self.use_transformer,
             use_separable=self.use_separable_conv,
             dropout=self.dropout * 2,  # Higher dropout in bottleneck
-            use_gradient_checkpointing=self.use_gradient_checkpointing
+            use_gradient_checkpointing=self.use_gradient_checkpointing,
         )
-        
+
         # Decoder (upsampling path)
         self.upsample_blocks = nn.ModuleList()
-        
+
         for i in range(self.depth - 1):
             features //= 2
             self.upsample_blocks.append(
                 EnhancedUpSample3D(
-                    features * 2, features, features,
+                    features * 2,
+                    features,
+                    features,
                     use_attention=self.use_attention,
                     use_separable=self.use_separable_conv,
                     dropout=self.dropout,
-                    use_gradient_checkpointing=self.use_gradient_checkpointing
+                    use_gradient_checkpointing=self.use_gradient_checkpointing,
                 )
             )
-        
+
         # Final output layer with physics-informed activation
         self.output_conv = nn.Conv3d(features, self.n_output_vars, 1)
         self.output_activation = self._get_physics_informed_activation()
-    
+
     def _get_physics_informed_activation(self):
         """Get physics-informed activation function"""
+
         def physics_activation(x):
             # Apply different activations based on physical meaning
             if len(self.output_variables) > 0:
                 activations = []
                 for i, var_name in enumerate(self.output_variables):
-                    if 'temperature' in var_name.lower():
+                    if "temperature" in var_name.lower():
                         # Temperature should be positive (Kelvin)
-                        activations.append(F.softplus(x[:, i:i+1]) + 273.15)
-                    elif 'pressure' in var_name.lower():
+                        activations.append(F.softplus(x[:, i : i + 1]) + 273.15)
+                    elif "pressure" in var_name.lower():
                         # Pressure should be positive
-                        activations.append(F.softplus(x[:, i:i+1]))
-                    elif 'humidity' in var_name.lower():
+                        activations.append(F.softplus(x[:, i : i + 1]))
+                    elif "humidity" in var_name.lower():
                         # Humidity should be between 0 and 1
-                        activations.append(torch.sigmoid(x[:, i:i+1]))
-                    elif 'velocity' in var_name.lower():
+                        activations.append(torch.sigmoid(x[:, i : i + 1]))
+                    elif "velocity" in var_name.lower():
                         # Velocity can be positive or negative
-                        activations.append(torch.tanh(x[:, i:i+1]) * 100)  # Scale to reasonable range
+                        activations.append(
+                            torch.tanh(x[:, i : i + 1]) * 100
+                        )  # Scale to reasonable range
                     else:
                         # Default activation
-                        activations.append(x[:, i:i+1])
-                
+                        activations.append(x[:, i : i + 1])
+
                 return torch.cat(activations, dim=1)
             else:
                 return x
-        
+
         return physics_activation
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Enhanced forward pass with curriculum learning support"""
         # Curriculum learning: progressively increase complexity
@@ -807,9 +877,9 @@ class EnhancedCubeUNet(pl.LightningModule):
         else:
             # Full forward pass
             x = self._forward_full(x)
-        
+
         return x
-    
+
     def _forward_curriculum(self, x: torch.Tensor) -> torch.Tensor:
         """Curriculum learning forward pass"""
         # Stage 0: Basic convolutions only
@@ -821,77 +891,79 @@ class EnhancedCubeUNet(pl.LightningModule):
         # Stage 2: Add transformers
         else:
             return self._forward_full(x)
-    
+
     def _forward_basic(self, x: torch.Tensor) -> torch.Tensor:
         """Basic forward pass without advanced features"""
         # Simplified encoder-decoder
         encoder_features = []
-        
+
         # First encoder block
         x = self.encoder_blocks[0](x)
         encoder_features.append(x)
-        
+
         # Downsampling blocks (without attention)
         for i, downsample in enumerate(self.downsample_blocks):
             skip, x = downsample(x)
             encoder_features.append(skip)
-        
+
         # Bottleneck
         x = self.bottleneck(x)
-        
+
         # Decoder
         for i, upsample in enumerate(self.upsample_blocks):
-            skip = encoder_features[-(i+2)]
+            skip = encoder_features[-(i + 2)]
             x = upsample(x, skip)
-        
+
         # Output
         x = self.output_conv(x)
         x = self.output_activation(x)
-        
+
         return x
-    
+
     def _forward_with_attention(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass with attention mechanisms"""
         # Similar to basic but with attention enabled
         return self._forward_full(x)
-    
+
     def _forward_full(self, x: torch.Tensor) -> torch.Tensor:
         """Full forward pass with all enhancements"""
         encoder_features = []
-        
+
         # First encoder block
         x = self.encoder_blocks[0](x)
         encoder_features.append(x)
-        
+
         # Downsampling blocks
         for i, downsample in enumerate(self.downsample_blocks):
             skip, x = downsample(x)
             encoder_features.append(skip)
-        
+
         # Bottleneck
         x = self.bottleneck(x)
-        
+
         # Decoder
         for i, upsample in enumerate(self.upsample_blocks):
-            skip = encoder_features[-(i+2)]
+            skip = encoder_features[-(i + 2)]
             x = upsample(x, skip)
-        
+
         # Output
         x = self.output_conv(x)
         x = self.output_activation(x)
-        
+
         return x
-    
-    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> torch.Tensor:
+
+    def training_step(
+        self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int
+    ) -> torch.Tensor:
         """Enhanced training step with curriculum learning"""
         inputs, targets = batch
-        
+
         # Forward pass
         predictions = self(inputs)
-        
+
         # Primary loss
         primary_loss = F.mse_loss(predictions, targets)
-        
+
         # Physics regularization
         physics_loss = torch.tensor(0.0, device=self.device)
         if self.use_physics_constraints:
@@ -899,14 +971,14 @@ class EnhancedCubeUNet(pl.LightningModule):
                 predictions, inputs, self.output_variables
             )
             physics_loss = sum(physics_losses.values())
-            
+
             # Log individual physics losses
             for name, loss in physics_losses.items():
-                self.log(f'train_physics_{name}', loss, on_step=True, on_epoch=True)
-        
+                self.log(f"train_physics_{name}", loss, on_step=True, on_epoch=True)
+
         # Total loss
         total_loss = primary_loss + self.physics_weight * physics_loss
-        
+
         # Curriculum learning advancement
         if self.curriculum_stage < self.max_curriculum_stages:
             # Advance curriculum based on loss improvement
@@ -915,29 +987,31 @@ class EnhancedCubeUNet(pl.LightningModule):
                 if recent_loss < 0.1 * (self.curriculum_stage + 1):
                     self.curriculum_stage += 1
                     logger.info(f"Advanced to curriculum stage {self.curriculum_stage}")
-        
+
         # Logging
-        self.log('train_loss', total_loss, on_step=True, on_epoch=True)
-        self.log('train_primary_loss', primary_loss, on_step=True, on_epoch=True)
-        self.log('train_physics_loss', physics_loss, on_step=True, on_epoch=True)
-        self.log('curriculum_stage', float(self.curriculum_stage), on_step=True, on_epoch=True)
-        
+        self.log("train_loss", total_loss, on_step=True, on_epoch=True)
+        self.log("train_primary_loss", primary_loss, on_step=True, on_epoch=True)
+        self.log("train_physics_loss", physics_loss, on_step=True, on_epoch=True)
+        self.log("curriculum_stage", float(self.curriculum_stage), on_step=True, on_epoch=True)
+
         # Track losses
         self.train_losses.append(total_loss.item())
         self.physics_losses.append(physics_loss.item())
-        
+
         return total_loss
-    
-    def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> torch.Tensor:
+
+    def validation_step(
+        self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int
+    ) -> torch.Tensor:
         """Enhanced validation step"""
         inputs, targets = batch
-        
+
         # Forward pass
         predictions = self(inputs)
-        
+
         # Primary loss
         primary_loss = F.mse_loss(predictions, targets)
-        
+
         # Physics regularization
         physics_loss = torch.tensor(0.0, device=self.device)
         if self.use_physics_constraints:
@@ -945,20 +1019,20 @@ class EnhancedCubeUNet(pl.LightningModule):
                 predictions, inputs, self.output_variables
             )
             physics_loss = sum(physics_losses.values())
-        
+
         # Total loss
         total_loss = primary_loss + self.physics_weight * physics_loss
-        
+
         # Logging
-        self.log('val_loss', total_loss, on_step=False, on_epoch=True)
-        self.log('val_primary_loss', primary_loss, on_step=False, on_epoch=True)
-        self.log('val_physics_loss', physics_loss, on_step=False, on_epoch=True)
-        
+        self.log("val_loss", total_loss, on_step=False, on_epoch=True)
+        self.log("val_primary_loss", primary_loss, on_step=False, on_epoch=True)
+        self.log("val_physics_loss", physics_loss, on_step=False, on_epoch=True)
+
         # Track losses
         self.val_losses.append(total_loss.item())
-        
+
         return total_loss
-    
+
     def configure_optimizers(self):
         """Configure enhanced optimizer with advanced scheduling"""
         # Use AdamW with decoupled weight decay
@@ -967,33 +1041,33 @@ class EnhancedCubeUNet(pl.LightningModule):
             lr=self.learning_rate,
             weight_decay=self.weight_decay,
             betas=(0.9, 0.999),
-            eps=1e-8
+            eps=1e-8,
         )
-        
+
         # Cosine annealing with warm restarts
         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer, T_0=10, T_mult=2, eta_min=1e-7
         )
-        
+
         return {
-            'optimizer': optimizer,
-            'lr_scheduler': {
-                'scheduler': scheduler,
-                'interval': 'epoch',
-                'frequency': 1
-            }
+            "optimizer": optimizer,
+            "lr_scheduler": {"scheduler": scheduler, "interval": "epoch", "frequency": 1},
         }
-    
+
     def get_model_complexity(self) -> Dict[str, Any]:
         """Get model complexity metrics"""
         total_params = sum(p.numel() for p in self.parameters())
         trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
-        
+
         return {
-            'total_parameters': total_params,
-            'trainable_parameters': trainable_params,
-            'model_size_mb': total_params * 4 / (1024 * 1024),  # Assuming float32
-            'attention_blocks': sum(1 for m in self.modules() if isinstance(m, CBAM3D)),
-            'transformer_blocks': sum(1 for m in self.modules() if isinstance(m, TransformerBlock3D)),
-            'separable_conv_blocks': sum(1 for m in self.modules() if isinstance(m, SeparableConv3D)),
-        } 
+            "total_parameters": total_params,
+            "trainable_parameters": trainable_params,
+            "model_size_mb": total_params * 4 / (1024 * 1024),  # Assuming float32
+            "attention_blocks": sum(1 for m in self.modules() if isinstance(m, CBAM3D)),
+            "transformer_blocks": sum(
+                1 for m in self.modules() if isinstance(m, TransformerBlock3D)
+            ),
+            "separable_conv_blocks": sum(
+                1 for m in self.modules() if isinstance(m, SeparableConv3D)
+            ),
+        }

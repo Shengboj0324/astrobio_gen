@@ -16,13 +16,14 @@ network_to_adj(network, n) -> np.ndarray
 visualise(G)
     Quick Matplotlib figure (works for ≤30 nodes, debugging only).
 """
+
 from __future__ import annotations
+
 from typing import Dict, List, Tuple
 
-import numpy as np
-import networkx as nx
 import matplotlib.pyplot as plt
-
+import networkx as nx
+import numpy as np
 
 __all__ = ["adj_to_network", "network_to_adj", "visualise"]
 

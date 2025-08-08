@@ -1,0 +1,41 @@
+_target_: datamodules.cube_dm.CubeDM
+
+# Data paths
+data_dir: ${data_dir}
+cache_dir: ${cache_dir}
+
+# Data loading
+batch_size: 32
+num_workers: 4
+pin_memory: true
+persistent_workers: true
+prefetch_factor: 2
+
+# Data splits
+train_split: 0.7
+val_split: 0.15
+test_split: 0.15
+
+# Data augmentation
+use_augmentation: true
+augmentation_strength: 0.1
+
+# Data preprocessing
+normalize: true
+standardize: true
+
+# Memory optimization
+shuffle: true
+drop_last: true
+
+# Data quality
+validate_data: true
+quality_threshold: 0.95
+
+# Caching
+use_cache: true
+cache_compression: gzip
+
+# Synthetic data fallback
+use_synthetic_fallback: true
+synthetic_size: 1000

@@ -1,0 +1,45 @@
+_target_: models.enhanced_datacube_unet.EnhancedCubeUNet
+
+# Model architecture
+name: enhanced_datacube
+n_input_vars: 5
+n_output_vars: 5
+input_variables: 
+  - temperature
+  - pressure  
+  - humidity
+  - velocity_u
+  - velocity_v
+output_variables:
+  - temperature
+  - pressure
+  - humidity
+  - velocity_u
+  - velocity_v
+
+# Architecture parameters
+base_features: 64
+depth: 4
+dropout: 0.1
+
+# Advanced features
+use_attention: true
+use_transformer: false
+use_separable_conv: true
+use_gradient_checkpointing: false
+use_mixed_precision: true
+model_scaling: efficient
+
+# Physics constraints
+use_physics_constraints: true
+physics_weight: 0.2
+
+# Optimization
+learning_rate: 1e-4
+weight_decay: 1e-4
+optimizer: adamw
+scheduler: cosine
+
+# Performance
+compile_model: false
+enable_benchmarking: true

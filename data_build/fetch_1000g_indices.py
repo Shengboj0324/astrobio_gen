@@ -3,8 +3,12 @@ Stream-download all 1000 Genomes *.index and *.stats files listed in URLS
 → data/raw/1000g_indices/
 (keeps a .done stamp so you can re-run safely)
 """
+
+import hashlib
 from pathlib import Path
-import requests, tqdm, hashlib
+
+import requests
+import tqdm
 
 URLS = [
     "https://ftp.ncbi.nlm.nih.gov/1000genomes/ftp/1000G_2504_high_coverage/additional_698_related/1000G_698_related_high_coverage.sequence.index",
