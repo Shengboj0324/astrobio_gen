@@ -5,7 +5,7 @@
 #
 
 # Core ML frameworks - pinned versions for reproducibility
-torch==2.1.2+cu121
+torch==2.8.0
 torchvision==0.16.2+cu121
 torchaudio==2.1.2+cu121
 lightning==2.1.3
