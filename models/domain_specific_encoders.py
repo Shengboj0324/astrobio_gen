@@ -884,3 +884,7 @@ if __name__ == "__main__":
 
     # Run test
     test_multimodal_encoder()
+
+
+# Alias for backward compatibility
+DomainSpecificEncoders = MultiModalEncoder

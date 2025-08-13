@@ -42,6 +42,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 # Scientific computing
 try:
     import astropy.units as u

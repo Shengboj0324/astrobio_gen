@@ -77,7 +77,7 @@ try:
     from models.meta_cognitive_control import MetaCognitiveController
     from models.world_class_multimodal_integration import (
         MultiModalConfig,
-        WorldClassMultiModalIntegration,
+        WorldClassMultimodalIntegrator,
     )
 
     PLATFORM_INTEGRATION_AVAILABLE = True

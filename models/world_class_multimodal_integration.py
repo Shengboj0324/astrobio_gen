@@ -805,7 +805,7 @@ class RealAstronomicalDataLoader:
             return None
 
 
-class WorldClassMultiModalIntegration(nn.Module):
+class WorldClassMultimodalIntegrator(nn.Module):
     """
     World-class multimodal integration system for astronomical data
     """
@@ -1233,7 +1233,7 @@ world_class_multimodal_system = None
 
 def get_multimodal_system(
     config: Optional[MultiModalConfig] = None,
-) -> WorldClassMultiModalIntegration:
+) -> WorldClassMultimodalIntegrator:
     """Get or create the global multimodal system"""
 
     global world_class_multimodal_system
@@ -1241,7 +1241,7 @@ def get_multimodal_system(
     if world_class_multimodal_system is None:
         if config is None:
             config = MultiModalConfig()
-        world_class_multimodal_system = WorldClassMultiModalIntegration(config)
+        world_class_multimodal_system = WorldClassMultimodalIntegrator(config)
 
     return world_class_multimodal_system
 

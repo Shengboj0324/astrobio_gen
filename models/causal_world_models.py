@@ -46,6 +46,9 @@ from scipy import stats
 from scipy.optimize import minimize
 from torch.distributions import Categorical, MultivariateNormal, Normal
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 # Statistical and causal inference libraries
 try:
     import dowhy
@@ -917,6 +920,10 @@ class AstronomicalCausalModel:
 
         else:
             raise ValueError(f"Counterfactual type {counterfactual_type} not implemented")
+
+
+# Main export class for compatibility
+CausalWorldModel = AstronomicalCausalModel
 
 
 class CausalInferenceEngine:

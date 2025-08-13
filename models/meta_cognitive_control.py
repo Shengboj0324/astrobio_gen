@@ -45,6 +45,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 # Scientific reasoning libraries
 try:
     from scipy import stats
