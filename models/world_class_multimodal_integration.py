@@ -463,42 +463,192 @@ class RealAstronomicalDataLoader:
 
         return transit_flux
 
-    async def _generate_realistic_jwst_spectra(
+    async def _load_real_jwst_spectra(
         self, target_list: List[str]
     ) -> List[RealAstronomicalDataPoint]:
-        """Generate realistic JWST-like spectra when real data not available"""
+        """Load real JWST spectroscopic data from MAST Archive"""
 
         data_points = []
+        
+        # JWST MAST API configuration
+        mast_api_base = "https://mast.stsci.edu/api/v0.1/"
+        jwst_endpoints = {
+            "search": f"{mast_api_base}invoke",
+            "download": f"{mast_api_base}download/file"
+        }
 
         for target in target_list:
             try:
-                # Create realistic spectrum based on JWST specifications
-                spectrum = await self._process_jwst_fits(b"", target, "NIRSpec")
-                if spectrum:
-                    data_points.append(spectrum)
+                # Search for JWST observations of target
+                search_params = {
+                    "service": "Mast.Jwst.Filtered.NIRSpec",
+                    "params": {
+                        "columns": "*",
+                        "filters": [
+                            {"paramName": "target_name", "values": [target]},
+                            {"paramName": "dataproduct_type", "values": ["spectrum"]},
+                            {"paramName": "calib_level", "values": [3]}  # Science-ready data
+                        ]
+                    }
+                }
 
-                    # Update quality metrics
-                    if spectrum.data_quality == DataQuality.EXCELLENT:
-                        self.quality_metrics["excellent_quality"] += 1
-                    elif spectrum.data_quality == DataQuality.GOOD:
-                        self.quality_metrics["good_quality"] += 1
-                    elif spectrum.data_quality == DataQuality.FAIR:
-                        self.quality_metrics["fair_quality"] += 1
-                    else:
-                        self.quality_metrics["poor_quality"] += 1
-
+                async with aiohttp.ClientSession() as session:
+                    # Search for observations
+                    async with session.post(
+                        jwst_endpoints["search"],
+                        json=search_params,
+                        timeout=aiohttp.ClientTimeout(total=30)
+                    ) as response:
+                        
+                        if response.status == 200:
+                            search_results = await response.json()
+                            observations = search_results.get("data", [])
+                            
+                            for obs in observations[:3]:  # Limit to 3 observations per target
+                                try:
+                                    # Download the actual FITS file
+                                    fits_url = obs.get("dataURI")
+                                    if fits_url:
+                                        async with session.get(fits_url) as fits_response:
+                                            if fits_response.status == 200:
+                                                fits_data = await fits_response.read()
+                                                
+                                                # Process real FITS data
+                                                spectrum_data = await self._process_real_jwst_fits(
+                                                    fits_data, target, obs.get("instrument", "NIRSpec")
+                                                )
+                                                
+                                                if spectrum_data:
+                                                    data_points.append(spectrum_data)
+                                                    self.quality_metrics["total_loaded"] += 1
+                                                    
+                                                    # Real quality assessment
+                                                    snr = obs.get("s_snr", 0)
+                                                    if snr > 50:
+                                                        self.quality_metrics["excellent_quality"] += 1
+                                                    elif snr > 20:
+                                                        self.quality_metrics["good_quality"] += 1
+                                                    elif snr > 10:
+                                                        self.quality_metrics["fair_quality"] += 1
+                                                    else:
+                                                        self.quality_metrics["poor_quality"] += 1
+                                
+                                except Exception as e:
+                                    logger.warning(f"Failed to process observation for {target}: {e}")
+                        
+                        else:
+                            logger.warning(f"MAST API search failed for {target}: HTTP {response.status}")
+            
+            except asyncio.TimeoutError:
+                logger.warning(f"Timeout searching for JWST data for {target}")
             except Exception as e:
-                logger.warning(f"Failed to generate spectrum for {target}: {e}")
+                logger.error(f"Error loading JWST data for {target}: {e}")
                 self.quality_metrics["rejected"] += 1
 
+        logger.info(f"✅ Loaded {len(data_points)} real JWST spectra from MAST Archive")
         return data_points
 
-    async def load_hubble_imaging(self, target_list: List[str]) -> List[RealAstronomicalDataPoint]:
-        """Load real Hubble Space Telescope imaging data"""
+    async def _process_real_jwst_fits(
+        self, fits_data: bytes, target: str, instrument: str
+    ) -> Optional[RealAstronomicalDataPoint]:
+        """Process real JWST FITS spectroscopic data"""
+        
+        try:
+            # Use astropy to read FITS data
+            from astropy.io import fits
+            from io import BytesIO
+            
+            with fits.open(BytesIO(fits_data)) as hdul:
+                # Extract primary HDU and data
+                primary_hdu = hdul[0]
+                header = primary_hdu.header
+                
+                # Try to find spectral data in extensions
+                spectrum_data = None
+                wavelength = None
+                flux = None
+                error = None
+                
+                for ext in hdul:
+                    if hasattr(ext, 'data') and ext.data is not None:
+                        if ext.name in ['SCI', 'FLUX', 'SPEC']:
+                            if len(ext.data.shape) >= 1:
+                                flux = ext.data.flatten()
+                        elif ext.name in ['WAVELENGTH', 'WAVE']:
+                            wavelength = ext.data.flatten()
+                        elif ext.name in ['ERROR', 'ERR']:
+                            error = ext.data.flatten()
+                
+                # If data found, create spectrum
+                if flux is not None:
+                    if wavelength is None:
+                        # Create default wavelength grid for NIRSpec
+                        wavelength = np.linspace(1.0, 5.0, len(flux))  # microns
+                    
+                    if error is None:
+                        # Estimate error from flux
+                        error = np.sqrt(np.abs(flux)) * 0.1
+                    
+                    # Calculate SNR and quality
+                    snr = np.median(flux / error) if len(error) > 0 else 0
+                    
+                    if snr > 50:
+                        quality = DataQuality.EXCELLENT
+                    elif snr > 20:
+                        quality = DataQuality.GOOD
+                    elif snr > 10:
+                        quality = DataQuality.FAIR
+                    else:
+                        quality = DataQuality.POOR
+                    
+                    # Extract observational metadata
+                    obs_date_str = header.get('DATE-OBS', datetime.now().isoformat())
+                    try:
+                        obs_date = datetime.fromisoformat(obs_date_str.replace('Z', '+00:00'))
+                    except:
+                        obs_date = datetime.now()
+                    
+                    return RealAstronomicalDataPoint(
+                        object_id=target,
+                        observation_date=obs_date,
+                        observatory="JWST",
+                        instrument=instrument,
+                        wavelength=wavelength,
+                        flux=flux,
+                        flux_error=error,
+                        ra=header.get('RA_TARG', 0.0),
+                        dec=header.get('DEC_TARG', 0.0),
+                        signal_to_noise=snr,
+                        data_quality=quality,
+                        calibrated=True,
+                        processed=True,
+                        filter_name=header.get('FILTER', 'CLEAR'),
+                        exposure_time=header.get('EXPTIME', 0.0),
+                        metadata={
+                            'program_id': header.get('PROGRAM', ''),
+                            'visit_id': header.get('VISIT', ''),
+                            'observation_id': header.get('OBS_ID', ''),
+                            'fits_header_keys': list(header.keys())[:50]  # Limit header size
+                        }
+                    )
+        
+        except Exception as e:
+            logger.error(f"Failed to process JWST FITS data for {target}: {e}")
+            return None
 
-        logger.info(f"🔭 Loading Hubble imaging for {len(target_list)} targets...")
+    async def load_hubble_imaging(self, target_list: List[str]) -> List[RealAstronomicalDataPoint]:
+        """Load real Hubble Space Telescope imaging data from MAST Archive"""
+
+        logger.info(f"🔭 Loading real Hubble imaging for {len(target_list)} targets...")
 
         data_points = []
+        
+        # HST MAST API configuration
+        mast_api_base = "https://mast.stsci.edu/api/v0.1/"
+        hst_endpoints = {
+            "search": f"{mast_api_base}invoke",
+            "download": f"{mast_api_base}download/file"
+        }
 
         # Hubble filters commonly used for exoplanet studies
         filters = ["F606W", "F814W", "F110W", "F160W", "F125W", "F140W"]
@@ -506,19 +656,190 @@ class RealAstronomicalDataLoader:
         for target in target_list:
             for filter_name in filters[:2]:  # Use 2 filters per target
                 try:
-                    # Generate realistic HST imaging data
-                    image_data = await self._generate_hst_image(target, filter_name)
-                    if image_data:
-                        data_points.append(image_data)
-                        self.quality_metrics["total_loaded"] += 1
+                    # Search for HST observations
+                    search_params = {
+                        "service": "Mast.Caom.Cone",
+                        "params": {
+                            "ra": 0,  # Will be updated with real target coordinates
+                            "dec": 0,
+                            "radius": 0.1,  # 0.1 degree search radius
+                            "columns": "*",
+                            "obstype": "science",
+                            "intentType": "science",
+                            "obs_collection": "HST",
+                            "filters": filter_name
+                        }
+                    }
+                    
+                    # Get target coordinates from Simbad/NED first
+                    target_coords = await self._resolve_target_coordinates(target)
+                    if target_coords:
+                        search_params["params"]["ra"] = target_coords["ra"]
+                        search_params["params"]["dec"] = target_coords["dec"]
+                    
+                    async with aiohttp.ClientSession() as session:
+                        # Search for observations
+                        async with session.post(
+                            hst_endpoints["search"],
+                            json=search_params,
+                            timeout=aiohttp.ClientTimeout(total=30)
+                        ) as response:
+                            
+                            if response.status == 200:
+                                search_results = await response.json()
+                                observations = search_results.get("data", [])
+                                
+                                for obs in observations[:3]:  # Limit to 3 observations per target/filter
+                                    try:
+                                        # Download the actual FITS file
+                                        fits_url = obs.get("dataURI")
+                                        if fits_url and "fits" in fits_url.lower():
+                                            async with session.get(fits_url) as fits_response:
+                                                if fits_response.status == 200:
+                                                    fits_data = await fits_response.read()
+                                                    
+                                                    # Process real HST imaging data
+                                                    image_data = await self._process_real_hst_image(
+                                                        fits_data, target, filter_name, obs
+                                                    )
+                                                    
+                                                    if image_data:
+                                                        data_points.append(image_data)
+                                                        self.quality_metrics["total_loaded"] += 1
+                                    
+                                    except Exception as e:
+                                        logger.warning(f"Failed to process HST observation for {target}: {e}")
+                            
+                            else:
+                                logger.warning(f"MAST HST search failed for {target}: HTTP {response.status}")
 
                 except Exception as e:
-                    logger.warning(
-                        f"Failed to generate HST image for {target} in {filter_name}: {e}"
-                    )
+                    logger.warning(f"Error loading HST data for {target} in {filter_name}: {e}")
 
-        logger.info(f"✅ Loaded {len(data_points)} Hubble imaging observations")
+        logger.info(f"✅ Loaded {len(data_points)} real Hubble imaging observations from MAST")
         return data_points
+
+    async def _resolve_target_coordinates(self, target_name: str) -> Optional[Dict[str, float]]:
+        """Resolve target coordinates using Simbad"""
+        
+        try:
+            # Use Simbad through astroquery
+            from astroquery.simbad import Simbad
+            from astropy.coordinates import SkyCoord
+            import astropy.units as u
+            
+            # Query Simbad for coordinates
+            simbad = Simbad()
+            simbad.add_votable_fields('ra', 'dec')
+            result_table = simbad.query_object(target_name)
+            
+            if result_table and len(result_table) > 0:
+                ra_str = result_table['RA'][0]
+                dec_str = result_table['DEC'][0]
+                
+                # Parse coordinates
+                coord = SkyCoord(f"{ra_str} {dec_str}", unit=(u.hourangle, u.deg))
+                
+                return {
+                    "ra": coord.ra.degree,
+                    "dec": coord.dec.degree
+                }
+        
+        except Exception as e:
+            logger.warning(f"Failed to resolve coordinates for {target_name}: {e}")
+            
+        # Return default coordinates if resolution fails
+        return {"ra": 0.0, "dec": 0.0}
+
+    async def _process_real_hst_image(
+        self, fits_data: bytes, target: str, filter_name: str, obs_metadata: Dict
+    ) -> Optional[RealAstronomicalDataPoint]:
+        """Process real HST FITS imaging data"""
+        
+        try:
+            from astropy.io import fits
+            from io import BytesIO
+            
+            with fits.open(BytesIO(fits_data)) as hdul:
+                # Find science data extension
+                image_data = None
+                header = None
+                
+                # Look for science data in typical HST extensions
+                for ext in hdul:
+                    if hasattr(ext, 'data') and ext.data is not None:
+                        if ext.name in ['SCI', 'PRIMARY'] and len(ext.data.shape) >= 2:
+                            image_data = ext.data
+                            header = ext.header
+                            break
+                
+                if image_data is None:
+                    return None
+                
+                # Calculate image statistics
+                image_stats = {
+                    'mean': float(np.mean(image_data)),
+                    'std': float(np.std(image_data)),
+                    'min': float(np.min(image_data)),
+                    'max': float(np.max(image_data))
+                }
+                
+                # Estimate SNR from image statistics
+                signal = image_stats['max'] - image_stats['mean']
+                noise = image_stats['std']
+                snr = signal / noise if noise > 0 else 0
+                
+                # Determine quality based on SNR and metadata
+                if snr > 100 and image_data.shape[0] > 500:
+                    quality = DataQuality.EXCELLENT
+                elif snr > 50:
+                    quality = DataQuality.GOOD
+                elif snr > 20:
+                    quality = DataQuality.FAIR
+                else:
+                    quality = DataQuality.POOR
+                
+                # Extract observational metadata
+                obs_date_str = header.get('DATE-OBS', obs_metadata.get('t_min', ''))
+                try:
+                    obs_date = datetime.fromisoformat(obs_date_str.replace('Z', '+00:00'))
+                except:
+                    obs_date = datetime.now()
+                
+                # Get pixel scale from header
+                pixel_scale = header.get('CD1_1', 0.04)  # Default to typical WFC3 scale
+                if pixel_scale == 0:
+                    pixel_scale = 0.04
+                
+                return RealAstronomicalDataPoint(
+                    object_id=target,
+                    observation_date=obs_date,
+                    observatory="HST",
+                    instrument=header.get('INSTRUME', obs_metadata.get('instrument_name', 'UNKNOWN')),
+                    image_data=image_data.astype(np.float32),
+                    pixel_scale=abs(pixel_scale),
+                    filter_name=filter_name,
+                    ra=header.get('RA_TARG', obs_metadata.get('s_ra', 0.0)),
+                    dec=header.get('DEC_TARG', obs_metadata.get('s_dec', 0.0)),
+                    signal_to_noise=snr,
+                    data_quality=quality,
+                    calibrated=True,
+                    processed=True,
+                    exposure_time=header.get('EXPTIME', obs_metadata.get('t_exptime', 0.0)),
+                    metadata={
+                        'proposal_id': header.get('PROPOSID', obs_metadata.get('proposal_id', '')),
+                        'program_id': obs_metadata.get('proposal_pi', ''),
+                        'observation_id': obs_metadata.get('obs_id', ''),
+                        'image_stats': image_stats,
+                        'detector': header.get('DETECTOR', ''),
+                        'aperture': header.get('APERTURE', ''),
+                        'fits_header_size': len(header)
+                    }
+                )
+        
+        except Exception as e:
+            logger.error(f"Failed to process HST FITS image for {target}: {e}")
+            return None
 
     async def _generate_hst_image(
         self, target: str, filter_name: str

@@ -176,7 +176,18 @@ class UltimateSystemOrchestrator:
             complexity = self.enhanced_cnn.get_model_complexity()
 
             # Test inference
-            test_input = torch.randn(2, 5, 32, 64, 64).to(self.device)
+            # Load real test data instead of synthetic
+            try:
+                from data_build.production_data_loader import production_loader
+                import asyncio
+                
+                # Try to load real climate data for testing
+                real_inputs, _ = asyncio.run(production_loader.load_climate_data(32, 2))
+                test_input = real_inputs[:2, :5, 0, 0, :20, :32, :64].to(self.device)  # Extract compatible slice
+                logger.info("✅ Using real climate data for CNN testing")
+            except Exception as e:
+                logger.warning(f"Real data unavailable, using test tensor: {e}")
+                test_input = torch.randn(2, 5, 32, 64, 64).to(self.device)  # Fallback for compatibility
 
             self.enhanced_cnn.eval()
             start_time = time.time()
