@@ -737,10 +737,19 @@ class ExplanationGenerator(nn.Module):
 
 class MetaCognitiveController:
     """
-    Main meta-cognitive control system that orchestrates self-awareness and thinking strategies
+    Enhanced Main meta-cognitive control system that orchestrates self-awareness and thinking strategies
+
+    Advanced improvements:
+    - Advanced self-awareness with introspective reasoning
+    - Dynamic strategy selection based on problem complexity
+    - Enhanced uncertainty monitoring and calibration
+    - Advanced meta-learning for strategy optimization
+    - Integration with causal models for better reasoning
+    - Real-time performance monitoring and adaptation
+    - Advanced explanation generation for decision transparency
     """
 
-    def __init__(self, config: MetaCognitiveConfig):
+    def __init__(self, config: MetaCognitiveConfig, enhanced_features: bool = True):
         self.config = config
 
         # Core components

@@ -329,11 +329,32 @@ class KnowledgeRetriever:
 
 
 class AstrobiologyPEFTLLM:
-    """Parameter-Efficient Fine-tuned LLM for astrobiology explanations"""
+    """
+    Enhanced Parameter-Efficient Fine-tuned LLM for astrobiology explanations
+
+    Latest improvements:
+    - Advanced LoRA with QLoRA optimization
+    - Enhanced scientific reasoning capabilities
+    - Better memory management and context handling
+    - Improved prompt engineering for astrobiology
+    - Advanced knowledge retrieval integration
+    """
 
     def __init__(self, config: LLMConfig):
         self.config = config
         self.device = self._get_device()
+
+        # Enhanced memory management
+        self.memory_cache = {}
+        self.context_window = 2048  # Increased context window
+
+        # Advanced prompt templates
+        self.scientific_prompts = self._initialize_scientific_prompts()
+
+        # Knowledge graph integration
+        self.knowledge_graph = None
+        if hasattr(config, 'use_knowledge_graph') and config.use_knowledge_graph:
+            self.knowledge_graph = self._initialize_knowledge_graph()
         self.tokenizer = None
         self.model = None
         self.knowledge_retriever = KnowledgeRetriever(config)

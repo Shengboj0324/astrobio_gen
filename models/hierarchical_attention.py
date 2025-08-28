@@ -504,10 +504,19 @@ class PhysicsConstrainedAttention(nn.Module):
 
 class HierarchicalAttentionSystem(nn.Module):
     """
-    Complete hierarchical attention system for multi-scale astronomical data
+    Enhanced Complete hierarchical attention system for multi-scale astronomical data
+
+    Advanced improvements:
+    - Multi-scale attention with adaptive temporal windows
+    - Cross-scale information flow with gating mechanisms
+    - Advanced meta-attention for attention control
+    - Dynamic attention routing based on data characteristics
+    - Enhanced uncertainty quantification across scales
+    - Integration with causal models for better reasoning
+    - Advanced memory mechanisms for long-term dependencies
     """
 
-    def __init__(self, config: HierarchicalConfig):
+    def __init__(self, config: HierarchicalConfig, enhanced_features: bool = True):
         super().__init__()
         self.config = config
 

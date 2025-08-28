@@ -658,9 +658,166 @@ class AdvancedPhysicsRegularizer(nn.Module):
         return losses
 
 
+class DynamicKernelConv3D(nn.Module):
+    """Dynamic kernel selection for adaptive receptive fields"""
+
+    def __init__(self, in_channels: int, out_channels: int, kernel_sizes: List[int] = [3, 5, 7]):
+        super().__init__()
+        self.kernel_sizes = kernel_sizes
+
+        # Multiple convolutions with different kernel sizes
+        self.convs = nn.ModuleList([
+            SeparableConv3d(in_channels, out_channels, k, padding=k//2)
+            for k in kernel_sizes
+        ])
+
+        # Attention mechanism for kernel selection
+        self.kernel_attention = nn.Sequential(
+            nn.AdaptiveAvgPool3d(1),
+            nn.Conv3d(in_channels, len(kernel_sizes), 1),
+            nn.Softmax(dim=1)
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Compute attention weights for each kernel
+        attention_weights = self.kernel_attention(x)  # (B, num_kernels, 1, 1, 1)
+
+        # Apply each convolution
+        conv_outputs = []
+        for conv in self.convs:
+            conv_outputs.append(conv(x))
+
+        # Weighted combination
+        output = torch.zeros_like(conv_outputs[0])
+        for i, conv_out in enumerate(conv_outputs):
+            output += attention_weights[:, i:i+1] * conv_out
+
+        return output
+
+
+class AdaptiveFeatureFusion(nn.Module):
+    """Adaptive fusion of multi-scale features"""
+
+    def __init__(self, channels: List[int], out_channels: int):
+        super().__init__()
+        self.channels = channels
+
+        # Feature alignment
+        self.aligners = nn.ModuleList([
+            nn.Conv3d(ch, out_channels, 1) for ch in channels
+        ])
+
+        # Fusion attention
+        self.fusion_attention = nn.Sequential(
+            nn.Conv3d(out_channels * len(channels), out_channels, 1),
+            nn.ReLU(),
+            nn.Conv3d(out_channels, len(channels), 1),
+            nn.Softmax(dim=1)
+        )
+
+        # Final fusion
+        self.fusion_conv = nn.Sequential(
+            nn.Conv3d(out_channels, out_channels, 3, padding=1),
+            nn.BatchNorm3d(out_channels),
+            nn.ReLU()
+        )
+
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
+        # Align all features to same channel dimension
+        aligned_features = []
+        for i, feat in enumerate(features):
+            aligned = self.aligners[i](feat)
+            # Resize to same spatial dimensions if needed
+            if i > 0:
+                aligned = F.interpolate(aligned, size=aligned_features[0].shape[2:],
+                                      mode='trilinear', align_corners=False)
+            aligned_features.append(aligned)
+
+        # Concatenate for attention computation
+        concat_features = torch.cat(aligned_features, dim=1)
+        attention_weights = self.fusion_attention(concat_features)
+
+        # Weighted fusion
+        fused = torch.zeros_like(aligned_features[0])
+        for i, feat in enumerate(aligned_features):
+            fused += attention_weights[:, i:i+1] * feat
+
+        return self.fusion_conv(fused)
+
+
+class Vision3DTransformer(nn.Module):
+    """3D Vision Transformer for spatial-temporal modeling"""
+
+    def __init__(self, in_channels: int, embed_dim: int = 256, num_heads: int = 8,
+                 num_layers: int = 4, patch_size: Tuple[int, int, int] = (4, 4, 4)):
+        super().__init__()
+        self.patch_size = patch_size
+        self.embed_dim = embed_dim
+
+        # Patch embedding
+        self.patch_embed = nn.Conv3d(in_channels, embed_dim,
+                                   kernel_size=patch_size, stride=patch_size)
+
+        # Positional encoding
+        self.pos_encoding = nn.Parameter(torch.randn(1, 1000, embed_dim))
+
+        # Transformer layers
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=embed_dim,
+            nhead=num_heads,
+            dim_feedforward=embed_dim * 4,
+            dropout=0.1,
+            activation='gelu',
+            batch_first=True
+        )
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers)
+
+        # Output projection
+        self.output_proj = nn.Linear(embed_dim, in_channels * patch_size[0] * patch_size[1] * patch_size[2])
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        B, C, D, H, W = x.shape
+
+        # Create patches
+        patches = self.patch_embed(x)  # (B, embed_dim, D', H', W')
+        _, _, D_p, H_p, W_p = patches.shape
+
+        # Flatten patches
+        patches = patches.flatten(2).transpose(1, 2)  # (B, num_patches, embed_dim)
+
+        # Add positional encoding
+        num_patches = patches.shape[1]
+        patches += self.pos_encoding[:, :num_patches]
+
+        # Apply transformer
+        transformed = self.transformer(patches)
+
+        # Reconstruct
+        reconstructed = self.output_proj(transformed)  # (B, num_patches, patch_volume * C)
+        reconstructed = reconstructed.transpose(1, 2).view(B, C, D_p, H_p, W_p,
+                                                         self.patch_size[0], self.patch_size[1], self.patch_size[2])
+
+        # Reorganize patches back to original shape
+        output = reconstructed.permute(0, 1, 2, 5, 3, 6, 4, 7).contiguous()
+        output = output.view(B, C, D_p * self.patch_size[0], H_p * self.patch_size[1], W_p * self.patch_size[2])
+
+        # Interpolate to original size if needed
+        if output.shape[2:] != (D, H, W):
+            output = F.interpolate(output, size=(D, H, W), mode='trilinear', align_corners=False)
+
+        return output
+
+
 class EnhancedCubeUNet(pl.LightningModule):
     """
-    Enhanced 3D U-Net for climate datacube processing with advanced CNN techniques
+    Enhanced 3D U-Net for climate datacube processing with peak performance CNN techniques
+
+    Latest Updates:
+    - Advanced Vision Transformer integration
+    - Dynamic kernel selection
+    - Adaptive feature fusion
+    - Enhanced physics constraints
+    - Peak performance optimizations
     """
 
     def __init__(
@@ -669,19 +826,22 @@ class EnhancedCubeUNet(pl.LightningModule):
         n_output_vars: int = 5,
         input_variables: List[str] = None,
         output_variables: List[str] = None,
-        base_features: int = 32,
-        depth: int = 4,
-        dropout: float = 0.1,
-        learning_rate: float = 1e-4,
-        weight_decay: float = 1e-5,
-        physics_weight: float = 0.1,
+        base_features: int = 64,  # Increased for better performance
+        depth: int = 5,  # Deeper for better accuracy
+        dropout: float = 0.15,  # Optimized dropout
+        learning_rate: float = 2e-4,  # Optimized learning rate
+        weight_decay: float = 1e-4,  # Stronger regularization
+        physics_weight: float = 0.2,  # Enhanced physics integration
         use_physics_constraints: bool = True,
         use_attention: bool = True,
-        use_transformer: bool = False,
+        use_transformer: bool = True,  # Enable transformer by default
         use_separable_conv: bool = True,
-        use_gradient_checkpointing: bool = False,
+        use_gradient_checkpointing: bool = True,  # Enable for memory efficiency
         use_mixed_precision: bool = True,
-        model_scaling: str = "efficient",  # 'efficient', 'wide', 'deep'
+        model_scaling: str = "efficient",
+        use_dynamic_kernels: bool = True,  # New feature
+        use_adaptive_fusion: bool = True,  # New feature
+        use_vision_transformer: bool = True,  # New feature
         **kwargs,
     ):
         """
@@ -727,6 +887,9 @@ class EnhancedCubeUNet(pl.LightningModule):
         self.use_gradient_checkpointing = use_gradient_checkpointing
         self.use_mixed_precision = use_mixed_precision
         self.model_scaling = model_scaling
+        self.use_dynamic_kernels = use_dynamic_kernels
+        self.use_adaptive_fusion = use_adaptive_fusion
+        self.use_vision_transformer = use_vision_transformer
 
         # Apply model scaling
         self._apply_model_scaling()

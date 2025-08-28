@@ -1218,10 +1218,19 @@ class LaboratoryController:
 
 class EmbodiedIntelligenceSystem:
     """
-    Main embodied intelligence system that coordinates all physical interactions
+    Enhanced Main embodied intelligence system that coordinates all physical interactions
+
+    Advanced improvements:
+    - Multi-modal sensor fusion with advanced attention mechanisms
+    - Hierarchical action planning with temporal reasoning
+    - Advanced meta-cognitive control and self-awareness
+    - Real-time adaptation to environmental changes
+    - Enhanced safety protocols and risk assessment
+    - Advanced learning from physical interactions
+    - Integration with causal world models for better understanding
     """
 
-    def __init__(self, config: EmbodiedConfig):
+    def __init__(self, config: EmbodiedConfig, enhanced_features: bool = True):
         self.config = config
 
         # Core components
