@@ -1,15 +1,67 @@
 # World-Class Models Package - All Components Ready for Deep Learning
 import warnings
 
-# World-class neural network components
+# Production-ready neural network components
 __all__ = []
 
-# Core world-class models
+# Production models (latest stable implementations)
+try:
+    from .production_galactic_network import ProductionGalacticNetwork, GalacticNetworkConfig, create_production_galactic_network
+    __all__.extend(["ProductionGalacticNetwork", "GalacticNetworkConfig", "create_production_galactic_network"])
+except ImportError as e:
+    warnings.warn(f"Production Galactic Network not available: {e}")
+
+try:
+    from .production_llm_integration import ProductionLLMIntegration, ProductionLLMConfig, create_production_llm
+    __all__.extend(["ProductionLLMIntegration", "ProductionLLMConfig", "create_production_llm"])
+except ImportError as e:
+    warnings.warn(f"Production LLM Integration not available: {e}")
+
+try:
+    from .unified_interfaces import (
+        BaseNeuralNetwork, ModelRegistry, TensorValidator,
+        ModelMetadata, ModelType, DataModality,
+        model_registry, register_model, get_model, list_models
+    )
+    __all__.extend([
+        "BaseNeuralNetwork", "ModelRegistry", "TensorValidator",
+        "ModelMetadata", "ModelType", "DataModality",
+        "model_registry", "register_model", "get_model", "list_models"
+    ])
+except ImportError as e:
+    warnings.warn(f"Unified Interfaces not available: {e}")
+
+# Rebuilt core models
+try:
+    from .rebuilt_datacube_cnn import RebuiltDatacubeCNN
+    __all__.append("RebuiltDatacubeCNN")
+except ImportError as e:
+    warnings.warn(f"Rebuilt Datacube CNN not available: {e}")
+
+try:
+    from .rebuilt_graph_vae import RebuiltGraphVAE
+    __all__.append("RebuiltGraphVAE")
+except ImportError as e:
+    warnings.warn(f"Rebuilt Graph VAE not available: {e}")
+
+try:
+    from .rebuilt_llm_integration import RebuiltLLMIntegration
+    __all__.append("RebuiltLLMIntegration")
+except ImportError as e:
+    warnings.warn(f"Rebuilt LLM Integration not available: {e}")
+
+try:
+    from .rebuilt_multimodal_integration import RebuiltMultiModalIntegration
+    __all__.append("RebuiltMultiModalIntegration")
+except ImportError as e:
+    warnings.warn(f"Rebuilt Multi-Modal Integration not available: {e}")
+
+# Legacy world-class models (maintained for compatibility)
 try:
     from .graph_vae import GVAE
     __all__.append("GVAE")
 except ImportError as e:
-    warnings.warn(f"World-class Graph VAE not available: {e}")
+    warnings.warn(f"Legacy Graph VAE not available: {e}")
 
 try:
     from .spectrum_model import WorldClassSpectralAutoencoder, get_autoencoder
@@ -18,28 +70,10 @@ except ImportError as e:
     warnings.warn(f"World-class Spectral Model not available: {e}")
 
 try:
-    from .fusion_transformer import WorldClassFusionTransformer, FusionModel
-    __all__.extend(["WorldClassFusionTransformer", "FusionModel"])
-except ImportError as e:
-    warnings.warn(f"World-class Fusion Transformer not available: {e}")
-
-try:
     from .enhanced_datacube_unet import EnhancedCubeUNet
     __all__.append("EnhancedCubeUNet")
 except ImportError as e:
     warnings.warn(f"Enhanced Datacube U-Net not available: {e}")
-
-try:
-    from .surrogate_transformer import SurrogateTransformer
-    __all__.append("SurrogateTransformer")
-except ImportError as e:
-    warnings.warn(f"Surrogate Transformer not available: {e}")
-
-try:
-    from .world_class_multimodal_integration import WorldClassMultiModalIntegration
-    __all__.append("WorldClassMultiModalIntegration")
-except ImportError as e:
-    warnings.warn(f"World-class Multi-Modal Integration not available: {e}")
 
 try:
     from .metabolism_model import WorldClassMetabolismGenerator, MetabolismGenerator

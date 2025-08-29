@@ -1,0 +1,88 @@
+# Production Requirements - Pinned Stable Versions
+# Compatible with Python 3.11+, CUDA 11.8+
+# Last updated: 2024-01-15
+
+# Core PyTorch Stack (Stable Versions)
+torch==2.1.2
+torchvision==0.16.2
+torchaudio==2.1.2
+pytorch-lightning==2.1.3
+
+# PyTorch Geometric (Stable)
+torch-geometric==2.4.0
+torch-scatter==2.1.2
+torch-sparse==0.6.18
+torch-cluster==1.6.3
+torch-spline-conv==1.2.2
+
+# Modern Transformers & PEFT Stack
+transformers==4.36.2
+peft==0.8.2
+accelerate==0.25.0
+bitsandbytes==0.41.3
+safetensors==0.4.1
+tokenizers==0.15.0
+
+# Scientific Computing (Compatible Versions)
+numpy==1.24.4  # Pinned to avoid 2.x compatibility issues
+scipy==1.11.4
+pandas==2.1.4
+scikit-learn==1.3.2
+
+# Data Processing & Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.17.0
+pillow==10.1.0
+
+# Async & Networking
+aiohttp==3.9.1
+asyncio-mqtt==0.13.0
+websockets==12.0
+
+# Configuration & Utilities
+pydantic==2.5.2
+click==8.1.7
+tqdm==4.66.1
+rich==13.7.0
+
+# Logging & Monitoring
+wandb==0.16.1
+tensorboard==2.15.1
+mlflow==2.9.2
+
+# Testing & Quality
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.12.0
+flake8==6.1.0
+mypy==1.8.0
+
+# Jupyter & Development
+jupyter==1.0.0
+ipykernel==6.27.1
+ipywidgets==8.1.1
+
+# Optional: FAISS for vector search (CPU version)
+faiss-cpu==1.7.4
+
+# Optional: Gradio for web interfaces
+gradio==4.11.0
+
+# Optional: FastAPI for serving
+fastapi==0.105.0
+uvicorn==0.25.0
+
+# Optional: Database connectors
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+
+# Optional: Cloud storage
+boto3==1.34.0
+google-cloud-storage==2.10.0
+
+# Development Dependencies
+pre-commit==3.6.0
+isort==5.13.2
+bandit==1.7.5
