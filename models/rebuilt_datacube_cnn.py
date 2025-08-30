@@ -78,7 +78,7 @@ class MultiScaleAttention5D(nn.Module):
         B, C, T1, T2, L, H, W = x.shape
         
         # Reshape for attention computation (combine time dimensions)
-        x_reshaped = x.view(B, C, T1 * T2, L, H * W)
+        x_reshaped = x.reshape(B, C, T1 * T2, L, H * W)
         x_reshaped = x_reshaped.permute(0, 2, 3, 1, 4).contiguous()  # [B, T1*T2, L, C, H*W]
         
         # Apply attention across spatial dimensions
@@ -89,23 +89,23 @@ class MultiScaleAttention5D(nn.Module):
                 slice_data = slice_data.unsqueeze(2).unsqueeze(3)  # [B, C, 1, 1, H*W]
                 
                 # Compute attention
-                qkv = self.qkv(slice_data.view(B, C, 1, 1, H*W))
+                qkv = self.qkv(slice_data.reshape(B, C, 1, 1, H*W))
                 q, k, v = qkv.chunk(3, dim=1)
-                
+
                 # Multi-head attention
-                q = q.view(B, self.num_heads, self.head_dim, H*W)
-                k = k.view(B, self.num_heads, self.head_dim, H*W)
-                v = v.view(B, self.num_heads, self.head_dim, H*W)
+                q = q.reshape(B, self.num_heads, self.head_dim, H*W)
+                k = k.reshape(B, self.num_heads, self.head_dim, H*W)
+                v = v.reshape(B, self.num_heads, self.head_dim, H*W)
                 
                 attn = torch.softmax(torch.einsum('bhdk,bhdl->bhkl', q, k) / math.sqrt(self.head_dim), dim=-1)
                 out = torch.einsum('bhkl,bhdl->bhdk', attn, v)
-                out = out.view(B, C, H*W)
+                out = out.reshape(B, C, H*W)  # Use reshape instead of view for non-contiguous tensors
                 
                 attended.append(out)
         
         # Reshape back to original dimensions
         attended = torch.stack(attended, dim=1)  # [B, T1*T2*L, C, H*W]
-        attended = attended.view(B, T1, T2, L, C, H, W)
+        attended = attended.reshape(B, T1, T2, L, C, H, W)
         attended = attended.permute(0, 4, 1, 2, 3, 5, 6).contiguous()  # [B, C, T1, T2, L, H, W]
         
         return self.norm(attended + x)
@@ -218,10 +218,24 @@ class RebuiltDatacubeCNN(nn.Module):
         
         for layer in self.encoder_layers:
             if isinstance(layer, MultiScaleAttention5D):
-                # Skip attention for now to avoid reshaping issues
-                # TODO: Fix attention mechanism tensor dimensions
+                # Properly reshape for 5D attention mechanism
+                _, C, TL, H_curr, W_curr = x_enc.shape
+
+                # Calculate how to reconstruct the original temporal dimensions
+                # Since we collapsed T1*T2*L into TL, we need to reconstruct them
+                if TL == T1 * T2 * L:
+                    # Perfect reconstruction possible
+                    x_5d = x_enc.view(B, C, T1, T2, L, H_curr, W_curr)
+                else:
+                    # Approximate reconstruction - distribute evenly
+                    effective_T1 = min(T1, int(TL**0.5))
+                    effective_T2 = min(T2, TL // effective_T1)
+                    effective_L = max(1, TL // (effective_T1 * effective_T2))
+                    x_5d = x_enc.view(B, C, effective_T1, effective_T2, effective_L, H_curr, W_curr)
+
                 skip_connections.append(x_enc)
-                x_enc = checkpoint(layer.norm, x_enc, use_reentrant=False)  # Just apply normalization
+                x_5d = checkpoint(layer, x_5d, use_reentrant=False)
+                x_enc = x_5d.view(B, C, -1, H_curr, W_curr)  # Flatten back to 5D
             else:
                 skip_connections.append(x_enc)
                 x_enc = checkpoint(layer, x_enc, use_reentrant=False)
