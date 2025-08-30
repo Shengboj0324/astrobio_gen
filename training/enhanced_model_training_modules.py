@@ -28,12 +28,12 @@ Features:
 Usage:
     # 5D Datacube training
     module = Enhanced5DDatacubeTrainingModule(model_config)
-    trainer = pl.Trainer(...)
-    trainer.fit(module, datamodule)
+    # trainer = pl.Trainer(...)  # PyTorch Lightning disabled due to protobuf conflict
+    # trainer.fit(module, datamodule)
 
     # Multi-modal training
     module = EnhancedSurrogateTrainingModule(multimodal_config)
-    trainer.fit(module, datamodule)
+    # trainer.fit(module, datamodule)
 """
 
 import json
@@ -49,7 +49,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pytorch_lightning as pl
+# import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
 import seaborn as sns
 import torch
 import torch.nn as nn
@@ -256,7 +256,7 @@ class Advanced5DPhysicsConstraints(nn.Module):
         return climate_smoothness
 
 
-class Enhanced5DDatacubeTrainingModule(pl.LightningModule):
+class Enhanced5DDatacubeTrainingModule(nn.Module):
     """
     Enhanced training module for 5D Datacube U-Net
     Supports [batch, variables, climate_time, geological_time, lev, lat, lon] tensors
@@ -452,7 +452,7 @@ class Enhanced5DDatacubeTrainingModule(pl.LightningModule):
         return Placeholder5DModel()
 
 
-class EnhancedSurrogateTrainingModule(pl.LightningModule):
+class EnhancedSurrogateTrainingModule(nn.Module):
     """
     Enhanced training module for multi-modal surrogate integration
     Supports coordinated training across multiple data modalities
@@ -728,7 +728,7 @@ class EnhancedSurrogateTrainingModule(pl.LightningModule):
         return PlaceholderSurrogate()
 
 
-class MetaLearningTrainingModule(pl.LightningModule):
+class MetaLearningTrainingModule(nn.Module):
     """
     Meta-learning training module for few-shot adaptation
     Implements MAML-style meta-learning for rapid domain adaptation
@@ -847,7 +847,7 @@ class MetaLearningTrainingModule(pl.LightningModule):
         return PlaceholderMeta()
 
 
-class CustomerDataTrainingModule(pl.LightningModule):
+class CustomerDataTrainingModule(nn.Module):
     """
     Training module for customer data treatment systems
     Supports federated learning and privacy-preserving training

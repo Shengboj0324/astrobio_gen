@@ -415,7 +415,7 @@ class Physics3DUNet(nn.Module):
 
         # Physics constraint layers
         if config.enable_physics_guidance:
-            self.physics_constraint = PhysicsConstraintLayer(config)
+            self.physics_constraint = ClimatePhysicsConstraintLayer(config)
 
         logger.info("✅ Physics-informed 3D UNet initialized")
 
@@ -606,7 +606,7 @@ class Upsample3D(nn.Module):
         return self.conv(x)
 
 
-class PhysicsConstraintLayer(nn.Module):
+class ClimatePhysicsConstraintLayer(nn.Module):
     """Physics constraint enforcement layer"""
 
     def __init__(self, config: ClimateGenerationConfig):

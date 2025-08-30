@@ -44,7 +44,7 @@ class PositionalEncoding(nn.Module):
         return x + self.pe[:, : x.size(1)]
 
 
-class PhysicsConstraintLayer(nn.Module):
+class SurrogatePhysicsConstraintLayer(nn.Module):
     """Physics-informed constraint layer for energy and mass balance"""
 
     def __init__(self, dim: int):
@@ -130,7 +130,7 @@ class SurrogateTransformer(nn.Module):
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=depth)
 
         # Physics constraint layer
-        self.physics_layer = PhysicsConstraintLayer(dim)
+        self.physics_layer = SurrogatePhysicsConstraintLayer(dim)
 
         # Mode-specific output heads
         self.output_heads = self._build_output_heads()

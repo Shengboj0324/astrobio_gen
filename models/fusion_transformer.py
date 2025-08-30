@@ -91,7 +91,7 @@ class MultiModalPositionalEncoding(nn.Module):
         return x
 
 
-class CrossModalAttention(nn.Module):
+class FusionCrossModalAttention(nn.Module):
     """Cross-attention mechanism for multi-modal fusion"""
 
     def __init__(self, d_model: int, n_heads: int = 8, dropout: float = 0.1):
@@ -247,7 +247,7 @@ class WorldClassFusionTransformer(pl.LightningModule):
         # Cross-attention layers
         if use_cross_attention:
             self.cross_attention_layers = nn.ModuleList([
-                CrossModalAttention(latent_dim, n_heads, dropout)
+                FusionCrossModalAttention(latent_dim, n_heads, dropout)
                 for _ in range(n_layers)
             ])
 

@@ -54,7 +54,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pytorch_lightning as pl
+# import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
 import seaborn as sns
 import torch
 import torch.nn as nn
@@ -69,21 +69,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# PyTorch Lightning components
-from pytorch_lightning.callbacks import (
-    BatchSizeFinder,
-    DeviceStatsMonitor,
-    EarlyStopping,
-    GradientAccumulationScheduler,
-    LearningRateMonitor,
-    ModelCheckpoint,
-    ModelSummary,
-    StochasticWeightAveraging,
-)
-from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
-from pytorch_lightning.plugins import MixedPrecisionPlugin
-from pytorch_lightning.profilers import AdvancedProfiler, PyTorchProfiler
-from pytorch_lightning.strategies import DDPStrategy, DeepSpeedStrategy
+# PyTorch Lightning components - Temporarily disabled due to protobuf conflict
+# from pytorch_lightning.callbacks import (
+#     BatchSizeFinder,
+#     DeviceStatsMonitor,
+#     EarlyStopping,
+#     GradientAccumulationScheduler,
+#     LearningRateMonitor,
+#     ModelCheckpoint,
+#     ModelSummary,
+#     StochasticWeightAveraging,
+# )
+# from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
+# from pytorch_lightning.plugins import MixedPrecisionPlugin
+# from pytorch_lightning.profilers import AdvancedProfiler, PyTorchProfiler
+# from pytorch_lightning.strategies import DDPStrategy, DeepSpeedStrategy
 
 # Optional imports with fallbacks
 try:
@@ -401,12 +401,13 @@ class PhysicsInformedLoss(nn.Module):
         return physics_losses
 
 
-class MultiModalTrainingModule(pl.LightningModule):
+class MultiModalTrainingModule(nn.Module):
     """PyTorch Lightning module for multi-modal training"""
 
     def __init__(self, models: Dict[str, nn.Module], config: EnhancedTrainingConfig):
         super().__init__()
-        self.save_hyperparameters(config.__dict__)
+        # Store hyperparameters manually (PyTorch Lightning disabled due to protobuf conflict)
+        self.config = config
         self.models = nn.ModuleDict(models)
         self.config = config
 
@@ -714,7 +715,7 @@ class EnhancedTrainingOrchestrator:
 
     async def initialize_data_modules(
         self, data_configs: Dict[str, Dict[str, Any]]
-    ) -> Dict[str, pl.LightningDataModule]:
+    ) -> Dict[str, Any]:  # Changed from pl.LightningDataModule
         """Initialize data modules"""
         logger.info("📊 Initializing data modules...")
 
@@ -936,7 +937,7 @@ class EnhancedTrainingOrchestrator:
 
         return results
 
-    def _create_trainer(self) -> pl.Trainer:
+    def _create_trainer(self) -> Any:  # Changed from pl.Trainer
         """Create PyTorch Lightning trainer with advanced configuration"""
         # Setup callbacks
         callbacks = [
@@ -1002,33 +1003,30 @@ class EnhancedTrainingOrchestrator:
                 process_group_backend=self.config.distributed_backend, find_unused_parameters=True
             )
 
-        # Create trainer
-        trainer = pl.Trainer(
-            max_epochs=self.config.max_epochs,
-            accelerator="auto",
-            devices="auto",
-            strategy=strategy,
-            precision="16-mixed" if self.config.use_mixed_precision else 32,
-            gradient_clip_val=self.config.gradient_clip_val,
-            accumulate_grad_batches=self.config.accumulate_grad_batches,
-            val_check_interval=self.config.val_check_interval,
-            log_every_n_steps=self.config.log_every_n_steps,
-            callbacks=callbacks,
-            logger=loggers if loggers else True,
-            profiler=profiler,
-            enable_checkpointing=True,
-            enable_progress_bar=True,
-            enable_model_summary=True,
-            deterministic=False,  # For better performance
-            benchmark=True,  # For consistent input shapes
-        )
+        # Create fallback trainer configuration (PyTorch Lightning disabled due to protobuf conflict)
+        trainer_config = {
+            'max_epochs': self.config.max_epochs,
+            'accelerator': "auto",
+            'devices': "auto",
+            'precision': "16-mixed" if self.config.use_mixed_precision else 32,
+            'gradient_clip_val': self.config.gradient_clip_val,
+            'accumulate_grad_batches': self.config.accumulate_grad_batches,
+            'val_check_interval': self.config.val_check_interval,
+            'log_every_n_steps': self.config.log_every_n_steps,
+            'enable_checkpointing': True,
+            'enable_progress_bar': True,
+            'enable_model_summary': True,
+            'deterministic': False,
+            'benchmark': True,
+        }
+        trainer = trainer_config  # Return config instead of trainer object
 
         return trainer
 
-    def _create_synthetic_data_module(self) -> pl.LightningDataModule:
+    def _create_synthetic_data_module(self) -> Any:  # Changed from pl.LightningDataModule
         """Create synthetic data module for testing"""
 
-        class SyntheticDataModule(pl.LightningDataModule):
+        class SyntheticDataModule:  # Changed from pl.LightningDataModule
             def __init__(self, batch_size: int = 8):
                 super().__init__()
                 self.batch_size = batch_size

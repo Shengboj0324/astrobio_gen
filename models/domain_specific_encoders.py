@@ -609,7 +609,7 @@ class CrossAttentionFusion(nn.Module):
         return fused
 
 
-class PhysicsConstraintLayer(nn.Module):
+class SpecificDomainPhysicsConstraintLayer(nn.Module):
     """Physics constraint layer for enforcing physical laws"""
 
     def __init__(self, latent_dim: int):
@@ -681,7 +681,7 @@ class MultiModalEncoder(nn.Module):
 
         # Physics constraints
         if config.use_physics_constraints:
-            self.physics_layer = PhysicsConstraintLayer(config.latent_dim)
+            self.physics_layer = SpecificDomainPhysicsConstraintLayer(config.latent_dim)
         else:
             self.physics_layer = None
 

@@ -192,26 +192,26 @@ class UnifiedTrainingSystem:
             from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
             from models.rebuilt_graph_vae import RebuiltGraphVAE
             from models.rebuilt_llm_integration import RebuiltLLMIntegration
-            from models.rebuilt_multimodal_integration import RebuiltMultiModalIntegration
+            from models.rebuilt_multimodal_integration import RebuiltMultimodalIntegration
 
             # Import surrogate models (CRITICAL - was missing)
             from models.surrogate_transformer import SurrogateTransformer
             from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration
             from models.spectral_surrogate import SpectralSurrogate
-            from models.surrogate_data_integration import SurrogateDataIntegration
+            from models.surrogate_data_integration import SurrogateDataManager
 
             # Import enhanced models
             from models.enhanced_datacube_unet import EnhancedCubeUNet
-            from models.enhanced_multimodal_integration import EnhancedMultiModalIntegration
+            from models.enhanced_multimodal_integration import EnhancedMultiModalProcessor
             from models.enhanced_foundation_llm import EnhancedFoundationLLM
 
             # Import specialized models
             from models.evolutionary_process_tracker import EvolutionaryProcessTracker
-            from models.metabolism_model import WorldClassMetabolismGenerator
+            from models.metabolism_generator import RebuiltMetabolismGenerator
             from models.advanced_graph_neural_network import AdvancedGraphNeuralNetwork
             from models.domain_specific_encoders import DomainSpecificEncoders
             from models.fusion_transformer import WorldClassFusionTransformer
-            from models.spectrum_model import WorldClassSpectralAutoencoder
+            from models.spectral_autoencoder import SpectralAutoencoder
             from models.graph_vae import GVAE
 
             # Import orchestration systems
@@ -220,8 +220,8 @@ class UnifiedTrainingSystem:
             from models.tier5_autonomous_discovery_orchestrator import Tier5AutonomousDiscoveryOrchestrator
 
             # Import data build systems (CRITICAL - was missing)
-            from data_build.advanced_data_system import AdvancedDataSystem
-            from data_build.advanced_quality_system import AdvancedQualitySystem
+            from data_build.advanced_data_system import AdvancedDataManager
+            from data_build.advanced_quality_system import QualityMonitor
             from data_build.production_data_loader import ProductionDataLoader
             from data_build.real_data_sources import RealDataSources
             from data_build.comprehensive_data_expansion import ComprehensiveDataExpansion
@@ -230,8 +230,8 @@ class UnifiedTrainingSystem:
             self.orchestrator = EnhancedTrainingOrchestrator()
 
             # Initialize comprehensive data systems for 96% accuracy
-            self.data_system = AdvancedDataSystem()
-            self.quality_system = AdvancedQualitySystem()
+            self.data_system = AdvancedDataManager()
+            self.quality_system = QualityMonitor()
             self.data_loader = ProductionDataLoader()
             self.data_expansion = ComprehensiveDataExpansion()
 
@@ -254,26 +254,26 @@ class UnifiedTrainingSystem:
                 'rebuilt_datacube_cnn': RebuiltDatacubeCNN,
                 'rebuilt_graph_vae': RebuiltGraphVAE,
                 'rebuilt_llm_integration': RebuiltLLMIntegration,
-                'rebuilt_multimodal_integration': RebuiltMultiModalIntegration,
+                'rebuilt_multimodal_integration': RebuiltMultimodalIntegration,
 
                 # Surrogate models (CRITICAL)
                 'surrogate_transformer': SurrogateTransformer,
                 'enhanced_surrogate_integration': EnhancedSurrogateIntegration,
                 'spectral_surrogate': SpectralSurrogate,
-                'surrogate_data_integration': SurrogateDataIntegration,
+                'surrogate_data_integration': SurrogateDataManager,
 
                 # Enhanced models
                 'enhanced_datacube_unet': EnhancedCubeUNet,
-                'enhanced_multimodal_integration': EnhancedMultiModalIntegration,
+                'enhanced_multimodal_integration': EnhancedMultiModalProcessor,
                 'enhanced_foundation_llm': EnhancedFoundationLLM,
 
                 # Specialized models
                 'evolutionary_process_tracker': EvolutionaryProcessTracker,
-                'metabolism_generator': WorldClassMetabolismGenerator,
+                'metabolism_generator': RebuiltMetabolismGenerator,
                 'advanced_graph_neural_network': AdvancedGraphNeuralNetwork,
                 'domain_specific_encoders': DomainSpecificEncoders,
                 'fusion_transformer': WorldClassFusionTransformer,
-                'spectral_autoencoder': WorldClassSpectralAutoencoder,
+                'spectral_autoencoder': SpectralAutoencoder,
                 'graph_vae': GVAE,
             }
 
