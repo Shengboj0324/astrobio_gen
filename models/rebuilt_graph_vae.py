@@ -96,9 +96,9 @@ class GraphAttentionEncoder(nn.Module):
             else:
                 self.gat_layers.append(GATConv(hidden_dim, hidden_dim // heads, heads=heads, dropout=0.1))
         
-        # Latent space projections
-        self.mu_proj = nn.Linear(hidden_dim, latent_dim)
-        self.logvar_proj = nn.Linear(hidden_dim, latent_dim)
+        # Latent space projections (input is hidden_dim * 2 from concatenated pooling)
+        self.mu_proj = nn.Linear(hidden_dim * 2, latent_dim)
+        self.logvar_proj = nn.Linear(hidden_dim * 2, latent_dim)
         
         # Normalization layers
         self.norms = nn.ModuleList([nn.LayerNorm(hidden_dim) for _ in range(num_layers)])
@@ -256,7 +256,8 @@ class RebuiltGraphVAE(nn.Module):
             'logvar': logvar,
             'z': z,
             'node_reconstruction': node_recon,
-            'edge_reconstruction': edge_recon
+            'edge_reconstruction': edge_recon,
+            'reconstruction': node_recon  # Add this for compatibility
         }
         
         # Apply biochemical constraints
@@ -270,8 +271,20 @@ class RebuiltGraphVAE(nn.Module):
         """Compute VAE loss with biochemical constraints"""
         x, edge_index, batch = data.x, data.edge_index, data.batch
         
-        # Reconstruction loss
-        node_recon_loss = self.mse_loss(outputs['node_reconstruction'], x.unsqueeze(0))
+        # Reconstruction loss - fix dimension mismatch
+        batch_size = outputs['node_reconstruction'].size(0)
+        num_nodes = x.size(0)
+
+        # Pad or truncate to match decoder output
+        if num_nodes <= self.decoder.max_nodes:
+            # Pad x to match max_nodes
+            padded_x = torch.zeros(batch_size, self.decoder.max_nodes, x.size(1), device=x.device)
+            padded_x[0, :num_nodes] = x
+            node_recon_loss = self.mse_loss(outputs['node_reconstruction'], padded_x)
+        else:
+            # Truncate decoder output to match x
+            truncated_recon = outputs['node_reconstruction'][0, :num_nodes]
+            node_recon_loss = self.mse_loss(truncated_recon, x)
         
         # Edge reconstruction loss (simplified)
         num_edges = edge_index.size(1)

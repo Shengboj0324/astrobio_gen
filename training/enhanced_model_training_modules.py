@@ -267,13 +267,19 @@ class Enhanced5DDatacubeTrainingModule(nn.Module):
         self.save_hyperparameters()
 
         # Import and initialize model
+        # Use production-ready rebuilt datacube CNN instead of placeholder
         try:
-            from models.enhanced_datacube_unet import EnhancedCubeUNet
+            from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
 
-            self.model = EnhancedCubeUNet(**model_config)
+            self.model = RebuiltDatacubeCNN(
+                input_variables=model_config.get('input_variables', 5),
+                output_variables=model_config.get('output_variables', 5),
+                **model_config
+            )
+            logger.info("Using production-ready RebuiltDatacubeCNN")
         except ImportError:
-            logger.warning("EnhancedCubeUNet not available, using placeholder")
-            self.model = self._create_placeholder_model()
+            logger.error("RebuiltDatacubeCNN not available - CRITICAL PRODUCTION ISSUE")
+            raise ImportError("Production model RebuiltDatacubeCNN is required for deployment")
 
         # Training configuration
         self.training_config = training_config or {}
@@ -429,27 +435,7 @@ class Enhanced5DDatacubeTrainingModule(nn.Module):
             },
         }
 
-    def _create_placeholder_model(self) -> nn.Module:
-        """Create placeholder model for testing"""
-
-        class Placeholder5DModel(nn.Module):
-            def __init__(self):
-                super().__init__()
-                self.conv = nn.Conv3d(5, 5, 3, padding=1)
-
-            def forward(self, x):
-                # Handle 5D input by processing as 3D
-                if x.dim() == 7:  # [batch, vars, climate_time, geo_time, lev, lat, lon]
-                    batch, vars, ct, gt, lev, lat, lon = x.shape
-                    # Flatten time dimensions
-                    x_reshaped = x.view(batch, vars * ct * gt, lev, lat, lon)
-                    out = self.conv(x_reshaped)
-                    out = out.view(batch, vars, ct, gt, lev, lat, lon)
-                    return out
-                else:
-                    return self.conv(x)
-
-        return Placeholder5DModel()
+    # Placeholder model method removed - using production RebuiltDatacubeCNN instead
 
 
 class EnhancedSurrogateTrainingModule(nn.Module):
@@ -475,8 +461,19 @@ class EnhancedSurrogateTrainingModule(nn.Module):
                 **{k: v for k, v in model_config.items() if k != "multimodal_config"},
             )
         except ImportError:
-            logger.warning("EnhancedSurrogateIntegration not available, using placeholder")
-            self.model = self._create_placeholder_surrogate()
+            # Use production-ready rebuilt multimodal integration instead
+            try:
+                from models.rebuilt_multimodal_integration import RebuiltMultimodalIntegration
+
+                self.model = RebuiltMultimodalIntegration(
+                    input_dim=model_config.get('input_dim', 512),
+                    fusion_dim=model_config.get('fusion_dim', 256),
+                    **model_config
+                )
+                logger.info("Using production-ready RebuiltMultimodalIntegration for surrogate training")
+            except ImportError:
+                logger.error("RebuiltMultimodalIntegration not available - CRITICAL PRODUCTION ISSUE")
+                raise ImportError("Production model RebuiltMultimodalIntegration is required for deployment")
 
         # Training configuration
         self.training_config = training_config or {}
@@ -710,22 +707,7 @@ class EnhancedSurrogateTrainingModule(nn.Module):
             },
         }
 
-    def _create_placeholder_surrogate(self) -> nn.Module:
-        """Create placeholder surrogate model"""
-
-        class PlaceholderSurrogate(nn.Module):
-            def __init__(self):
-                super().__init__()
-                self.fc = nn.Linear(100, 50)
-
-            def forward(self, batch):
-                # Simple placeholder that processes first available tensor
-                for key, value in batch.items():
-                    if isinstance(value, torch.Tensor) and not key.startswith("target_"):
-                        return {"prediction": self.fc(value.flatten(1))}
-                return {"prediction": torch.zeros(1, 50)}
-
-        return PlaceholderSurrogate()
+    # Placeholder surrogate method removed - using production RebuiltMultimodalIntegration instead
 
 
 class MetaLearningTrainingModule(nn.Module):
@@ -744,8 +726,19 @@ class MetaLearningTrainingModule(nn.Module):
 
             self.model = MetaLearningSystem(**model_config)
         except ImportError:
-            logger.warning("MetaLearningSystem not available, using placeholder")
-            self.model = self._create_placeholder_meta()
+            # Use production-ready rebuilt graph VAE for meta-learning instead
+            try:
+                from models.rebuilt_graph_vae import RebuiltGraphVAE
+
+                self.model = RebuiltGraphVAE(
+                    node_features=model_config.get('node_features', 16),
+                    hidden_dim=model_config.get('hidden_dim', 64),
+                    **model_config
+                )
+                logger.info("Using production-ready RebuiltGraphVAE for meta-learning")
+            except ImportError:
+                logger.error("RebuiltGraphVAE not available - CRITICAL PRODUCTION ISSUE")
+                raise ImportError("Production model RebuiltGraphVAE is required for deployment")
 
         # Meta-learning configuration
         self.training_config = training_config or {}
@@ -816,35 +809,7 @@ class MetaLearningTrainingModule(nn.Module):
 
         return optimizer
 
-    def _create_placeholder_meta(self) -> nn.Module:
-        """Create placeholder meta-learning model"""
-
-        class PlaceholderMeta(nn.Module):
-            def __init__(self):
-                super().__init__()
-                self.net = nn.Sequential(nn.Linear(100, 64), nn.ReLU(), nn.Linear(64, 10))
-
-            def forward(self, x):
-                return self.net(x)
-
-            def meta_forward(self, support_x, support_y, query_x, query_y):
-                # Simple placeholder meta-learning
-                support_pred = self.forward(support_x)
-                query_pred = self.forward(query_x)
-
-                support_loss = F.mse_loss(support_pred, support_y)
-                query_loss = F.mse_loss(query_pred, query_y)
-
-                return support_loss + query_loss
-
-            def fast_adapt(self, support_x, support_y):
-                return {}  # Placeholder
-
-            def evaluate_adapted(self, query_x, query_y, adapted_params):
-                query_pred = self.forward(query_x)
-                return F.mse_loss(query_pred, query_y)
-
-        return PlaceholderMeta()
+    # Placeholder meta-learning method removed - using production RebuiltGraphVAE instead
 
 
 class CustomerDataTrainingModule(nn.Module):
