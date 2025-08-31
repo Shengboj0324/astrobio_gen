@@ -637,8 +637,18 @@ class RebuiltGraphVAE(nn.Module):
         # Reparameterize
         z = self.reparameterize(mu, logvar)
         
-        # Decode
+        # Decode (pass actual number of nodes)
+        actual_num_nodes = x.size(0)
         node_recon, edge_recon = self.decoder(z)
+
+        # Truncate to actual number of nodes
+        if node_recon.size(1) > actual_num_nodes:
+            node_recon = node_recon[:, :actual_num_nodes, :]
+
+        # Truncate edge reconstruction to match actual edges
+        actual_num_edges = edge_index.size(1)
+        if edge_recon.size(1) > actual_num_edges:
+            edge_recon = edge_recon[:, :actual_num_edges]
         
         results = {
             'mu': mu,

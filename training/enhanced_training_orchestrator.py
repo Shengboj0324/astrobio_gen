@@ -112,7 +112,21 @@ except ImportError:
     ray = None
     tune = None
 
-# Local imports - import with fallbacks for robustness
+# SOTA Model imports - Updated for 2025 SOTA compliance
+try:
+    # SOTA Rebuilt Models (Primary)
+    from models.rebuilt_graph_vae import RebuiltGraphVAE
+    from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
+    from models.rebuilt_llm_integration import RebuiltLLMIntegration
+    from models.simple_diffusion_model import SimpleAstrobiologyDiffusion
+
+    SOTA_MODELS_AVAILABLE = True
+    logger.info("✅ SOTA rebuilt models imported successfully")
+except ImportError as e:
+    logger.error(f"❌ SOTA models not available: {e}")
+    SOTA_MODELS_AVAILABLE = False
+
+# Legacy Enhanced Models (Fallback)
 try:
     from models.advanced_graph_neural_network import AdvancedGraphNeuralNetwork
     from models.domain_specific_encoders import DomainSpecificEncoders
@@ -125,9 +139,23 @@ try:
     from models.uncertainty_emergence_system import UncertaintyEmergenceSystem
 
     ENHANCED_MODELS_AVAILABLE = True
+    logger.info("✅ Legacy enhanced models available as fallback")
 except ImportError as e:
     logger.warning(f"Some enhanced models not available: {e}")
     ENHANCED_MODELS_AVAILABLE = False
+
+# SOTA Training Strategies
+try:
+    from training.sota_training_strategies import (
+        SOTATrainingOrchestrator, SOTATrainingConfig,
+        GraphTransformerTrainer, CNNViTTrainer,
+        AdvancedAttentionTrainer, DiffusionTrainer
+    )
+    SOTA_TRAINING_AVAILABLE = True
+    logger.info("✅ SOTA training strategies imported successfully")
+except ImportError as e:
+    logger.warning(f"SOTA training strategies not available: {e}")
+    SOTA_TRAINING_AVAILABLE = False
 
 try:
     from datamodules.cube_dm import CubeDM
@@ -447,31 +475,49 @@ class MultiModalTrainingModule(nn.Module):
         return outputs
 
     def training_step(self, batch: Dict[str, torch.Tensor], batch_idx: int) -> torch.Tensor:
-        """Training step with comprehensive loss computation"""
+        """Enhanced training step with SOTA strategies"""
         start_time = time.time()
 
-        # Forward pass
-        outputs = self(batch)
+        # Use SOTA training if available
+        if self.use_sota_training and self.sota_orchestrator:
+            # SOTA unified training step
+            all_losses = self.sota_orchestrator.unified_training_step(batch, self.current_epoch)
 
-        # Extract targets from batch
-        targets = {k: v for k, v in batch.items() if k.startswith("target_")}
+            # Aggregate losses
+            total_loss = 0.0
+            model_losses = {}
 
-        # Compute losses for each model
-        total_loss = 0.0
-        model_losses = {}
+            for model_name, losses in all_losses.items():
+                if 'total_loss' in losses and not isinstance(losses['total_loss'], str):
+                    model_loss = losses['total_loss']
+                    total_loss += model_loss
+                    model_losses[model_name] = losses
 
-        for model_name in self.models.keys():
-            model_outputs = {
-                k.replace(f"{model_name}_", ""): v
-                for k, v in outputs.items()
-                if k.startswith(f"{model_name}_")
-            }
-            model_targets = {k.replace("target_", ""): v for k, v in targets.items()}
+            logger.debug(f"🚀 SOTA training step - Total loss: {total_loss:.4f}")
 
-            if model_outputs and model_targets:
-                losses = self.criterion(model_outputs, model_targets, model_name)
-                model_losses[model_name] = losses
-                total_loss += losses["total_loss"]
+        else:
+            # Fallback to legacy training
+            outputs = self(batch)
+
+            # Extract targets from batch
+            targets = {k: v for k, v in batch.items() if k.startswith("target_")}
+
+            # Compute losses for each model
+            total_loss = 0.0
+            model_losses = {}
+
+            for model_name in self.models.keys():
+                model_outputs = {
+                    k.replace(f"{model_name}_", ""): v
+                    for k, v in outputs.items()
+                    if k.startswith(f"{model_name}_")
+                }
+                model_targets = {k.replace("target_", ""): v for k, v in targets.items()}
+
+                if model_outputs and model_targets:
+                    losses = self.criterion(model_outputs, model_targets, model_name)
+                    model_losses[model_name] = losses
+                    total_loss += losses["total_loss"]
 
         # Log losses
         self.log("train/total_loss", total_loss, on_step=True, on_epoch=True, prog_bar=True)
@@ -626,6 +672,16 @@ class EnhancedTrainingOrchestrator:
         self.results = {}
         self.training_history = []
 
+        # SOTA Training Components
+        self.sota_orchestrator = None
+        self.sota_configs = {}
+        self.use_sota_training = SOTA_TRAINING_AVAILABLE and SOTA_MODELS_AVAILABLE
+
+        if self.use_sota_training:
+            logger.info("🚀 SOTA training strategies enabled")
+        else:
+            logger.warning("⚠️ Falling back to legacy training strategies")
+
         # Initialize monitoring systems
         self.diagnostics = None
         self.profiler = None
@@ -664,15 +720,33 @@ class EnhancedTrainingOrchestrator:
 
         for model_name, model_config in model_configs.items():
             try:
-                if model_name == "enhanced_datacube" and ENHANCED_MODELS_AVAILABLE:
+                # SOTA REBUILT MODELS (Priority)
+                if model_name == "rebuilt_graph_vae" and SOTA_MODELS_AVAILABLE:
+                    models[model_name] = RebuiltGraphVAE(**model_config).to(self.device)
+                    logger.info(f"🚀 Initialized SOTA Graph Transformer VAE")
+
+                elif model_name == "rebuilt_datacube_cnn" and SOTA_MODELS_AVAILABLE:
+                    models[model_name] = RebuiltDatacubeCNN(**model_config).to(self.device)
+                    logger.info(f"🚀 Initialized SOTA CNN-ViT Hybrid")
+
+                elif model_name == "rebuilt_llm_integration" and SOTA_MODELS_AVAILABLE:
+                    models[model_name] = RebuiltLLMIntegration(**model_config).to(self.device)
+                    logger.info(f"🚀 Initialized SOTA LLM with Advanced Attention")
+
+                elif model_name == "diffusion_model" and SOTA_MODELS_AVAILABLE:
+                    models[model_name] = SimpleAstrobiologyDiffusion(**model_config).to(self.device)
+                    logger.info(f"🚀 Initialized SOTA Diffusion Model")
+
+                # LEGACY ENHANCED MODELS (Fallback)
+                elif model_name == "enhanced_datacube" and ENHANCED_MODELS_AVAILABLE:
                     models[model_name] = EnhancedCubeUNet(**model_config).to(self.device)
-                    logger.info(f"✅ Initialized Enhanced Datacube U-Net")
+                    logger.info(f"✅ Initialized Enhanced Datacube U-Net (Legacy)")
 
                 elif model_name == "enhanced_surrogate" and ENHANCED_MODELS_AVAILABLE:
                     models[model_name] = EnhancedSurrogateIntegration(**model_config).to(
                         self.device
                     )
-                    logger.info(f"✅ Initialized Enhanced Surrogate Integration")
+                    logger.info(f"✅ Initialized Enhanced Surrogate Integration (Legacy)")
 
                 elif model_name == "evolutionary_tracker" and ENHANCED_MODELS_AVAILABLE:
                     models[model_name] = EvolutionaryProcessTracker(**model_config).to(self.device)
@@ -692,11 +766,11 @@ class EnhancedTrainingOrchestrator:
 
                 elif model_name == "peft_llm" and ENHANCED_MODELS_AVAILABLE:
                     models[model_name] = PEFTLLMIntegration(**model_config).to(self.device)
-                    logger.info(f"✅ Initialized PEFT LLM Integration")
+                    logger.info(f"✅ Initialized PEFT LLM Integration (Legacy)")
 
                 elif model_name == "advanced_gnn" and ENHANCED_MODELS_AVAILABLE:
                     models[model_name] = AdvancedGraphNeuralNetwork(**model_config).to(self.device)
-                    logger.info(f"✅ Initialized Advanced Graph Neural Network")
+                    logger.info(f"✅ Initialized Advanced Graph Neural Network (Legacy)")
 
                 elif model_name == "domain_encoders" and ENHANCED_MODELS_AVAILABLE:
                     models[model_name] = DomainSpecificEncoders(**model_config).to(self.device)
@@ -710,8 +784,40 @@ class EnhancedTrainingOrchestrator:
                 continue
 
         self.models = models
+
+        # Initialize SOTA training strategies
+        if self.use_sota_training:
+            self._initialize_sota_training(models, model_configs)
+
         logger.info(f"🎯 Successfully initialized {len(models)} models")
         return models
+
+    def _initialize_sota_training(self, models: Dict[str, nn.Module],
+                                model_configs: Dict[str, Dict[str, Any]]):
+        """Initialize SOTA training strategies for each model"""
+        logger.info("🚀 Initializing SOTA training strategies...")
+
+        # Create SOTA training configurations
+        for model_name, model in models.items():
+            if any(sota_name in model_name for sota_name in ['rebuilt_', 'diffusion_']):
+                config = SOTATrainingConfig(
+                    model_type=model_name,
+                    learning_rate=model_configs[model_name].get('learning_rate', 1e-4),
+                    weight_decay=model_configs[model_name].get('weight_decay', 1e-5),
+                    warmup_epochs=model_configs[model_name].get('warmup_epochs', 10),
+                    max_epochs=self.config.max_epochs,
+                    gradient_clip=1.0,
+                    use_mixed_precision=self.config.use_mixed_precision,
+                    use_gradient_checkpointing=True
+                )
+                self.sota_configs[model_name] = config
+
+        # Initialize SOTA orchestrator
+        if self.sota_configs:
+            sota_models = {name: model for name, model in models.items()
+                          if name in self.sota_configs}
+            self.sota_orchestrator = SOTATrainingOrchestrator(sota_models, self.sota_configs)
+            logger.info(f"✅ SOTA orchestrator initialized for {len(sota_models)} models")
 
     async def initialize_data_modules(
         self, data_configs: Dict[str, Dict[str, Any]]
