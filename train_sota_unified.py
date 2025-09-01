@@ -258,13 +258,20 @@ class SOTAUnifiedTrainer:
                 elif model_name == "advanced_graph_neural_network" and ADVANCED_MODELS_AVAILABLE:
                     from models.advanced_graph_neural_network import GraphConfig
                     graph_config = GraphConfig(
-                        input_dim=model_config.get('input_dim', 128),
                         hidden_dim=model_config.get('hidden_dim', 256),
                         num_layers=model_config.get('num_layers', 4),
-                        num_heads=model_config.get('num_heads', 8)
+                        num_heads=model_config.get('num_heads', 8),
+                        dropout=model_config.get('dropout', 0.1),
+                        use_attention=model_config.get('use_attention', True),
+                        use_spectral_conv=model_config.get('use_spectral_conv', True),
+                        use_hierarchical_pooling=model_config.get('use_hierarchical_pooling', True),
+                        node_feature_dim=model_config.get('node_feature_dim', 64),
+                        edge_feature_dim=model_config.get('edge_feature_dim', 32),
+                        graph_norm=model_config.get('graph_norm', True)
                     )
                     models[model_name] = AdvancedGraphNeuralNetwork(
                         config=graph_config,
+                        task_type=model_config.get('task_type', 'metabolic_network'),
                         output_dim=model_config.get('output_dim', 64)
                     ).to(self.device)
                     logger.info("🕸️ Initialized Advanced Graph Neural Network")
@@ -278,10 +285,12 @@ class SOTAUnifiedTrainer:
 
                 elif model_name == "surrogate_transformer" and ADVANCED_MODELS_AVAILABLE:
                     models[model_name] = SurrogateTransformer(
-                        d_model=model_config.get('d_model', 512),
-                        nhead=model_config.get('nhead', 8),
-                        num_layers=model_config.get('num_layers', 6),
-                        dim_feedforward=model_config.get('dim_feedforward', 2048)
+                        dim=model_config.get('dim', 256),
+                        depth=model_config.get('depth', 6),
+                        heads=model_config.get('heads', 8),
+                        n_inputs=model_config.get('n_inputs', 128),
+                        mode=model_config.get('mode', 'scalar'),
+                        dropout=model_config.get('dropout', 0.1)
                     ).to(self.device)
                     logger.info("🔄 Initialized Surrogate Transformer")
 

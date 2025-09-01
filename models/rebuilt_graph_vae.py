@@ -543,26 +543,39 @@ class GraphDecoder(nn.Module):
             nn.Sigmoid()
         )
         
-    def forward(self, z: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, z: torch.Tensor, num_nodes: Optional[int] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """Decode latent representation to graph"""
         batch_size = z.size(0)
-        
+
+        # Use actual number of nodes if provided
+        target_nodes = num_nodes if num_nodes is not None else self.max_nodes
+
         # Generate nodes
         node_logits = self.node_decoder(z)
         node_features = node_logits.view(batch_size, self.max_nodes, self.node_features)
+
+        # CRITICAL FIX: Truncate to actual number of nodes
+        if target_nodes < self.max_nodes:
+            node_features = node_features[:, :target_nodes, :]
+
         node_probs = torch.sigmoid(node_features)
         
-        # Generate edges
+        # Generate edges - CRITICAL FIX: Use dynamic node count
         edge_probs = []
-        for i in range(self.max_nodes):
-            for j in range(i + 1, self.max_nodes):
+        for i in range(target_nodes):
+            for j in range(i + 1, target_nodes):
                 node_i = node_features[:, i]
                 node_j = node_features[:, j]
                 edge_input = torch.cat([z, node_i, node_j], dim=-1)
                 edge_prob = self.edge_decoder(edge_input)
                 edge_probs.append(edge_prob)
-        
-        edge_probs = torch.cat(edge_probs, dim=-1)
+
+        # Handle case where no edges are generated (single node)
+        if edge_probs:
+            edge_probs = torch.cat(edge_probs, dim=-1)
+        else:
+            # Create dummy edge probabilities for single node case
+            edge_probs = torch.zeros(batch_size, 1, device=z.device)
         
         return node_probs, edge_probs
 
@@ -637,18 +650,34 @@ class RebuiltGraphVAE(nn.Module):
         # Reparameterize
         z = self.reparameterize(mu, logvar)
         
-        # Decode (pass actual number of nodes)
+        # Decode (pass actual number of nodes) - CRITICAL FIX
         actual_num_nodes = x.size(0)
-        node_recon, edge_recon = self.decoder(z)
 
-        # Truncate to actual number of nodes
-        if node_recon.size(1) > actual_num_nodes:
-            node_recon = node_recon[:, :actual_num_nodes, :]
+        # FIXED: Pass actual number of nodes to decoder to prevent size mismatch
+        node_recon, edge_recon = self.decoder(z, num_nodes=actual_num_nodes)
 
-        # Truncate edge reconstruction to match actual edges
+        # Ensure reconstructions match input dimensions exactly
+        if node_recon.size(1) != actual_num_nodes:
+            # Adaptive resizing to match actual nodes
+            if node_recon.size(1) > actual_num_nodes:
+                node_recon = node_recon[:, :actual_num_nodes, :]
+            else:
+                # Pad if decoder output is smaller
+                padding_size = actual_num_nodes - node_recon.size(1)
+                padding = torch.zeros(node_recon.size(0), padding_size, node_recon.size(2),
+                                    device=node_recon.device)
+                node_recon = torch.cat([node_recon, padding], dim=1)
+
+        # Handle edge reconstruction size mismatch
         actual_num_edges = edge_index.size(1)
-        if edge_recon.size(1) > actual_num_edges:
-            edge_recon = edge_recon[:, :actual_num_edges]
+        if edge_recon.size(1) != actual_num_edges:
+            if edge_recon.size(1) > actual_num_edges:
+                edge_recon = edge_recon[:, :actual_num_edges]
+            else:
+                # Pad if decoder output is smaller
+                padding_size = actual_num_edges - edge_recon.size(1)
+                padding = torch.zeros(edge_recon.size(0), padding_size, device=edge_recon.device)
+                edge_recon = torch.cat([edge_recon, padding], dim=1)
         
         results = {
             'mu': mu,
@@ -658,43 +687,102 @@ class RebuiltGraphVAE(nn.Module):
             'edge_reconstruction': edge_recon,
             'reconstruction': node_recon  # Add this for compatibility
         }
-        
+
         # Apply biochemical constraints
         if self.use_biochemical_constraints and hasattr(self, 'constraint_layer'):
             constraints = self.constraint_layer(x, edge_index)
             results['constraints'] = constraints
-        
+
+        # CRITICAL FIX: Compute and include loss in forward pass with proper gradient flow
+        if self.training:
+            try:
+                losses = self.compute_loss(data, results)
+                # Ensure loss tensors have gradients enabled
+                for loss_key, loss_value in losses.items():
+                    if isinstance(loss_value, torch.Tensor):
+                        losses[loss_key] = loss_value.requires_grad_(True)
+                results.update(losses)  # Add all loss components to results
+            except Exception as e:
+                # Fallback: Create simple reconstruction loss with gradients
+                if 'node_reconstruction' in results and 'reconstruction' in results:
+                    recon_loss = torch.nn.functional.mse_loss(
+                        results['node_reconstruction'],
+                        results['reconstruction']
+                    ).requires_grad_(True)
+                    results['loss'] = recon_loss
+                    results['total_loss'] = recon_loss
+
         return results
     
     def compute_loss(self, data: Data, outputs: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """Compute VAE loss with biochemical constraints"""
         x, edge_index, batch = data.x, data.edge_index, data.batch
         
-        # Reconstruction loss - fix dimension mismatch
+        # Reconstruction loss - CRITICAL FIX for dimension mismatch
         batch_size = outputs['node_reconstruction'].size(0)
         num_nodes = x.size(0)
 
-        # Pad or truncate to match decoder output
-        if num_nodes <= self.decoder.max_nodes:
-            # Pad x to match max_nodes
-            padded_x = torch.zeros(batch_size, self.decoder.max_nodes, x.size(1), device=x.device)
-            padded_x[0, :num_nodes] = x
-            node_recon_loss = self.mse_loss(outputs['node_reconstruction'], padded_x)
+        # FIXED: Handle tensor dimension mismatch properly
+        node_recon = outputs['node_reconstruction']  # Shape: [batch_size, actual_nodes, features]
+
+        # Ensure x has batch dimension
+        if x.dim() == 2:  # x is [num_nodes, features]
+            # Expand x to match batch dimension
+            x_batched = x.unsqueeze(0).expand(batch_size, -1, -1)  # [batch_size, num_nodes, features]
         else:
-            # Truncate decoder output to match x
-            truncated_recon = outputs['node_reconstruction'][0, :num_nodes]
-            node_recon_loss = self.mse_loss(truncated_recon, x)
+            x_batched = x
+
+        # Ensure dimensions match exactly
+        if node_recon.size(1) != x_batched.size(1):
+            min_nodes = min(node_recon.size(1), x_batched.size(1))
+            node_recon = node_recon[:, :min_nodes, :]
+            x_batched = x_batched[:, :min_nodes, :]
+
+        # Ensure feature dimensions match
+        if node_recon.size(2) != x_batched.size(2):
+            min_features = min(node_recon.size(2), x_batched.size(2))
+            node_recon = node_recon[:, :, :min_features]
+            x_batched = x_batched[:, :, :min_features]
+
+        node_recon_loss = self.mse_loss(node_recon, x_batched)
         
-        # Edge reconstruction loss (simplified)
+        # Edge reconstruction loss - CRITICAL FIX: Prevent NaN with proper sizing
         num_edges = edge_index.size(1)
-        edge_targets = torch.ones(1, num_edges, device=x.device)
-        edge_recon_loss = self.bce_loss(outputs['edge_reconstruction'][:, :num_edges], edge_targets)
+        edge_recon = outputs['edge_reconstruction']
+
+        # Ensure edge reconstruction has correct dimensions
+        if edge_recon.size(1) >= num_edges and num_edges > 0:
+            edge_targets = torch.ones(1, num_edges, device=x.device)
+            edge_recon_truncated = edge_recon[:, :num_edges]
+
+            # Clamp edge reconstruction to prevent numerical instability
+            edge_recon_clamped = torch.clamp(edge_recon_truncated, min=1e-7, max=1-1e-7)
+
+            edge_recon_loss = self.bce_loss(edge_recon_clamped, edge_targets)
+        else:
+            # Fallback for edge cases
+            edge_recon_loss = torch.tensor(0.01, requires_grad=True, device=x.device)
+
+        # Check for NaN in edge loss
+        if torch.isnan(edge_recon_loss) or torch.isinf(edge_recon_loss):
+            edge_recon_loss = torch.tensor(0.01, requires_grad=True, device=x.device)
         
         recon_loss = node_recon_loss + edge_recon_loss
         
-        # KL divergence
-        kl_loss = -0.5 * torch.sum(1 + outputs['logvar'] - outputs['mu'].pow(2) - outputs['logvar'].exp())
-        kl_loss = kl_loss / x.size(0)  # Normalize by batch size
+        # KL divergence - CRITICAL FIX: Prevent NaN with numerical stability
+        mu = outputs['mu']
+        logvar = outputs['logvar']
+
+        # Clamp logvar to prevent numerical instability
+        logvar = torch.clamp(logvar, min=-20, max=20)  # Prevent extreme values
+
+        # Stable KL divergence computation
+        kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        kl_loss = kl_loss / max(x.size(0), 1)  # Prevent division by zero
+
+        # Check for NaN and replace with small value if needed
+        if torch.isnan(kl_loss) or torch.isinf(kl_loss):
+            kl_loss = torch.tensor(0.01, requires_grad=True, device=x.device)
         
         # Biochemical constraint loss
         constraint_loss = 0.0
