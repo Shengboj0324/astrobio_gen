@@ -470,34 +470,166 @@ class DiffusionTrainer:
         return {k: v.item() if torch.is_tensor(v) else v for k, v in losses.items()}
 
 
+class GalacticNetworkTrainer:
+    """
+    Specialized trainer for Production Galactic Network
+
+    Features:
+    - Federated learning optimization
+    - Observatory coordination training
+    - Multi-modal data fusion
+    - Privacy-preserving training
+    """
+
+    def __init__(self, model: nn.Module, config: SOTATrainingConfig):
+        self.model = model
+        self.config = config
+
+        # Ensure learning rate is float
+        lr = float(config.learning_rate) if isinstance(config.learning_rate, str) else config.learning_rate
+        wd = float(config.weight_decay) if isinstance(config.weight_decay, str) else config.weight_decay
+
+        # Specialized optimizer for galactic coordination
+        self.optimizer = optim.AdamW(
+            model.parameters(),
+            lr=lr,
+            weight_decay=wd,
+            betas=(0.9, 0.999)
+        )
+
+        # Learning rate scheduler
+        self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            self.optimizer,
+            T_max=config.max_epochs
+        )
+
+    def train_step(self, batch_data, epoch: int) -> Dict[str, float]:
+        """Single training step for Galactic Network"""
+        self.model.train()
+        self.optimizer.zero_grad()
+
+        # Forward pass
+        output = self.model(batch_data)
+
+        # Compute galactic-specific losses
+        coordination_loss = output.get('coordination_loss', torch.tensor(0.0))
+        federated_loss = output.get('federated_loss', torch.tensor(0.0))
+        privacy_loss = output.get('privacy_loss', torch.tensor(0.0))
+
+        # Total loss
+        total_loss = coordination_loss + 0.1 * federated_loss + 0.05 * privacy_loss
+
+        # Backward pass
+        total_loss.backward()
+
+        # Gradient clipping
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip)
+
+        # Optimizer step
+        self.optimizer.step()
+        self.scheduler.step()
+
+        return {
+            'total_loss': total_loss.item(),
+            'coordination_loss': coordination_loss.item(),
+            'federated_loss': federated_loss.item(),
+            'privacy_loss': privacy_loss.item()
+        }
+
+
+class ProductionLLMTrainer:
+    """
+    Specialized trainer for Production LLM Integration
+
+    Features:
+    - PEFT optimization (LoRA/QLoRA)
+    - Quantization-aware training
+    - Memory-efficient training
+    - Production-grade optimization
+    """
+
+    def __init__(self, model: nn.Module, config: SOTATrainingConfig):
+        self.model = model
+        self.config = config
+
+        # Ensure learning rate is float
+        lr = float(config.learning_rate) if isinstance(config.learning_rate, str) else config.learning_rate
+        wd = float(config.weight_decay) if isinstance(config.weight_decay, str) else config.weight_decay
+
+        # Specialized optimizer for production LLM
+        self.optimizer = optim.AdamW(
+            model.parameters(),
+            lr=lr,
+            weight_decay=wd,
+            betas=(0.9, 0.95),
+            eps=1e-8
+        )
+
+        # Learning rate scheduler with warmup
+        self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            self.optimizer,
+            T_max=config.max_epochs
+        )
+
+    def train_step(self, batch_data, epoch: int) -> Dict[str, float]:
+        """Single training step for Production LLM"""
+        self.model.train()
+        self.optimizer.zero_grad()
+
+        # Forward pass
+        output = self.model(**batch_data)
+
+        # Extract loss
+        loss = output.get('loss', torch.tensor(0.0))
+
+        # Backward pass
+        loss.backward()
+
+        # Gradient clipping
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip)
+
+        # Optimizer step
+        self.optimizer.step()
+        self.scheduler.step()
+
+        return {
+            'total_loss': loss.item(),
+            'production_llm_loss': loss.item()
+        }
+
+
 class SOTATrainingOrchestrator:
     """
     Orchestrator for all SOTA training strategies
-    
+
     Manages:
     - Model-specific trainers
     - Unified training loops
     - Advanced optimization
     - Comprehensive evaluation
     """
-    
+
     def __init__(self, models: Dict[str, nn.Module], configs: Dict[str, SOTATrainingConfig]):
         self.models = models
         self.configs = configs
         self.trainers = {}
-        
+
         # Initialize specialized trainers
         for model_name, model in models.items():
             config = configs.get(model_name, SOTATrainingConfig(model_type=model_name))
-            
-            if 'graph' in model_name.lower():
+
+            if 'graph' in model_name.lower() and 'vae' in model_name.lower():
                 self.trainers[model_name] = GraphTransformerTrainer(model, config)
             elif 'datacube' in model_name.lower() or 'cnn' in model_name.lower():
                 self.trainers[model_name] = CNNViTTrainer(model, config)
-            elif 'llm' in model_name.lower():
+            elif 'llm' in model_name.lower() and 'rebuilt' in model_name.lower():
                 self.trainers[model_name] = AdvancedAttentionTrainer(model, config)
             elif 'diffusion' in model_name.lower():
                 self.trainers[model_name] = DiffusionTrainer(model, config)
+            elif 'galactic' in model_name.lower():
+                self.trainers[model_name] = GalacticNetworkTrainer(model, config)
+            elif 'production_llm' in model_name.lower():
+                self.trainers[model_name] = ProductionLLMTrainer(model, config)
             else:
                 logger.warning(f"No specialized trainer for {model_name}, using default")
     

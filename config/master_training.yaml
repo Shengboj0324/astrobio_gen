@@ -296,6 +296,193 @@ models:
       classifier_free_prob: 0.1
 
   # ========================================
+  # CRITICAL PRODUCTION MODELS (NEWLY INTEGRATED)
+  # ========================================
+
+  # Production Galactic Network
+  production_galactic_network:
+    enabled: true
+    num_observatories: 12
+    coordination_dim: 256
+    hidden_dim: 512
+    num_attention_heads: 8
+    num_layers: 6
+    use_federated_learning: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+    # Galactic-specific training
+    galactic_training:
+      observatory_dropout: 0.1
+      coordination_loss_weight: 0.2
+      federated_rounds: 10
+      privacy_epsilon: 1.0
+
+  # Production LLM Integration
+  production_llm_integration:
+    enabled: true
+    model_name: "microsoft/DialoGPT-medium"
+    use_quantization: true
+    use_lora: true
+    lora_r: 16
+    lora_alpha: 32
+    max_length: 512
+    learning_rate: 2e-5
+    weight_decay: 1e-4
+    # Production LLM training
+    production_training:
+      gradient_checkpointing: true
+      warmup_steps: 500
+      max_grad_norm: 1.0
+      eval_steps: 100
+
+  # Ultimate Coordination System
+  ultimate_coordination_system:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+    # Coordination-specific training
+    coordination_training:
+      meta_learning_rate: 1e-3
+      adaptation_steps: 5
+      task_batch_size: 16
+
+  # Tier5 Autonomous Discovery Orchestrator
+  tier5_autonomous_discovery:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+    # Autonomous discovery training
+    discovery_training:
+      exploration_rate: 0.1
+      discovery_threshold: 0.8
+      autonomy_level: 5
+
+  # ========================================
+  # ADVANCED MODELS (NEWLY INTEGRATED)
+  # ========================================
+
+  # Advanced Experiment Orchestrator
+  advanced_experiment_orchestrator:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Advanced Graph Neural Network
+  advanced_graph_neural_network:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # ========================================
+  # WORKING ADVANCED MODELS (TESTED AND SAFE)
+  # ========================================
+
+  # Advanced Graph Neural Network
+  advanced_graph_neural_network:
+    enabled: true
+    input_dim: 128
+    hidden_dim: 256
+    output_dim: 64
+    num_layers: 4
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Spectral Surrogate
+  spectral_surrogate:
+    enabled: true
+    n_gases: 4
+    bins: 100
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Surrogate Transformer
+  surrogate_transformer:
+    enabled: true
+    d_model: 512
+    nhead: 8
+    num_layers: 6
+    dim_feedforward: 2048
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # ========================================
+  # HIGH PRIORITY MODELS - Phase 3 Integration
+  # ========================================
+
+  # World Class Multimodal Integration
+  world_class_multimodal_integration:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Hierarchical Attention
+  hierarchical_attention:
+    enabled: true
+    input_dim: 512
+    num_levels: 3
+    num_heads: 8
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Advanced Multimodal LLM
+  advanced_multimodal_llm:
+    enabled: true
+    base_model_name: "microsoft/DialoGPT-medium"
+    fusion_dim: 512
+    learning_rate: 2e-5
+    weight_decay: 1e-4
+
+  # Cross Modal Fusion
+  cross_modal_fusion:
+    enabled: true
+    modalities: ['text', 'image', 'spectral']
+    fusion_dim: 512
+    num_heads: 8
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Neural Architecture Search
+  neural_architecture_search:
+    enabled: true
+    search_space_size: 1000
+    controller_dim: 256
+    learning_rate: 1e-3
+    weight_decay: 1e-4
+
+  # ========================================
+  # ADDITIONAL WORKING MODELS (MEDIUM PRIORITY)
+  # ========================================
+
+  # Galactic Research Network
+  galactic_research_network:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Meta Learning System
+  meta_learning_system:
+    enabled: true
+    input_dim: 256
+    hidden_dim: 512
+    num_tasks: 10
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # Neural Architecture Search
+  neural_architecture_search:
+    enabled: true
+    search_space_size: 1000
+    controller_dim: 256
+    learning_rate: 1e-3
+    weight_decay: 1e-4
+
+  # World Class Multimodal Integration
+  world_class_multimodal_integration:
+    enabled: true
+    learning_rate: 1e-4
+    weight_decay: 1e-5
+
+  # ========================================
   # LEGACY ENHANCED MODELS (FALLBACK)
   # ========================================
 

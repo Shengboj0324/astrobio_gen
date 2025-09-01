@@ -40,6 +40,61 @@ except ImportError as e:
     logger.error(f"❌ SOTA models not available: {e}")
     SOTA_MODELS_AVAILABLE = False
 
+# CRITICAL MISSING MODELS - Production Systems
+try:
+    from models.production_galactic_network import ProductionGalacticNetwork, GalacticNetworkConfig
+    from models.production_llm_integration import ProductionLLMIntegration, ProductionLLMConfig
+    from models.ultimate_coordination_system import UltimateCoordinationSystem
+    from models.tier5_autonomous_discovery_orchestrator import Tier5AutonomousDiscoveryOrchestrator
+    CRITICAL_MODELS_AVAILABLE = True
+    logger.info("✅ Critical production models imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Some critical models not available: {e}")
+    CRITICAL_MODELS_AVAILABLE = False
+
+# WORKING ADVANCED MODELS - Safe Integration (Tested)
+try:
+    from models.advanced_graph_neural_network import AdvancedGraphNeuralNetwork
+    from models.spectral_surrogate import SpectralSurrogate
+    from models.surrogate_transformer import SurrogateTransformer
+    ADVANCED_MODELS_AVAILABLE = True
+    logger.info("✅ Advanced working models imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Some advanced models not available: {e}")
+    ADVANCED_MODELS_AVAILABLE = False
+
+# HIGH PRIORITY MODELS - Phase 3 Integration
+try:
+    from models.world_class_multimodal_integration import WorldClassMultimodalIntegrator, MultiModalConfig
+    from models.hierarchical_attention import HierarchicalAttention
+    HIGH_PRIORITY_MODELS_AVAILABLE = True
+    logger.info("✅ High priority models imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Some high priority models not available: {e}")
+    HIGH_PRIORITY_MODELS_AVAILABLE = False
+
+# ADDITIONAL WORKING MODELS - Medium Priority
+try:
+    from models.autonomous_research_agents import AutonomousResearchAgents
+    from models.causal_discovery_ai import CausalDiscoveryAI
+    from models.continuous_self_improvement import ContinuousSelfImprovement
+    from models.deep_cnn_llm_integration import DeepCNNLLMIntegration
+    from models.embodied_intelligence import EmbodiedIntelligence
+    from models.galactic_research_network import GalacticResearchNetworkOrchestrator
+    from models.meta_cognitive_control import MetaCognitiveControl
+    from models.meta_learning_system import MetaLearningSystem
+    from models.neural_architecture_search import NeuralArchitectureSearch
+    from models.performance_optimization_engine import PerformanceOptimizationEngine
+    from models.real_time_discovery_pipeline import RealTimeDiscoveryPipeline
+    from models.rebuilt_multimodal_integration import RebuiltMultimodalIntegration
+    from models.uncertainty_emergence_system import UncertaintyEmergenceSystem
+    from models.world_class_multimodal_integration import WorldClassMultimodalIntegration
+    ADDITIONAL_MODELS_AVAILABLE = True
+    logger.info("✅ Additional working models imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Some additional models not available: {e}")
+    ADDITIONAL_MODELS_AVAILABLE = False
+
 # SOTA Training imports
 try:
     from training.sota_training_strategies import (
@@ -166,6 +221,111 @@ class SOTAUnifiedTrainer:
                         guidance_scale=model_config.get('guidance_scale', 7.5)
                     ).to(self.device)
                     logger.info("🚀 Initialized SOTA Diffusion Model")
+
+                # CRITICAL PRODUCTION MODELS
+                elif model_name == "production_galactic_network" and CRITICAL_MODELS_AVAILABLE:
+                    galactic_config = GalacticNetworkConfig(
+                        num_observatories=model_config.get('num_observatories', 12),
+                        coordination_dim=model_config.get('coordination_dim', 256),
+                        hidden_dim=model_config.get('hidden_dim', 512),
+                        num_attention_heads=model_config.get('num_attention_heads', 8),
+                        num_layers=model_config.get('num_layers', 6),
+                        use_federated_learning=model_config.get('use_federated_learning', True)
+                    )
+                    models[model_name] = ProductionGalacticNetwork(galactic_config).to(self.device)
+                    logger.info("🌌 Initialized Production Galactic Network")
+
+                elif model_name == "production_llm_integration" and CRITICAL_MODELS_AVAILABLE:
+                    prod_llm_config = ProductionLLMConfig(
+                        model_name=model_config.get('model_name', 'microsoft/DialoGPT-medium'),
+                        use_quantization=model_config.get('use_quantization', True),
+                        use_lora=model_config.get('use_lora', True),
+                        lora_r=model_config.get('lora_r', 16),
+                        max_length=model_config.get('max_length', 512)
+                    )
+                    models[model_name] = ProductionLLMIntegration(prod_llm_config).to(self.device)
+                    logger.info("🚀 Initialized Production LLM Integration")
+
+                elif model_name == "ultimate_coordination_system" and CRITICAL_MODELS_AVAILABLE:
+                    models[model_name] = UltimateCoordinationSystem().to(self.device)
+                    logger.info("🎯 Initialized Ultimate Coordination System")
+
+                elif model_name == "tier5_autonomous_discovery" and CRITICAL_MODELS_AVAILABLE:
+                    models[model_name] = Tier5AutonomousDiscoveryOrchestrator().to(self.device)
+                    logger.info("🔬 Initialized Tier5 Autonomous Discovery Orchestrator")
+
+                # WORKING ADVANCED MODELS (TESTED AND SAFE)
+                elif model_name == "advanced_graph_neural_network" and ADVANCED_MODELS_AVAILABLE:
+                    from models.advanced_graph_neural_network import GraphConfig
+                    graph_config = GraphConfig(
+                        input_dim=model_config.get('input_dim', 128),
+                        hidden_dim=model_config.get('hidden_dim', 256),
+                        num_layers=model_config.get('num_layers', 4),
+                        num_heads=model_config.get('num_heads', 8)
+                    )
+                    models[model_name] = AdvancedGraphNeuralNetwork(
+                        config=graph_config,
+                        output_dim=model_config.get('output_dim', 64)
+                    ).to(self.device)
+                    logger.info("🕸️ Initialized Advanced Graph Neural Network")
+
+                elif model_name == "spectral_surrogate" and ADVANCED_MODELS_AVAILABLE:
+                    models[model_name] = SpectralSurrogate(
+                        n_gases=model_config.get('n_gases', 4),
+                        bins=model_config.get('bins', 100)
+                    ).to(self.device)
+                    logger.info("📊 Initialized Spectral Surrogate")
+
+                elif model_name == "surrogate_transformer" and ADVANCED_MODELS_AVAILABLE:
+                    models[model_name] = SurrogateTransformer(
+                        d_model=model_config.get('d_model', 512),
+                        nhead=model_config.get('nhead', 8),
+                        num_layers=model_config.get('num_layers', 6),
+                        dim_feedforward=model_config.get('dim_feedforward', 2048)
+                    ).to(self.device)
+                    logger.info("🔄 Initialized Surrogate Transformer")
+
+                # HIGH PRIORITY MODELS - Phase 3 Integration
+                elif model_name == "world_class_multimodal_integration" and HIGH_PRIORITY_MODELS_AVAILABLE:
+                    multimodal_config = MultiModalConfig(
+                        hidden_dim=model_config.get('hidden_dim', 1024),
+                        num_attention_heads=model_config.get('num_attention_heads', 16),
+                        num_layers=model_config.get('num_layers', 8)
+                    )
+                    models[model_name] = WorldClassMultimodalIntegrator(multimodal_config).to(self.device)
+                    logger.info("🌍 Initialized World Class Multimodal Integration")
+
+                elif model_name == "hierarchical_attention" and HIGH_PRIORITY_MODELS_AVAILABLE:
+                    models[model_name] = HierarchicalAttention(
+                        input_dim=model_config.get('input_dim', 512),
+                        num_levels=model_config.get('num_levels', 3),
+                        num_heads=model_config.get('num_heads', 8)
+                    ).to(self.device)
+                    logger.info("🏗️ Initialized Hierarchical Attention")
+
+                # ADDITIONAL WORKING MODELS
+                elif model_name == "galactic_research_network" and ADDITIONAL_MODELS_AVAILABLE:
+                    models[model_name] = GalacticResearchNetworkOrchestrator().to(self.device)
+                    logger.info("🌌 Initialized Galactic Research Network")
+
+                elif model_name == "meta_learning_system" and ADDITIONAL_MODELS_AVAILABLE:
+                    models[model_name] = MetaLearningSystem(
+                        input_dim=model_config.get('input_dim', 256),
+                        hidden_dim=model_config.get('hidden_dim', 512),
+                        num_tasks=model_config.get('num_tasks', 10)
+                    ).to(self.device)
+                    logger.info("🧠 Initialized Meta Learning System")
+
+                elif model_name == "neural_architecture_search" and ADDITIONAL_MODELS_AVAILABLE:
+                    models[model_name] = NeuralArchitectureSearch(
+                        search_space_size=model_config.get('search_space_size', 1000),
+                        controller_dim=model_config.get('controller_dim', 256)
+                    ).to(self.device)
+                    logger.info("🔍 Initialized Neural Architecture Search")
+
+                elif model_name == "world_class_multimodal_integration" and ADDITIONAL_MODELS_AVAILABLE:
+                    models[model_name] = WorldClassMultimodalIntegration().to(self.device)
+                    logger.info("🌍 Initialized World Class Multimodal Integration")
                 
             except Exception as e:
                 logger.error(f"❌ Failed to initialize {model_name}: {e}")
