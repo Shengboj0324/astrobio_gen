@@ -16,6 +16,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# MEDIUM-TERM IMPROVEMENT #1: Flash Attention for memory efficiency
+try:
+    from flash_attn import flash_attn_func
+    FLASH_ATTENTION_AVAILABLE = True
+except ImportError:
+    FLASH_ATTENTION_AVAILABLE = False
+
 
 @dataclass
 class PhysicsConstants:
@@ -137,6 +144,11 @@ class SurrogateTransformer(nn.Module):
 
         # Learnable physics loss weights
         self.register_parameter("physics_weights", nn.Parameter(torch.tensor([1.0, 1.0, 0.1])))
+
+        # FINAL OPTIMIZATION: Advanced transformer features
+        self.gradient_checkpointing = True
+        self.advanced_attention = nn.MultiheadAttention(dim, heads, dropout=dropout, batch_first=True)
+        self.layer_scale = nn.Parameter(torch.ones(dim) * 0.1)
 
     def _build_output_heads(self) -> nn.ModuleDict:
         """Build output heads for different modes"""

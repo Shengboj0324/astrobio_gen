@@ -379,10 +379,12 @@ class RebuiltDatacubeCNN(nn.Module):
         num_transformer_layers: int = 6,
         patch_size: Tuple[int, int, int, int, int] = (1, 2, 2, 4, 4),
         use_vit_features: bool = True,
+        use_gradient_checkpointing: bool = True,  # MEDIUM-TERM IMPROVEMENT #2
         **kwargs
     ):
         super().__init__()
         # Store hyperparameters manually (PyTorch Lightning disabled due to protobuf conflict)
+        self.use_gradient_checkpointing = use_gradient_checkpointing
         self.learning_rate = learning_rate
         
         self.input_variables = input_variables

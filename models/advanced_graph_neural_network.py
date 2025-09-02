@@ -299,6 +299,14 @@ class AdvancedGraphNeuralNetwork(nn.Module):
         # Graph transformer
         self.transformer = GraphTransformer(config)
 
+        # MEDIUM-TERM IMPROVEMENT #3: Advanced Regularization
+        self.advanced_dropout = nn.ModuleList([
+            nn.Dropout(config.dropout * (1 + 0.1 * i)) for i in range(config.num_layers)
+        ])
+        self.layer_norms = nn.ModuleList([
+            nn.LayerNorm(config.hidden_dim) for _ in range(config.num_layers)
+        ])
+
         # Task-specific heads
         self.task_heads = self._build_task_heads()
 

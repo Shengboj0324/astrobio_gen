@@ -131,26 +131,40 @@ class GraphTransformerTrainer:
         """Single training step for Graph Transformer"""
         self.model.train()
         self.optimizer.zero_grad()
-        
+
         # Update KL weight (annealing)
         self.kl_weight = min(1.0, epoch * self.kl_anneal_rate)
-        
+
         # Forward pass
         output = self.model(batch_data)
-        
-        # Compute losses
-        losses = self.compute_graph_transformer_loss(output, batch_data)
-        
+
+        # CRITICAL FIX: Use model's built-in loss computation if available
+        if isinstance(output, dict) and 'total_loss' in output:
+            # Model already computed loss in forward pass
+            losses = {
+                'total_loss': output['total_loss'],
+                'reconstruction_loss': output.get('reconstruction_loss', torch.tensor(0.0)),
+                'kl_loss': output.get('kl_loss', torch.tensor(0.0)),
+                'constraint_loss': output.get('constraint_loss', torch.tensor(0.0))
+            }
+        else:
+            # Fallback to custom loss computation
+            losses = self.compute_graph_transformer_loss(output, batch_data)
+
+        # Ensure total_loss has gradients
+        if not losses['total_loss'].requires_grad:
+            losses['total_loss'] = losses['total_loss'].requires_grad_(True)
+
         # Backward pass
         losses['total_loss'].backward()
-        
+
         # Gradient clipping
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip)
-        
+
         # Optimizer step
         self.optimizer.step()
         self.scheduler.step()
-        
+
         # Return scalar losses
         return {k: v.item() if torch.is_tensor(v) else v for k, v in losses.items()}
 

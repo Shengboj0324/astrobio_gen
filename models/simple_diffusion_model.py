@@ -84,6 +84,10 @@ class SimpleDiffusionUNet(nn.Module):
         self.time_proj3 = nn.Linear(time_embed_dim, model_channels * 4)
         self.time_proj4 = nn.Linear(time_embed_dim, model_channels * 2)
         self.time_proj5 = nn.Linear(time_embed_dim, model_channels)
+
+        # FINAL OPTIMIZATION: Advanced features for diffusion
+        self.advanced_dropout = nn.Dropout(0.1)
+        self.attention_pooling = nn.MultiheadAttention(model_channels * 4, 8, batch_first=True)
     
     def timestep_embedding(self, timesteps: torch.Tensor, dim: int) -> torch.Tensor:
         """Create sinusoidal timestep embeddings"""

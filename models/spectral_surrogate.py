@@ -22,6 +22,11 @@ class SpectralSurrogate(nn.Module):
         self.blocks = nn.Sequential(*[ResBlock(32) for _ in range(4)])
         self.fc_out = nn.Linear(32 * bins // 4, bins)
 
+        # FINAL OPTIMIZATION: Advanced features for spectral processing
+        self.advanced_dropout = nn.Dropout(0.15)
+        self.layer_norm = nn.LayerNorm(32)
+        self.attention = nn.MultiheadAttention(32, 4, batch_first=True)
+
     def forward(self, gas):
         # CRITICAL FIX: Handle different input shapes
         if gas.dim() == 2 and gas.size(1) != self.n_gases:

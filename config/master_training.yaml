@@ -12,7 +12,7 @@ tags: ["astrobiology", "sota", "graph-transformers", "vit", "diffusion", "advanc
 # Global Training Settings
 global:
   max_epochs: 200
-  batch_size: 8  # Auto-adjusted based on available memory
+  batch_size: 16  # QUICK WIN #3: Optimized batch size for better throughput
   learning_rate: 1e-4
   weight_decay: 1e-5
   use_mixed_precision: true
@@ -22,7 +22,8 @@ global:
   use_wandb: true
   use_tensorboard: true
   gradient_clip_val: 1.0
-  accumulate_grad_batches: 1
+  accumulate_grad_batches: 2  # QUICK WIN #2: Increase for better performance
+  loss_scaling: "dynamic"  # Dynamic loss scaling for mixed precision stability
   val_check_interval: 1.0
   log_every_n_steps: 50
 

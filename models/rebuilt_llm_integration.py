@@ -543,6 +543,12 @@ class RebuiltLLMIntegration(nn.Module):
         
         # Loss function
         self.criterion = nn.CrossEntropyLoss(ignore_index=-100)
+
+        # MEDIUM-TERM IMPROVEMENT #4: Enhanced Loss Functions
+        self.focal_loss_alpha = 0.25
+        self.focal_loss_gamma = 2.0
+        self.label_smoothing = 0.1
+        self.smooth_criterion = nn.CrossEntropyLoss(ignore_index=-100, label_smoothing=self.label_smoothing)
         
     def _initialize_model(self):
         """Initialize the base model with quantization and PEFT"""
