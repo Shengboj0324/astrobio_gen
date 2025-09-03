@@ -317,28 +317,38 @@ class RebuiltMultimodalIntegration(nn.Module):
         # Fusion strategy
         if self.fusion_strategy == "cross_attention" and len(modality_features) > 1:
             # Use first modality as query, others as key/value
-            fused_features = modality_features[0].unsqueeze(1)  # Add sequence dimension
-            
-            for i, layer in enumerate(self.fusion_layers):
-                # Cross-attention with other modalities
-                for j, other_features in enumerate(modality_features[1:], 1):
-                    key_value = other_features.unsqueeze(1)
-                    fused_features = checkpoint(
-                        layer, fused_features, key_value, key_value,
-                        use_reentrant=False
-                    )
-            
+            query = modality_features[0].unsqueeze(1)  # Add sequence dimension
+
+            # Stack other modalities as key/value
+            key_value = torch.stack(modality_features[1:], dim=1)  # [batch, num_modalities-1, features]
+
+            # Apply cross-attention
+            fused_features, _ = self.cross_attention(query, key_value, key_value)
             fused_features = fused_features.squeeze(1)  # Remove sequence dimension
-        else:
-            # Weighted average fusion
+
+        elif self.fusion_strategy == "weighted_sum":
+            # Weighted sum fusion
             weighted_features = []
             for i, features in enumerate(modality_features):
-                weighted_features.append(features * weights[:, i:i+1])
+                weighted_features.append(features * weights[i].unsqueeze(-1))
             fused_features = torch.stack(weighted_features).sum(dim=0)
-        
-        # Output projection
+
+        elif self.fusion_strategy == "concatenation":
+            # Simple concatenation
+            fused_features = torch.cat(modality_features, dim=-1)
+            fused_features = self.fusion_projection(fused_features)
+
+        else:
+            # Default: use first modality
+            fused_features = modality_features[0]
+
+        # Apply fusion layers
+        for layer in self.fusion_layers:
+            fused_features = layer(fused_features)
+
+        # Output projections
         output_features = self.output_projection(fused_features)
-        
+
         # Task-specific heads
         classification_logits = self.classification_head(output_features)
         regression_output = self.regression_head(output_features)
