@@ -1,0 +1,63 @@
+{
+  "integration_timestamp": "2025-09-03T00:32:22.480133",
+  "total_sources_processed": 36,
+  "integration_success_rate": 100.0,
+  "status_breakdown": {
+    "integrated": 36
+  },
+  "domain_statistics": {
+    "nasa_space_agencies": {
+      "total": 5,
+      "integrated": 5,
+      "failed": 0
+    },
+    "astronomical_surveys": {
+      "total": 5,
+      "integrated": 5,
+      "failed": 0
+    },
+    "climate_atmospheric": {
+      "total": 5,
+      "integrated": 5,
+      "failed": 0
+    },
+    "genomics_molecular": {
+      "total": 5,
+      "integrated": 5,
+      "failed": 0
+    },
+    "geoscience_earth": {
+      "total": 3,
+      "integrated": 3,
+      "failed": 0
+    },
+    "particle_physics": {
+      "total": 3,
+      "integrated": 3,
+      "failed": 0
+    },
+    "materials_chemistry": {
+      "total": 3,
+      "integrated": 3,
+      "failed": 0
+    },
+    "environmental_ecology": {
+      "total": 3,
+      "integrated": 3,
+      "failed": 0
+    },
+    "medical_health": {
+      "total": 2,
+      "integrated": 2,
+      "failed": 0
+    },
+    "social_economic": {
+      "total": 2,
+      "integrated": 2,
+      "failed": 0
+    }
+  },
+  "authentication_requirements": 7,
+  "existing_sources_preserved": true,
+  "system_ready_for_training": true
+}
