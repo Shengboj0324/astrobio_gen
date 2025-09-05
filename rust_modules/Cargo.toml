@@ -1,0 +1,75 @@
+[package]
+name = "astrobio_rust"
+version = "0.1.0"
+edition = "2021"
+authors = ["Astrobiology AI Platform Team"]
+description = "High-performance Rust extensions for astrobiology AI datacube processing"
+license = "MIT"
+
+[lib]
+name = "astrobio_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Python integration
+pyo3 = { version = "0.20", features = ["extension-module", "abi3-py38"] }
+numpy = "0.20"
+
+# High-performance computing
+ndarray = { version = "0.15", features = ["rayon", "serde"] }
+rayon = "1.8"
+
+# Async and networking for future phases
+tokio = { version = "1.0", features = ["full"], optional = true }
+reqwest = { version = "0.11", features = ["json"], optional = true }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+log = "0.4"
+pyo3-log = "0.9"
+
+# System information
+num_cpus = "1.16"
+
+# Random number generation for noise
+rand = "0.8"
+rand_distr = "0.4"
+
+# SIMD optimizations
+wide = "0.7"
+
+# Memory management
+memmap2 = "0.9"
+
+[features]
+default = ["datacube-processing"]
+datacube-processing = []
+concurrent-acquisition = ["tokio", "reqwest"]
+full = ["datacube-processing", "concurrent-acquisition"]
+
+[profile.release]
+# Optimize for performance
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+# Enable CPU-specific optimizations
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+# x86_64 specific optimizations can be added here
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.0"
+
+[package.metadata.maturin]
+# Configuration for maturin (Python wheel building)
+python-source = "python"
+module-name = "astrobio_rust"

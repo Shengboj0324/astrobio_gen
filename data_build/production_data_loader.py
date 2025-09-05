@@ -18,6 +18,7 @@ import asyncio
 import logging
 import os
 import tempfile
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -28,7 +29,19 @@ import torch
 import yaml
 from dataclasses import dataclass
 
-logger = logging.getLogger(__name__)
+# Import Rust acceleration with fallback
+try:
+    from rust_integration import DatacubeAccelerator
+    RUST_ACCELERATION_AVAILABLE = True
+    _rust_accelerator = DatacubeAccelerator(enable_fallback=True, log_performance=True)
+    logger = logging.getLogger(__name__)
+    logger.info("🦀 Rust datacube acceleration enabled - expecting 10-20x speedup")
+except ImportError as e:
+    RUST_ACCELERATION_AVAILABLE = False
+    _rust_accelerator = None
+    logger = logging.getLogger(__name__)
+    logger.warning(f"📋 Rust acceleration not available: {e}")
+    logger.info("🐍 Using Python fallback for datacube processing")
 
 @dataclass
 class RealDataSource:
@@ -482,20 +495,31 @@ class ProductionDataLoader:
             if not samples:
                 return None, None
             
-            # Convert to tensors
-            inputs_array = np.stack(samples, axis=0)
-            
-            # Transpose to expected format: [batch, variables, time, geo_time, level, lat, lon]
-            inputs_array = np.transpose(inputs_array, (0, 2, 1, 3, 4, 5, 6))
-            
-            # Create targets with physical evolution
-            targets_array = inputs_array.copy()
-            
-            # Add small realistic perturbations for prediction targets
-            targets_array = targets_array + np.random.normal(0, 0.005, targets_array.shape)
-            
-            inputs_tensor = torch.tensor(inputs_array, dtype=torch.float32)
-            targets_tensor = torch.tensor(targets_array, dtype=torch.float32)
+            # High-performance datacube processing with Rust acceleration
+            if RUST_ACCELERATION_AVAILABLE and _rust_accelerator is not None:
+                try:
+                    # Use Rust-accelerated processing (10-20x speedup expected)
+                    logger.debug("🦀 Using Rust-accelerated datacube processing")
+                    start_time = time.time()
+
+                    inputs_tensor, targets_tensor = _rust_accelerator.process_batch(
+                        samples=samples,
+                        transpose_dims=(0, 2, 1, 3, 4, 5, 6),
+                        noise_std=0.005
+                    )
+
+                    processing_time = time.time() - start_time
+                    logger.info(f"🚀 Rust datacube processing: {processing_time:.4f}s")
+
+                except Exception as e:
+                    logger.warning(f"⚠️  Rust processing failed: {e}")
+                    logger.info("📋 Falling back to Python implementation")
+                    # Fallback to Python implementation
+                    inputs_tensor, targets_tensor = _python_process_datacube(samples)
+            else:
+                # Python fallback implementation
+                logger.debug("🐍 Using Python datacube processing")
+                inputs_tensor, targets_tensor = _python_process_datacube(samples)
             
             logger.info(f"✅ Processed climate data: {inputs_tensor.shape}")
             return inputs_tensor, targets_tensor
@@ -503,6 +527,44 @@ class ProductionDataLoader:
         except Exception as e:
             logger.error(f"Failed to process climate NetCDF: {e}")
             return None, None
+
+def _python_process_datacube(samples: List[np.ndarray]) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Python fallback implementation for datacube processing
+
+    This function provides the original NumPy-based implementation as a fallback
+    when Rust acceleration is not available or fails.
+
+    Args:
+        samples: List of datacube samples as NumPy arrays
+
+    Returns:
+        Tuple of (inputs_tensor, targets_tensor) as PyTorch tensors
+    """
+    import time
+
+    start_time = time.time()
+
+    # Step 1: Stack samples (equivalent to np.stack(samples, axis=0))
+    inputs_array = np.stack(samples, axis=0)
+
+    # Step 2: Transpose to expected format: [batch, variables, time, geo_time, level, lat, lon]
+    inputs_array = np.transpose(inputs_array, (0, 2, 1, 3, 4, 5, 6))
+
+    # Step 3: Create targets with physical evolution
+    targets_array = inputs_array.copy()
+
+    # Step 4: Add small realistic perturbations for prediction targets
+    targets_array = targets_array + np.random.normal(0, 0.005, targets_array.shape)
+
+    # Step 5: Convert to tensors
+    inputs_tensor = torch.tensor(inputs_array, dtype=torch.float32)
+    targets_tensor = torch.tensor(targets_array, dtype=torch.float32)
+
+    processing_time = time.time() - start_time
+    logger.debug(f"🐍 Python datacube processing: {processing_time:.4f}s")
+
+    return inputs_tensor, targets_tensor
 
     async def load_astronomical_data(self, target_list: List[str], n_samples: int) -> List[Dict[str, Any]]:
         """Load real astronomical data from observatories"""
