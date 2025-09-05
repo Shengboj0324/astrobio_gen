@@ -36,6 +36,18 @@ pub enum AstrobiologyError {
     
     #[error("Internal error: {message}")]
     InternalError { message: String },
+
+    #[error("Initialization error: {message}")]
+    InitializationError { message: String },
+
+    #[error("Network error: {message}")]
+    NetworkError { message: String },
+
+    #[error("Service unavailable: {service}")]
+    ServiceUnavailable { service: String },
+
+    #[error("Model not found: {model_name}")]
+    ModelNotFound { model_name: String },
 }
 
 impl From<AstrobiologyError> for PyErr {
@@ -64,6 +76,18 @@ impl From<AstrobiologyError> for PyErr {
             }
             AstrobiologyError::InternalError { .. } => {
                 PyRuntimeError::new_err(format!("Internal error: {}", err))
+            }
+            AstrobiologyError::InitializationError { .. } => {
+                PyRuntimeError::new_err(format!("Initialization error: {}", err))
+            }
+            AstrobiologyError::NetworkError { .. } => {
+                PyRuntimeError::new_err(format!("Network error: {}", err))
+            }
+            AstrobiologyError::ServiceUnavailable { .. } => {
+                PyRuntimeError::new_err(format!("Service unavailable: {}", err))
+            }
+            AstrobiologyError::ModelNotFound { .. } => {
+                PyRuntimeError::new_err(format!("Model not found: {}", err))
             }
         }
     }

@@ -20,7 +20,6 @@ ndarray = { version = "0.15", features = ["rayon", "serde"] }
 rayon = "1.8"
 
 # Async and networking for future phases
-tokio = { version = "1.0", features = ["full"], optional = true }
 reqwest = { version = "0.11", features = ["json"], optional = true }
 
 # Serialization
@@ -41,17 +40,27 @@ num_cpus = "1.16"
 # Random number generation for noise
 rand = "0.8"
 rand_distr = "0.4"
+fastrand = "2.0"
 
 # SIMD optimizations
 wide = "0.7"
 
 # Memory management
 memmap2 = "0.9"
+bumpalo = "3.14"
+
+# Performance optimization
+bytemuck = "1.14"
+once_cell = "1.19"
+
+# Async runtime and networking
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"
 
 [features]
 default = ["datacube-processing"]
 datacube-processing = []
-concurrent-acquisition = ["tokio", "reqwest"]
+concurrent-acquisition = ["reqwest"]
 full = ["datacube-processing", "concurrent-acquisition"]
 
 [profile.release]

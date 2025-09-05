@@ -79,6 +79,8 @@ except Exception as e:
 
 # Import accelerator classes
 from .datacube_accelerator import DatacubeAccelerator
+from .training_accelerator import TrainingAccelerator
+from .production_optimizer import ProductionOptimizer
 from .base import RustAcceleratorBase
 
 # Import utility functions
@@ -91,6 +93,8 @@ from .utils import (
 # Export public API
 __all__ = [
     'DatacubeAccelerator',
+    'TrainingAccelerator',
+    'ProductionOptimizer',
     'RustAcceleratorBase',
     'RUST_AVAILABLE',
     'RUST_VERSION',

@@ -31,9 +31,17 @@ use pyo3::types::PyModule;
 pub mod datacube_processor;
 pub mod error;
 pub mod utils;
+pub mod simd_ops;
+pub mod memory_pool;
+pub mod training_accelerator;
+pub mod inference_engine;
+pub mod concurrent_data_acquisition;
 
 // Re-export key types
 pub use datacube_processor::*;
+pub use training_accelerator::*;
+pub use inference_engine::*;
+pub use concurrent_data_acquisition::*;
 pub use error::{AstrobiologyError, Result};
 
 /// Initialize the astrobio_rust Python module
@@ -68,6 +76,19 @@ fn astrobio_rust(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(datacube_processor::process_datacube_batch, m)?)?;
     m.add_function(wrap_pyfunction!(datacube_processor::stack_and_transpose, m)?)?;
     m.add_function(wrap_pyfunction!(datacube_processor::add_noise_and_convert, m)?)?;
+
+    // Add training acceleration functions
+    m.add_function(wrap_pyfunction!(training_accelerator::physics_augmentation, m)?)?;
+    m.add_function(wrap_pyfunction!(training_accelerator::variable_specific_noise, m)?)?;
+    m.add_function(wrap_pyfunction!(training_accelerator::spatial_transforms, m)?)?;
+
+    // Add inference engine functions
+    m.add_function(wrap_pyfunction!(inference_engine::create_inference_engine, m)?)?;
+    m.add_function(wrap_pyfunction!(inference_engine::compile_model_for_inference, m)?)?;
+    m.add_function(wrap_pyfunction!(inference_engine::run_inference, m)?)?;
+
+    // Add concurrent data acquisition functions
+    m.add_function(wrap_pyfunction!(concurrent_data_acquisition::create_data_acquisition_engine, m)?)?;
     
     // Add utility functions
     m.add_function(wrap_pyfunction!(utils::get_version, m)?)?;
