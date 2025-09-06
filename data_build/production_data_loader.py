@@ -141,25 +141,69 @@ class ProductionDataLoader:
 
     def _setup_authentication(self):
         """Setup authentication for data sources that require it"""
-        
-        # Environment variables for API keys
+
+        # Environment variables for API keys and credentials
         auth_env_vars = {
             "nasa_mast": "NASA_MAST_API_KEY",
-            "esa_gaia": "ESA_GAIA_API_KEY", 
             "copernicus_cds": "COPERNICUS_CDS_API_KEY",
             "ncbi": "NCBI_API_KEY",
-            "uniprot": "UNIPROT_API_KEY",
-            "kegg": "KEGG_API_KEY",
-            "eso_archive": "ESO_ARCHIVE_API_KEY"
+            "eso_archive": ("ESO_USERNAME", "ESO_PASSWORD"),  # Username/password pair
+            "gaia": ("GAIA_USER", "GAIA_PASS"),  # Username/password pair
+            "uniprot": "UNIPROT_API_KEY",  # Optional
+            "kegg": "KEGG_API_KEY"  # Optional
         }
-        
+
+        # Public data sources (no authentication required)
+        public_sources = {
+            "nasa_exoplanet_archive": "NASA_EXOPLANET_ARCHIVE_PUBLIC",
+            "mast_public": "MAST_PUBLIC_ACCESS",
+            "tess_public": "TESS_PUBLIC_ACCESS",
+            "kepler_k2_public": "KEPLER_K2_PUBLIC_ACCESS"
+        }
+
+        # Setup authenticated sources
         for service, env_var in auth_env_vars.items():
-            api_key = os.getenv(env_var)
-            if api_key:
-                self.authentication_tokens[service] = api_key
-                logger.info(f"✅ Authentication configured for {service}")
+            if isinstance(env_var, tuple):
+                # Username/password authentication
+                username = os.getenv(env_var[0])
+                password = os.getenv(env_var[1])
+                if username and password:
+                    self.authentication_tokens[service] = {
+                        "username": username,
+                        "password": password,
+                        "auth_type": "basic"
+                    }
+                    logger.info(f"✅ Authentication configured for {service} (username/password)")
+                else:
+                    logger.warning(f"⚠️ No credentials found for {service} (set {env_var[0]} and {env_var[1]})")
             else:
-                logger.warning(f"⚠️ No API key found for {service} (set {env_var})")
+                # API key authentication
+                api_key = os.getenv(env_var)
+                if api_key:
+                    self.authentication_tokens[service] = {
+                        "api_key": api_key,
+                        "auth_type": "api_key"
+                    }
+                    logger.info(f"✅ Authentication configured for {service} (API key)")
+                else:
+                    if service in ["uniprot", "kegg"]:
+                        logger.info(f"ℹ️ {service} API key not set (optional for basic access)")
+                    else:
+                        logger.warning(f"⚠️ No API key found for {service} (set {env_var})")
+
+        # Setup public sources
+        for service, env_var in public_sources.items():
+            public_access = os.getenv(env_var, "false").lower() == "true"
+            if public_access:
+                self.authentication_tokens[service] = {
+                    "auth_type": "public",
+                    "public_access": True
+                }
+                logger.info(f"✅ Public access configured for {service}")
+
+        # Log summary
+        total_configured = len([k for k, v in self.authentication_tokens.items() if v])
+        logger.info(f"📊 Authentication summary: {total_configured} services configured")
 
     async def load_climate_data(self, resolution: int, n_samples: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """Load real climate data from multiple sources"""
