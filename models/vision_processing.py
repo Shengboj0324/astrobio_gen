@@ -54,19 +54,28 @@ except ImportError:
 
 try:
     import timm
-    from torchvision import models, transforms
-    from torchvision.models import (
-        densenet121,
-        efficientnet_b4,
-        mobilenet_v3_large,
-        resnet50,
-        vit_b_16,
-    )
-
-    TORCHVISION_AVAILABLE = True
-except ImportError:
-    TORCHVISION_AVAILABLE = False
-    warnings.warn("Torchvision not available. Install with: pip install torchvision timm")
+    try:
+        from torchvision import models, transforms
+        from torchvision.models import (
+            densenet121,
+            efficientnet_b4,
+            mobilenet_v3_large,
+            resnet50,
+            vit_b_16,
+        )
+        TORCHVISION_AVAILABLE = True
+    except (ImportError, AttributeError) as e:
+        TORCHVISION_AVAILABLE = False
+        warnings.warn(f"Torchvision not available: {e}")
+        # Create dummy models for compatibility
+        class models:
+            @staticmethod
+            def resnet50(*args, **kwargs):
+                return nn.Identity()
+        class transforms:
+            @staticmethod
+            def Compose(*args, **kwargs):
+                return lambda x: x
 
 try:
     from transformers import AutoImageProcessor, AutoModel, CLIPModel, CLIPProcessor

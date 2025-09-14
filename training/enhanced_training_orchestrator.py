@@ -61,13 +61,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.cuda.amp import GradScaler, autocast
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from torch.utils.tensorboard import SummaryWriter
 
 # Configure logging early to avoid logger undefined errors
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# TensorBoard will be imported later with proper error handling
+TENSORBOARD_AVAILABLE = False
 
 # PyTorch Lightning components - Temporarily disabled due to protobuf conflict
 # from pytorch_lightning.callbacks import (
