@@ -1,0 +1,184 @@
+#########################################################
+# NASA-Grade Astrobiology Research Platform Requirements
+# PRODUCTION-LOCKED VERSIONS FOR ISEF COMPETITION
+# Compatible with RunPod A500 GPU (PyTorch 2.4/2.8)
+# Generated: 2025-01-14
+# DO NOT MODIFY - Use for reproducible builds
+#########################################################
+
+#########################################################
+# ===== CORE NUMERICAL & DATA-SCIENCE STACK ============ #
+#########################################################
+numpy==1.26.4
+scipy==1.11.4
+pandas==2.2.2
+xarray==2024.2.0          # NetCDF climate cubes
+tqdm==4.66.4
+networkx==3.2.1
+sympy==1.12.1             # quick analytic checks / ODE prototypes
+
+#########################################################
+# =====  DEEP-LEARNING & CLASSICAL ML (RunPod A500)  == #
+#########################################################
+# ---- PyTorch ecosystem (RunPod A500 compatible) ----
+torch==2.4.0+cu124        # Core PyTorch - RunPod A500 compatible
+torchvision==0.19.0+cu124 # Computer vision utilities
+torchaudio==2.4.0+cu124   # Audio processing (for biosignatures)
+pytorch-lightning==2.4.0  # High-level PyTorch training framework
+
+# ---- Enhanced ML for production ----
+transformers==4.35.2      # Enhanced Foundation LLM
+peft==0.7.1              # Parameter-Efficient Fine-tuning
+accelerate==0.25.0       # Model acceleration
+bitsandbytes==0.41.3     # Quantization for efficiency
+sentence-transformers==2.2.2  # Embeddings for knowledge retrieval
+optuna==3.4.0            # Neural architecture search and optimization
+ray[tune]==2.8.0         # Distributed hyperparameter optimization
+
+# ---- Graph Neural Networks (CUDA 12.4 compatible) ----
+torch_geometric==2.5.3   # Graph neural networks for metabolic pathways
+torch_sparse==0.6.18+pt24cu124      # Sparse tensor operations
+torch_scatter==2.1.2+pt24cu124      # Scatter operations
+torch_cluster==1.6.3+pt24cu124      # Graph clustering operations
+
+# ---- Classical ML ----
+scikit-learn==1.4.2      # Classical machine learning
+umap-learn==0.5.5        # Dimensionality reduction for spectra clusters
+lightgbm==4.3.0          # Fast gradient boosting baseline
+
+# ---- Datacube functionality ----
+zarr==2.16.1             # Chunked array storage for GCM datacubes
+dask[array]==2024.2.1    # Parallel processing for large arrays
+
+#########################################################
+# ======  BIOCHEMISTRY / METABOLIC MODELING  ========= #
+#########################################################
+cobra==0.29.1            # Constraint-based modeling
+optlang==1.7.0           # Solver backend for COBRA
+rdkit-pypi==2022.9.5     # Molecular operations for cheminformatics
+
+#########################################################
+# ======  ATMOSPHERIC & CLIMATE SIM  ================= #
+#########################################################
+atmos==0.2.6             # Simple 1-D photochem model fork
+pint==0.23               # Unit-handling for chemistry
+pyproj==3.6.1            # Map projections for 2-D climate output
+netCDF4==1.6.5           # Read pre-run ROCKE-3D cubes
+
+#########################################################
+# ======  ASTRONOMY / ASTROCHEMISTRY STACK ============ #
+#########################################################
+astropy==6.0.1           # Core astronomy library
+astroquery==0.4.7        # NASA archive, Vizier, etc.
+specutils==1.13.0        # Spectrum containers / operations
+lightkurve==2.4.2        # Transit light-curve helpers
+pysynphot==2.0.0         # Synthetic spectra utilities
+pysiaf==0.19.1          # JWST aperture data for pixel-level sims
+
+#########################################################
+# ======  WEB SCRAPING & HTTP REQUESTS  =============== #
+#########################################################
+requests==2.31.0         # HTTP library for REST APIs
+aiohttp==3.9.5           # Async HTTP client/server framework
+beautifulsoup4==4.12.3   # HTML/XML parsing for web scraping
+lxml==4.9.4              # Fast XML/HTML parser backend
+urllib3==2.0.7           # HTTP library with connection pooling
+
+#########################################################
+# ======  DATA STORAGE & PERSISTENCE  ================= #
+#########################################################
+h5py==3.11.0             # HDF5 file format support
+boto3==1.34.69           # AWS SDK for cloud storage
+botocore==1.34.69        # Low-level AWS interface
+s3fs==2024.10.0          # S3 filesystem interface
+
+#########################################################
+# ======  REAL-TIME STREAMING & PRODUCTION  =========== #
+#########################################################
+# ---- Production Deployment ----
+kafka-python==2.0.2      # Apache Kafka client
+redis==5.0.1             # In-memory data structure store
+kubernetes==29.0.0       # Kubernetes client
+prometheus-client==0.19.0 # Prometheus metrics
+websockets==12.0         # WebSocket support for real-time updates
+
+# ---- Model Serving & Optimization ----
+onnxruntime==1.16.3      # ONNX runtime for optimized inference
+tritonclient[all]==2.40.0 # NVIDIA Triton client for model serving
+
+# ---- Monitoring & Observability ----
+jaeger-client==4.8.0     # Distributed tracing
+grafana-api==1.0.3       # Grafana integration
+psycopg2-binary==2.9.9   # PostgreSQL adapter
+
+#########################################################
+# ======  ASYNC & CONCURRENCY  ======================== #
+#########################################################
+asyncpg==0.29.0          # Async PostgreSQL driver
+schedule==1.2.0          # Task scheduling
+aiofiles==23.2.1         # Async file operations
+aiobotocore==2.15.2      # Async boto3 support
+
+#########################################################
+# ======  SECURITY & ENCRYPTION  ====================== #
+#########################################################
+cryptography==41.0.8     # Modern cryptographic library
+
+#########################################################
+# ======  WEB API & DATACUBE INFRASTRUCTURE  ========== #
+#########################################################
+fastapi==0.104.1         # Modern web API framework
+uvicorn==0.24.0          # ASGI server for FastAPI
+pydantic==2.5.3          # Data validation and serialization
+psutil==5.9.8            # System monitoring for health checks
+
+#########################################################
+# ======  DATA VERSION CONTROL  ======================= #
+#########################################################
+dvc==3.35.2              # Data version control for large files
+dvc[gs]==3.35.2          # Google Cloud Storage support
+
+#########################################################
+# ======  VISUALISATION & NOTEBOOK EXPERIENCE  ======== #
+#########################################################
+matplotlib==3.8.4        # Core plotting library
+seaborn==0.13.2          # Statistical data visualization
+plotly==5.19.0           # Interactive spectral plots
+ipykernel==6.29.5        # Jupyter kernel
+jupyterlab==4.1.8        # Modern Jupyter interface
+
+#########################################################
+# ======  DATA FORMATS & SERIALIZATION  =============== #
+#########################################################
+PyYAML==6.0.1            # YAML configuration files
+
+#########################################################
+# ======  DEVELOPMENT & TESTING  ====================== #
+#########################################################
+black==24.3.0            # Code formatter
+isort==5.13.2            # Import sorter
+ruff==0.3.7              # Fast linter combo
+pre-commit==3.7.1        # Pre-commit hooks
+pytest==8.1.1            # Testing framework
+pytest-cov==4.1.0        # Test coverage
+pytest-xdist==3.5.0      # Parallel test execution
+
+#########################################################
+# ======  SCIENTIFIC ANALYSIS & EXPLANATION  ========== #
+#########################################################
+shap==0.42.1             # Model explanation and interpretability
+graphviz==0.20.1         # Graph visualization
+sqlalchemy==2.0.25       # Database ORM
+gputil==1.4.0            # GPU utilization monitoring
+
+#########################################################
+# ======  INSTALLATION NOTES FOR RUNPOD A500  ========= #
+#########################################################
+# Install PyTorch with CUDA 12.4 support:
+# pip install torch==2.4.0+cu124 torchvision==0.19.0+cu124 torchaudio==2.4.0+cu124 --index-url https://download.pytorch.org/whl/cu124
+#
+# Install PyTorch Geometric with CUDA 12.4:
+# pip install torch-geometric torch-sparse torch-scatter torch-cluster --index-url https://data.pyg.org/whl/torch-2.4.0+cu124.html
+#
+# Verify GPU compatibility:
+# python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}, Version: {torch.version.cuda}')"
