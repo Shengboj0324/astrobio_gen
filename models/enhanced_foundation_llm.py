@@ -348,7 +348,7 @@ class ScientificReasoningModule(nn.Module):
 
     def __init__(self, config: EnhancedLLMConfig):
         super().__init__()
-        self.dim = config.max_context_length
+        self.dim = config.hidden_size
         self.reasoning_depth = config.reasoning_depth
 
         # Reasoning layers

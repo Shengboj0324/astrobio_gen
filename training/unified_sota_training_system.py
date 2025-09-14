@@ -36,7 +36,7 @@ import logging
 import warnings
 import asyncio
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Union, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
@@ -176,11 +176,36 @@ class UnifiedSOTATrainer:
         logger.info(f"   Gradient Checkpointing: {config.use_gradient_checkpointing}")
     
     def _setup_device(self) -> torch.device:
-        """Setup optimal device configuration"""
+        """Setup optimal device configuration with multi-GPU support"""
         if torch.cuda.is_available():
-            device = torch.device("cuda")
+            # Multi-GPU setup for distributed training
+            num_gpus = torch.cuda.device_count()
+            
+            if self.config.use_distributed and num_gpus > 1:
+                # Initialize distributed training
+                if not torch.distributed.is_initialized():
+                    try:
+                        torch.distributed.init_process_group(
+                            backend='nccl',
+                            init_method='env://',
+                            timeout=timedelta(minutes=30)
+                        )
+                        logger.info(f"🌐 Distributed training initialized with {num_gpus} GPUs")
+                    except Exception as e:
+                        logger.warning(f"Distributed training setup failed: {e}")
+                        self.config.use_distributed = False
+                
+                # Set device to local rank if distributed
+                local_rank = int(os.environ.get('LOCAL_RANK', 0))
+                device = torch.device(f"cuda:{local_rank}")
+                torch.cuda.set_device(device)
+            else:
+                device = torch.device("cuda")
+            
             logger.info(f"🔥 CUDA available: {torch.cuda.get_device_name()}")
             logger.info(f"   Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
+            logger.info(f"   GPUs available: {num_gpus}")
+            logger.info(f"   Distributed training: {self.config.use_distributed}")
         else:
             device = torch.device("cpu")
             logger.warning("⚠️  CUDA not available, using CPU")
@@ -234,6 +259,18 @@ class UnifiedSOTATrainer:
             if self.config.use_compile and hasattr(torch, 'compile'):
                 model = torch.compile(model)
                 logger.info("⚡ Model compiled for optimization")
+            
+            # Wrap with DDP for multi-GPU training
+            if self.config.use_distributed and torch.cuda.device_count() > 1 and torch.distributed.is_initialized():
+                try:
+                    model = torch.nn.parallel.DistributedDataParallel(
+                        model,
+                        device_ids=[self.device.index] if self.device.type == 'cuda' else None,
+                        find_unused_parameters=True
+                    )
+                    logger.info("🌐 Model wrapped with DistributedDataParallel")
+                except Exception as e:
+                    logger.warning(f"DDP wrapping failed: {e}")
             
             # Count parameters
             total_params = sum(p.numel() for p in model.parameters())
@@ -305,14 +342,20 @@ class UnifiedSOTATrainer:
         max_epochs = self.config.max_epochs
 
         if scheduler_name == "onecycle":
+            # Calculate actual steps per epoch from data loader
+            steps_per_epoch = len(self.data_loaders.get('train', [])) if self.data_loaders else 100
+            if steps_per_epoch == 0:
+                steps_per_epoch = 100  # Fallback for empty data loaders
+                
             scheduler = optim.lr_scheduler.OneCycleLR(
                 self.optimizer,
                 max_lr=self.config.learning_rate,
                 epochs=max_epochs,
-                steps_per_epoch=100,  # Will be updated with actual data
+                steps_per_epoch=steps_per_epoch,
                 pct_start=0.1,
                 anneal_strategy='cos'
             )
+            logger.info(f"OneCycleLR configured with {steps_per_epoch} steps per epoch")
         elif scheduler_name == "cosine":
             scheduler = optim.lr_scheduler.CosineAnnealingLR(
                 self.optimizer,

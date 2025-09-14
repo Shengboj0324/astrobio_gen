@@ -233,7 +233,11 @@ class SeparableConv3D(nn.Module):
         self.pointwise = nn.Conv3d(in_channels, out_channels, 1, bias=bias)
 
         # Batch normalization
-        self.bn = nn.BatchNorm3d(out_channels)
+        # Use SyncBatchNorm for multi-GPU training, fallback to BatchNorm3d
+        try:
+            self.bn = nn.SyncBatchNorm(out_channels)
+        except:
+            self.bn = nn.BatchNorm3d(out_channels)
         self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -367,7 +371,11 @@ class EnhancedConv3DBlock(nn.Module):
                 in_channels, out_channels, kernel_size, stride, padding, groups=groups
             )
 
-        self.bn1 = nn.BatchNorm3d(out_channels)
+        # Use SyncBatchNorm for multi-GPU training
+        try:
+            self.bn1 = nn.SyncBatchNorm(out_channels)
+        except:
+            self.bn1 = nn.BatchNorm3d(out_channels)
         self.relu1 = nn.ReLU(inplace=True)
 
         # Second convolution
@@ -378,7 +386,11 @@ class EnhancedConv3DBlock(nn.Module):
                 out_channels, out_channels, kernel_size, 1, padding, groups=groups
             )
 
-        self.bn2 = nn.BatchNorm3d(out_channels)
+        # Use SyncBatchNorm for multi-GPU training
+        try:
+            self.bn2 = nn.SyncBatchNorm(out_channels)
+        except:
+            self.bn2 = nn.BatchNorm3d(out_channels)
         self.relu2 = nn.ReLU(inplace=True)
 
         # Attention mechanism
@@ -718,7 +730,7 @@ class AdaptiveFeatureFusion(nn.Module):
         # Final fusion
         self.fusion_conv = nn.Sequential(
             nn.Conv3d(out_channels, out_channels, 3, padding=1),
-            nn.BatchNorm3d(out_channels),
+            nn.SyncBatchNorm(out_channels) if hasattr(nn, 'SyncBatchNorm') else nn.BatchNorm3d(out_channels),
             nn.ReLU()
         )
 
