@@ -89,6 +89,10 @@ class EnhancedLLMConfig(LLMConfig):
     enable_multimodal: bool = True
     vision_encoder_dim: int = 768
     scientific_data_encoder_dim: int = 512
+    
+    # Model dimensions
+    hidden_size: int = 768  # Model hidden dimension
+    num_attention_heads: int = 12  # Number of attention heads
 
 
 class RotaryPositionalEmbedding(nn.Module):
@@ -166,7 +170,7 @@ class MixtureOfExperts(nn.Module):
     def __init__(self, config: EnhancedLLMConfig):
         super().__init__()
         self.num_experts = config.num_experts
-        self.dim = config.model_max_length  # Will be set properly from model config
+        self.dim = config.hidden_size  # Set from enhanced config
         self.capacity_factor = config.expert_capacity_factor
 
         # Scientific domain experts
@@ -235,8 +239,8 @@ class EnhancedAttentionLayer(nn.Module):
 
     def __init__(self, config: EnhancedLLMConfig):
         super().__init__()
-        self.dim = config.model_max_length  # Will be properly set
-        self.num_heads = 12  # Will be set from model config
+        self.dim = config.hidden_size  # Set from enhanced config
+        self.num_heads = config.num_attention_heads  # Set from enhanced config
         self.head_dim = self.dim // self.num_heads
 
         # Attention projections
@@ -344,7 +348,7 @@ class ScientificReasoningModule(nn.Module):
 
     def __init__(self, config: EnhancedLLMConfig):
         super().__init__()
-        self.dim = config.model_max_length
+        self.dim = config.max_context_length
         self.reasoning_depth = config.reasoning_depth
 
         # Reasoning layers
