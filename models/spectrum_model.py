@@ -20,7 +20,15 @@ from typing import Dict, List, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
+# PyTorch Lightning import with fallback
+try:
+    import pytorch_lightning as pl
+    PYTORCH_LIGHTNING_AVAILABLE = True
+except ImportError:
+    PYTORCH_LIGHTNING_AVAILABLE = False
+    class pl:
+        class LightningModule(nn.Module):
+            def log(self, *args, **kwargs): pass
 
 
 class SpectralPhysicsConstants:
@@ -188,7 +196,7 @@ class PhysicsInformedSpectralConstraints(nn.Module):
         return pressure_gradient_loss + abundance_conservation_loss + 0.1 * temp_pressure_consistency
 
 
-class WorldClassSpectralAutoencoder(pl.LightningModule):
+class WorldClassSpectralAutoencoder(pl.LightningModule if PYTORCH_LIGHTNING_AVAILABLE else nn.Module):
     """
     World-class spectral autoencoder for exoplanet atmospheric analysis
 

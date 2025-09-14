@@ -26,7 +26,25 @@ from functools import partial
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
-import pytorch_lightning as pl
+# PyTorch Lightning import with fallback due to protobuf conflicts
+try:
+    import pytorch_lightning as pl
+    PYTORCH_LIGHTNING_AVAILABLE = True
+except ImportError:
+    PYTORCH_LIGHTNING_AVAILABLE = False
+    # Create dummy base class
+    class LightningModule(nn.Module):
+        def __init__(self):
+            super().__init__()
+        def log(self, *args, **kwargs):
+            pass
+        def training_step(self, *args, **kwargs):
+            pass
+        def validation_step(self, *args, **kwargs):
+            pass
+    
+    class pl:
+        LightningModule = LightningModule
 import torch
 import torch.distributed as dist
 import torch.nn as nn
@@ -820,7 +838,7 @@ class Vision3DTransformer(nn.Module):
         return output
 
 
-class EnhancedCubeUNet(pl.LightningModule):
+class EnhancedCubeUNet(pl.LightningModule if PYTORCH_LIGHTNING_AVAILABLE else nn.Module):
     """
     Enhanced 3D U-Net for climate datacube processing with peak performance CNN techniques
 

@@ -23,7 +23,15 @@ from torch_geometric.nn import (
     global_mean_pool, global_max_pool,
     LayerNorm
 )
-import pytorch_lightning as pl
+# PyTorch Lightning import with fallback
+try:
+    import pytorch_lightning as pl
+    PYTORCH_LIGHTNING_AVAILABLE = True
+except ImportError:
+    PYTORCH_LIGHTNING_AVAILABLE = False
+    class pl:
+        class LightningModule(nn.Module):
+            def log(self, *args, **kwargs): pass
 
 
 class GraphTransformerEncoder(nn.Module):
@@ -159,7 +167,7 @@ class GraphDecoder(nn.Module):
         }
 
 
-class GVAE(pl.LightningModule):
+class GVAE(pl.LightningModule if PYTORCH_LIGHTNING_AVAILABLE else nn.Module):
     """
     World-class Graph VAE for metabolic networks
     

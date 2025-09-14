@@ -86,14 +86,14 @@ try:
     from .advanced_multimodal_llm import AdvancedLLMConfig, AdvancedMultiModalLLM
 
     __all__.extend(["AdvancedMultiModalLLM", "AdvancedLLMConfig"])
-except ImportError as e:
+except (ImportError, OSError, AttributeError) as e:
     warnings.warn(f"Advanced Multi-Modal LLM not available: {e}")
 
 try:
     from .vision_processing import AdvancedImageAnalyzer, VideoProcessor, VisionConfig
 
     __all__.extend(["AdvancedImageAnalyzer", "VideoProcessor", "VisionConfig"])
-except ImportError as e:
+except (ImportError, OSError, AttributeError) as e:
     warnings.warn(f"Vision processing components not available: {e}")
 
 try:

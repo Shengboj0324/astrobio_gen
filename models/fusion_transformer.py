@@ -18,7 +18,25 @@ from typing import Dict, List, Optional, Tuple, Union, Any
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
+# PyTorch Lightning import with fallback due to protobuf conflicts
+try:
+    import pytorch_lightning as pl
+    PYTORCH_LIGHTNING_AVAILABLE = True
+except ImportError:
+    PYTORCH_LIGHTNING_AVAILABLE = False
+    # Create dummy base class
+    class LightningModule(nn.Module):
+        def __init__(self):
+            super().__init__()
+        def log(self, *args, **kwargs):
+            pass
+        def training_step(self, *args, **kwargs):
+            pass
+        def validation_step(self, *args, **kwargs):
+            pass
+    
+    class pl:
+        LightningModule = LightningModule
 
 try:
     from utils.dynamic_features import build_encoders
@@ -193,7 +211,7 @@ class AdaptiveModalitySelector(nn.Module):
         return weighted_features, modality_weights.squeeze(1)
 
 
-class WorldClassFusionTransformer(pl.LightningModule):
+class WorldClassFusionTransformer(pl.LightningModule if PYTORCH_LIGHTNING_AVAILABLE else nn.Module):
     """
     World-class multi-modal fusion transformer for astrobiology
 

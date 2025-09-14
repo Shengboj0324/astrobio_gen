@@ -20,7 +20,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.data import Data
 from torch_geometric.nn import GCNConv, GATConv, global_mean_pool, global_max_pool
-import pytorch_lightning as pl
+# PyTorch Lightning import with fallback
+try:
+    import pytorch_lightning as pl
+    PYTORCH_LIGHTNING_AVAILABLE = True
+except ImportError:
+    PYTORCH_LIGHTNING_AVAILABLE = False
+    class pl:
+        class LightningModule(nn.Module):
+            def log(self, *args, **kwargs): pass
 
 
 class MetabolicConstants:
@@ -303,7 +311,7 @@ class WorldClassMetabolicDecoder(nn.Module):
         }
 
 
-class WorldClassMetabolismGenerator(pl.LightningModule):
+class WorldClassMetabolismGenerator(pl.LightningModule if PYTORCH_LIGHTNING_AVAILABLE else nn.Module):
     """
     World-class metabolic network generator for astrobiology
 
