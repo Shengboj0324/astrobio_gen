@@ -69,15 +69,26 @@ try:
 except ImportError:
     HDF5_AVAILABLE = False
 
+# Configure logging first
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 try:
     from torch_geometric.data import Data, Batch
     TORCH_GEOMETRIC_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError) as e:
     TORCH_GEOMETRIC_AVAILABLE = False
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+    logger.warning(f"PyTorch Geometric not available: {e}")
+    # Create dummy classes for compatibility
+    class Data:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+    
+    class Batch:
+        @staticmethod
+        def from_data_list(data_list):
+            return data_list
 
 
 class DataModality(Enum):
@@ -161,8 +172,11 @@ class PhysicsValidator:
             elif modality == DataModality.MOLECULAR:
                 violations.update(self._validate_molecular_physics(data))
             
-            # Overall physics score
-            violations['physics_score'] = 1.0 - min(1.0, sum(violations.values()) / len(violations))
+            # Overall physics score (avoid division by zero)
+            if len(violations) > 0:
+                violations['physics_score'] = 1.0 - min(1.0, sum(violations.values()) / len(violations))
+            else:
+                violations['physics_score'] = 1.0
             
         except Exception as e:
             logger.warning(f"Physics validation failed: {e}")
