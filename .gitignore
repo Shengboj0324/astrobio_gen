@@ -97,7 +97,7 @@ models/*.h5
 models/*.safetensors
 models/**/*.bin
 models/**/*.model
-
+astrobio_venv/lib/site_packages
 # Training artifacts
 lightning_logs/**
 wandb/**
