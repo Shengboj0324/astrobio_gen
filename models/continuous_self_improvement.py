@@ -1083,7 +1083,7 @@ class ContinualSelfImprovementSystem:
             self.meta_cognitive = None
 
         logger.info(
-            f"🧠 Continual Self-Improvement System initialized with strategy: {config.primary_strategy.value}"
+            f"🧠 Continual Self-Improvement System initialized with strategy: {self.config.primary_strategy.value}"
         )
 
     async def learn_new_task(

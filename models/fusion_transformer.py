@@ -241,9 +241,9 @@ class WorldClassFusionTransformer(pl.LightningModule if PYTORCH_LIGHTNING_AVAILA
         self.save_hyperparameters()
 
         self.schema = schema if schema is not None else {
-            'climate': {'type': 'numerical', 'dim': 100},
-            'spectral': {'type': 'numerical', 'dim': 200},
-            'molecular': {'type': 'categorical', 'categories': 50}
+            'climate': ('numeric', None),
+            'spectral': ('numeric', None),
+            'molecular': ('categorical', 50)
         }
         self.latent_dim = latent_dim
         self.n_heads = n_heads

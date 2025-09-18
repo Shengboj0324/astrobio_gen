@@ -226,7 +226,7 @@ class DifferentialPrivacyLayer(nn.Module):
         return x
 
 
-class ProductionGalacticNetwork(pl.LightningModule):
+class ProductionGalacticNetwork(nn.Module):
     """
     Production-ready galactic research network for multi-observatory coordination
     
@@ -240,10 +240,11 @@ class ProductionGalacticNetwork(pl.LightningModule):
     - Compatible with all rebuilt components
     """
     
-    def __init__(self, config: GalacticNetworkConfig):
+    def __init__(self, config: Optional[GalacticNetworkConfig] = None):
         super().__init__()
-        
-        self.save_hyperparameters()
+        if config is None:
+            config = GalacticNetworkConfig()
+
         self.config = config
         
         # Observatory encoders
