@@ -79,6 +79,15 @@ try:
 except ImportError:
     warnings.warn("timm not available")
     TORCHVISION_AVAILABLE = False
+    # Create dummy classes for fallback
+    class models:
+        @staticmethod
+        def resnet50(*args, **kwargs):
+            return nn.Identity()
+    class transforms:
+        @staticmethod
+        def Compose(*args, **kwargs):
+            return lambda x: x
 
 try:
     from transformers import AutoImageProcessor, AutoModel, CLIPModel, CLIPProcessor

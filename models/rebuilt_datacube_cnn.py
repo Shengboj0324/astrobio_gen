@@ -306,7 +306,12 @@ class MultiScaleAttention5D(nn.Module):
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply multi-scale attention across spatial dimensions"""
-        B, C, T1, T2, L, H, W = x.shape
+        if x.dim() == 5:
+            B, C, L, H, W = x.shape
+            # Add dummy temporal dimensions for compatibility
+            T1, T2 = 1, 1
+        else:
+            B, C, T1, T2, L, H, W = x.shape
         
         # Reshape for attention computation (combine time dimensions)
         x_reshaped = x.reshape(B, C, T1 * T2, L, H * W)
@@ -336,9 +341,16 @@ class MultiScaleAttention5D(nn.Module):
         
         # Reshape back to original dimensions
         attended = torch.stack(attended, dim=1)  # [B, T1*T2*L, C, H*W]
-        attended = attended.reshape(B, T1, T2, L, C, H, W)
-        attended = attended.permute(0, 4, 1, 2, 3, 5, 6).contiguous()  # [B, C, T1, T2, L, H, W]
-        
+
+        if x.dim() == 5:
+            # For 5D input, reshape to [B, C, L, H, W]
+            attended = attended.reshape(B, L, C, H, W)
+            attended = attended.permute(0, 2, 1, 3, 4).contiguous()  # [B, C, L, H, W]
+        else:
+            # For 7D input, reshape to [B, C, T1, T2, L, H, W]
+            attended = attended.reshape(B, T1, T2, L, C, H, W)
+            attended = attended.permute(0, 4, 1, 2, 3, 5, 6).contiguous()  # [B, C, T1, T2, L, H, W]
+
         return self.norm(attended + x)
 
 
@@ -452,8 +464,8 @@ class RebuiltDatacubeCNN(nn.Module):
         self.rms_normalization = True
         self.spectral_normalization = True
 
-        # Input projection
-        self.input_proj = nn.Conv3d(input_variables, base_channels, 3, padding=1)
+        # Input projection - handle combined temporal-variable channels
+        self.input_proj = nn.Conv3d(input_variables * 4, base_channels, 3, padding=1)  # V*T1*T2 channels
         
         # Encoder layers
         self.encoder_layers = nn.ModuleList()
@@ -534,31 +546,35 @@ class RebuiltDatacubeCNN(nn.Module):
             x, physics_violations = self.physics_constraints(x)
 
         # SOTA PREPROCESSING: Robust input processing
-        # Reshape for CNN processing: [B, V, T1, T2, L, H, W] -> [B*V, T1*T2, L, H, W]
-        x_reshaped = x.view(B * V, T1 * T2, L, H, W)
+        # Reshape for CNN processing: [B, V, T1, T2, L, H, W] -> [B, V*T1*T2, L, H, W]
+        x_reshaped = x.view(B, V * T1 * T2, L, H, W)
 
-        # Apply CNN layers
-        cnn_features = []
-        for i, layer in enumerate(self.cnn_layers):
-            if i == 0:
-                # First layer processes the reshaped input
-                features = layer(x_reshaped)
-            else:
-                # Subsequent layers
-                features = layer(features)
-            cnn_features.append(features)
+        # Apply encoder layers
+        x = self.input_proj(x_reshaped)
+        encoder_features = []
 
-        # Get final CNN features
-        final_cnn_features = cnn_features[-1]  # [B*V, channels, reduced_dims...]
+        for i, layer in enumerate(self.encoder_layers):
+            x = layer(x)
+            encoder_features.append(x)
+
+        # Bottleneck
+        x = self.bottleneck(x)
+
+        # Apply decoder layers
+        for i, layer in enumerate(self.decoder_layers):
+            x = layer(x)
+
+        # Get final features
+        final_features = x  # [B*V, channels, reduced_dims...]
 
         # Reshape for ViT processing
         # Flatten spatial dimensions for patch embedding
-        batch_size_expanded = final_cnn_features.size(0)
-        channels = final_cnn_features.size(1)
-        spatial_dims = final_cnn_features.shape[2:]
+        batch_size_expanded = final_features.size(0)
+        channels = final_features.size(1)
+        spatial_dims = final_features.shape[2:]
 
         # Flatten spatial dimensions
-        flattened_features = final_cnn_features.view(batch_size_expanded, channels, -1)
+        flattened_features = final_features.view(batch_size_expanded, channels, -1)
         flattened_features = flattened_features.permute(0, 2, 1)  # [B*V, spatial_tokens, channels]
 
         # Apply Vision Transformer processing if enabled

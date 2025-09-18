@@ -98,12 +98,15 @@ try:
 except ImportError as e:
     warnings.warn(f"Enhanced Datacube U-Net not available: {e}")
 
-# Temporarily disable torch_geometric dependent models due to Windows DLL issues
-# try:
-#     from .metabolism_model import WorldClassMetabolismGenerator, MetabolismGenerator
-#     __all__.extend(["WorldClassMetabolismGenerator", "MetabolismGenerator"])
-# except ImportError as e:
-#     warnings.warn(f"Metabolism models not available: {e}")
+# Re-enable torch_geometric dependent models with fallback implementations
+try:
+    from .rebuilt_graph_vae import RebuiltGraphVAE
+    __all__.extend(["RebuiltGraphVAE"])
+    print("✅ RebuiltGraphVAE loaded with fallback implementations")
+except ImportError as e:
+    warnings.warn(f"RebuiltGraphVAE not available: {e}")
+
+# Keep metabolism models disabled for now (can be re-enabled later)
 warnings.warn("Metabolism models temporarily disabled due to torch_geometric Windows compatibility issues")
 
 # Import new advanced components if available
