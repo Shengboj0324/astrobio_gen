@@ -55,7 +55,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# PyTorch Geometric for graph neural networks
+# PyTorch Geometric for graph neural networks - with comprehensive fallback
+PYTORCH_GEOMETRIC_AVAILABLE = False
+PyGBatch = None
+PyGData = None
+GCNConv = None
+GATConv = None
+GraphConv = None
+global_mean_pool = None
+global_max_pool = None
+
 try:
     import torch_geometric
     from torch_geometric.data import Batch as PyGBatch
@@ -63,8 +72,53 @@ try:
     from torch_geometric.nn import GATConv, GCNConv, GraphConv, global_max_pool, global_mean_pool
 
     PYTORCH_GEOMETRIC_AVAILABLE = True
-except ImportError:
+    print("✅ PyTorch Geometric available for domain encoders")
+except (ImportError, OSError) as e:
     PYTORCH_GEOMETRIC_AVAILABLE = False
+    print(f"⚠️ PyTorch Geometric not available for domain encoders: {e}")
+
+    # Create fallback classes
+    class PyGBatch:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    class PyGData:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    # Fallback GNN layers
+    class GCNConv(nn.Module):
+        def __init__(self, in_channels, out_channels, **kwargs):
+            super().__init__()
+            self.linear = nn.Linear(in_channels, out_channels)
+
+        def forward(self, x, edge_index):
+            return self.linear(x)
+
+    class GATConv(nn.Module):
+        def __init__(self, in_channels, out_channels, heads=1, **kwargs):
+            super().__init__()
+            self.linear = nn.Linear(in_channels, out_channels * heads)
+            self.heads = heads
+
+        def forward(self, x, edge_index):
+            return self.linear(x)
+
+    class GraphConv(nn.Module):
+        def __init__(self, in_channels, out_channels, **kwargs):
+            super().__init__()
+            self.linear = nn.Linear(in_channels, out_channels)
+
+        def forward(self, x, edge_index):
+            return self.linear(x)
+
+    def global_mean_pool(x, batch):
+        return x.mean(dim=0, keepdim=True)
+
+    def global_max_pool(x, batch):
+        return x.max(dim=0, keepdim=True)[0]
 
 # Configure logging
 logging.basicConfig(

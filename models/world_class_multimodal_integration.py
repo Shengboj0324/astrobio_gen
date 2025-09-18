@@ -209,9 +209,9 @@ class RealAstronomicalDataLoader:
     Loads and processes real astronomical data from various observatories
     """
 
-    def __init__(self, config: MultiModalConfig):
-        self.config = config
-        self.cache_dir = Path(config.data_cache_dir)
+    def __init__(self, config: Optional[MultiModalConfig] = None):
+        self.config = config if config is not None else MultiModalConfig()
+        self.cache_dir = Path(self.config.data_cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize connections to real data sources

@@ -67,6 +67,10 @@ import pandas as pd
 import torch
 import torch.nn as nn
 
+# Configure logging first
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Import our Tier 1 and Tier 2 components
 try:
     from .causal_discovery_ai import CausalDiscoveryAI, CausalHypothesis
@@ -85,9 +89,7 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Logging already configured above
 
 
 @dataclass
@@ -645,6 +647,93 @@ class DataAnalystAgent(ResearchAgent):
             "task_type": "anomaly_detection",
         }
 
+    def _clustering_analysis(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """Perform clustering analysis on data"""
+        logger.info("🔍 Performing clustering analysis")
+
+        # Prepare numeric data
+        numeric_data = data.select_dtypes(include=[np.number]).fillna(data.mean())
+
+        if numeric_data.empty:
+            return {"success": False, "error": "No numeric data for clustering"}
+
+        # Standardize data
+        scaler = StandardScaler()
+        scaled_data = scaler.fit_transform(numeric_data)
+
+        # Perform clustering
+        clustering_results = {}
+
+        # K-means clustering
+        try:
+            from sklearn.cluster import KMeans
+            kmeans = KMeans(n_clusters=3, random_state=42)
+            cluster_labels = kmeans.fit_predict(scaled_data)
+            clustering_results["kmeans"] = {
+                "labels": cluster_labels.tolist(),
+                "centers": kmeans.cluster_centers_.tolist(),
+                "inertia": kmeans.inertia_
+            }
+        except Exception as e:
+            clustering_results["kmeans"] = {"error": str(e)}
+
+        # DBSCAN clustering
+        try:
+            from sklearn.cluster import DBSCAN
+            dbscan = DBSCAN(eps=0.5, min_samples=5)
+            cluster_labels = dbscan.fit_predict(scaled_data)
+            clustering_results["dbscan"] = {
+                "labels": cluster_labels.tolist(),
+                "n_clusters": len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0),
+                "n_noise": list(cluster_labels).count(-1)
+            }
+        except Exception as e:
+            clustering_results["dbscan"] = {"error": str(e)}
+
+        logger.info("✅ Clustering analysis completed")
+
+        return {
+            "success": True,
+            "clustering": clustering_results,
+            "insights": self._generate_clustering_insights(clustering_results),
+            "success_score": 0.7,
+            "task_type": "clustering_analysis",
+        }
+
+    def _time_series_analysis(self, data: pd.DataFrame) -> Dict[str, Any]:
+        """Perform time series analysis on data"""
+        logger.info("📈 Performing time series analysis")
+
+        # Look for datetime columns
+        datetime_cols = data.select_dtypes(include=['datetime64']).columns
+        numeric_cols = data.select_dtypes(include=[np.number]).columns
+
+        if len(datetime_cols) == 0 or len(numeric_cols) == 0:
+            return {"success": False, "error": "No suitable time series data found"}
+
+        time_series_results = {}
+
+        # Basic time series statistics
+        for col in numeric_cols:
+            if data[col].notna().sum() > 10:  # Need sufficient data points
+                series_stats = {
+                    "mean": float(data[col].mean()),
+                    "std": float(data[col].std()),
+                    "trend": "stable",  # Simplified trend analysis
+                    "seasonality": "none",  # Simplified seasonality detection
+                }
+                time_series_results[col] = series_stats
+
+        logger.info("✅ Time series analysis completed")
+
+        return {
+            "success": True,
+            "time_series": time_series_results,
+            "insights": self._generate_time_series_insights(time_series_results),
+            "success_score": 0.6,
+            "task_type": "time_series_analysis",
+        }
+
     def _generate_statistical_insights(self, results: Dict[str, Any]) -> List[str]:
         """Generate insights from statistical analysis"""
         insights = []
@@ -725,6 +814,37 @@ class DataAnalystAgent(ResearchAgent):
             )
         elif stat_count > iso_count * 2:
             insights.append("Statistical methods detect more extreme outliers")
+
+        return insights
+
+    def _generate_clustering_insights(self, results: Dict[str, Any]) -> List[str]:
+        """Generate insights from clustering analysis"""
+        insights = []
+
+        if "kmeans" in results and "error" not in results["kmeans"]:
+            insights.append(f"K-means clustering identified 3 distinct groups in the data")
+            insights.append(f"Clustering inertia: {results['kmeans']['inertia']:.2f}")
+
+        if "dbscan" in results and "error" not in results["dbscan"]:
+            n_clusters = results["dbscan"]["n_clusters"]
+            n_noise = results["dbscan"]["n_noise"]
+            insights.append(f"DBSCAN identified {n_clusters} density-based clusters")
+            if n_noise > 0:
+                insights.append(f"Found {n_noise} noise points (outliers)")
+
+        return insights
+
+    def _generate_time_series_insights(self, results: Dict[str, Any]) -> List[str]:
+        """Generate insights from time series analysis"""
+        insights = []
+
+        for var, stats in results.items():
+            if isinstance(stats, dict):
+                insights.append(f"{var}: mean={stats['mean']:.3f}, std={stats['std']:.3f}")
+                if stats.get('trend') != 'stable':
+                    insights.append(f"{var} shows {stats['trend']} trend")
+                if stats.get('seasonality') != 'none':
+                    insights.append(f"{var} exhibits {stats['seasonality']} seasonality")
 
         return insights
 

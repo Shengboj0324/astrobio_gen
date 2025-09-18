@@ -104,16 +104,58 @@ except ImportError as e:
     SOTA_MODELS_AVAILABLE = False
     logger.warning(f"SOTA models not available for causal discovery: {e}")
 
-# Advanced neural architectures for causal modeling
+# Advanced neural architectures for causal modeling - with comprehensive fallback
+GEOMETRIC_AVAILABLE = False
+GCNConv = None
+GATConv = None
+TransformerConv = None
+Data = None
+Batch = None
+
 try:
     import torch_geometric
     from torch_geometric.nn import GCNConv, GATConv, TransformerConv
     from torch_geometric.data import Data, Batch
 
     GEOMETRIC_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError) as e:
     GEOMETRIC_AVAILABLE = False
-    logger.warning("PyTorch Geometric not available - some neural causal features disabled")
+    logger.warning(f"PyTorch Geometric not available - using fallback implementations: {e}")
+
+    # Create fallback classes
+    class GCNConv(nn.Module):
+        def __init__(self, in_channels, out_channels, **kwargs):
+            super().__init__()
+            self.linear = nn.Linear(in_channels, out_channels)
+
+        def forward(self, x, edge_index):
+            return self.linear(x)
+
+    class GATConv(nn.Module):
+        def __init__(self, in_channels, out_channels, heads=1, **kwargs):
+            super().__init__()
+            self.linear = nn.Linear(in_channels, out_channels * heads)
+
+        def forward(self, x, edge_index):
+            return self.linear(x)
+
+    class TransformerConv(nn.Module):
+        def __init__(self, in_channels, out_channels, heads=1, **kwargs):
+            super().__init__()
+            self.linear = nn.Linear(in_channels, out_channels)
+
+        def forward(self, x, edge_index):
+            return self.linear(x)
+
+    class Data:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    class Batch:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

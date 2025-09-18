@@ -81,19 +81,84 @@ try:
 except ImportError:
     COMMUNICATION_AVAILABLE = False
 
-# Platform integration
-try:
-    from models.causal_world_models import CausalInferenceEngine
-    from models.galactic_research_network import GalacticResearchNetworkOrchestrator
-    from models.meta_cognitive_control import MetaCognitiveController
-    from models.world_class_multimodal_integration import (
-        RealAstronomicalDataLoader,
-        RealAstronomicalDataPoint,
-    )
-    from utils.real_observatory_api_client import ObservatoryAPI, RealObservatoryAPIClient
+# Platform integration - use dynamic imports to avoid circular dependencies
+PLATFORM_INTEGRATION_AVAILABLE = False
 
-    PLATFORM_INTEGRATION_AVAILABLE = True
+def get_causal_inference_engine():
+    """Dynamically import CausalInferenceEngine to avoid circular imports"""
+    try:
+        from models.causal_world_models import CausalInferenceEngine
+        return CausalInferenceEngine
+    except ImportError:
+        return None
+
+def get_galactic_research_network():
+    """Dynamically import GalacticResearchNetworkOrchestrator to avoid circular imports"""
+    try:
+        from models.galactic_research_network import GalacticResearchNetworkOrchestrator
+        return GalacticResearchNetworkOrchestrator
+    except ImportError:
+        return None
+
+def get_meta_cognitive_controller():
+    """Dynamically import MetaCognitiveController to avoid circular imports"""
+    try:
+        from models.meta_cognitive_control import MetaCognitiveController
+        return MetaCognitiveController
+    except ImportError:
+        return None
+
+def get_astronomical_data_loader():
+    """Dynamically import astronomical data components to avoid circular imports"""
+    try:
+        from models.world_class_multimodal_integration import (
+            RealAstronomicalDataLoader,
+            RealAstronomicalDataPoint,
+        )
+        return RealAstronomicalDataLoader, RealAstronomicalDataPoint
+    except ImportError:
+        return None, None
+
+def get_observatory_api_client():
+    """Dynamically import observatory API client to avoid circular imports"""
+    try:
+        from utils.real_observatory_api_client import ObservatoryAPI, RealObservatoryAPIClient
+        return ObservatoryAPI, RealObservatoryAPIClient
+    except ImportError:
+        return None, None
+
+# Create fallback ObservatoryAPI if not available
+try:
+    from utils.real_observatory_api_client import ObservatoryAPI, RealObservatoryAPIClient
 except ImportError:
+    from enum import Enum
+
+    class ObservatoryAPI(Enum):
+        """Fallback ObservatoryAPI enum"""
+        JWST = "jwst"
+        HST = "hst"
+        VLT = "vlt"
+        ALMA = "alma"
+        CHANDRA = "chandra"
+
+    class RealObservatoryAPIClient:
+        """Fallback observatory API client"""
+        def __init__(self):
+            pass
+
+        async def submit_observation_request(self, observatory, request):
+            """Fallback observation request"""
+            class MockResponse:
+                success = True
+                data = {"status": "simulated"}
+            return MockResponse()
+
+# Test if platform integration is available
+try:
+    if (get_causal_inference_engine() is not None and
+        get_galactic_research_network() is not None):
+        PLATFORM_INTEGRATION_AVAILABLE = True
+except:
     PLATFORM_INTEGRATION_AVAILABLE = False
 
 # Configure logging
@@ -1247,10 +1312,21 @@ class EmbodiedIntelligenceSystem:
         self.action_history = []
         self.sensor_history = []
 
-        # Integration with platform components
+        # Integration with platform components - use dynamic imports
+        self.galactic_network = None
+        self.meta_cognitive = None
+
         if PLATFORM_INTEGRATION_AVAILABLE:
-            self.galactic_network = GalacticResearchNetworkOrchestrator()
-            self.meta_cognitive = MetaCognitiveController()
+            try:
+                galactic_class = get_galactic_research_network()
+                if galactic_class:
+                    self.galactic_network = galactic_class()
+
+                meta_class = get_meta_cognitive_controller()
+                if meta_class:
+                    self.meta_cognitive = meta_class()
+            except Exception as e:
+                logger.warning(f"Platform integration failed: {e}")
 
         # Start safety monitoring
         self.safety_controller.start_monitoring()

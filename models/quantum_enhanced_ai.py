@@ -112,9 +112,12 @@ try:
     from pennylane import numpy as pnp
 
     PENNYLANE_AVAILABLE = True
-except ImportError:
+except (ImportError, AttributeError) as e:
     PENNYLANE_AVAILABLE = False
-    warnings.warn("PennyLane not available. Install with: pip install pennylane")
+    warnings.warn(f"PennyLane not available: {e}. Install with: pip install pennylane")
+
+    # Create fallback for PennyLane numpy
+    import numpy as pnp
 
 # Classical machine learning for hybrid systems
 try:

@@ -57,18 +57,43 @@ try:
 except ImportError:
     SCIENTIFIC_LIBRARIES_AVAILABLE = False
 
-# Platform integration
-try:
-    from models.causal_world_models import CausalInferenceEngine
-    from models.galactic_research_network import GalacticResearchNetworkOrchestrator
-    from models.world_class_multimodal_integration import (
-        MultiModalConfig,
-        RealAstronomicalDataLoader,
-        RealAstronomicalDataPoint,
-    )
+# Platform integration - use dynamic imports to avoid circular dependencies
+PLATFORM_INTEGRATION_AVAILABLE = False
 
-    PLATFORM_INTEGRATION_AVAILABLE = True
-except ImportError:
+def get_causal_inference_engine():
+    """Dynamically import CausalInferenceEngine to avoid circular imports"""
+    try:
+        from models.causal_world_models import CausalInferenceEngine
+        return CausalInferenceEngine
+    except ImportError:
+        return None
+
+def get_galactic_research_network():
+    """Dynamically import GalacticResearchNetworkOrchestrator to avoid circular imports"""
+    try:
+        from models.galactic_research_network import GalacticResearchNetworkOrchestrator
+        return GalacticResearchNetworkOrchestrator
+    except ImportError:
+        return None
+
+def get_multimodal_components():
+    """Dynamically import multimodal components to avoid circular imports"""
+    try:
+        from models.world_class_multimodal_integration import (
+            MultiModalConfig,
+            RealAstronomicalDataLoader,
+            RealAstronomicalDataPoint,
+        )
+        return MultiModalConfig, RealAstronomicalDataLoader, RealAstronomicalDataPoint
+    except ImportError:
+        return None, None, None
+
+# Test if platform integration is available
+try:
+    if (get_causal_inference_engine() is not None and
+        get_galactic_research_network() is not None):
+        PLATFORM_INTEGRATION_AVAILABLE = True
+except:
     PLATFORM_INTEGRATION_AVAILABLE = False
 
 # Configure logging

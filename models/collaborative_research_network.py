@@ -66,12 +66,33 @@ try:
         MultiAgentResearchOrchestrator,
         ScientificHypothesis,
     )
-    from models.real_time_discovery_pipeline import DiscoveryType, RealTimeDiscovery
+    from models.real_time_discovery_pipeline import DiscoveryType, RealTimeDiscoveryPipeline
     from utils.enhanced_ssl_certificate_manager import ssl_manager
 
     PLATFORM_INTEGRATION_AVAILABLE = True
+
+    # Create alias for compatibility
+    RealTimeDiscovery = RealTimeDiscoveryPipeline
+
 except ImportError:
     PLATFORM_INTEGRATION_AVAILABLE = False
+
+    # Create fallback classes
+    from enum import Enum
+
+    class DiscoveryType(Enum):
+        EXOPLANET_DISCOVERY = "exoplanet_discovery"
+        BIOSIGNATURE_DETECTION = "biosignature_detection"
+        ATMOSPHERIC_ANOMALY = "atmospheric_anomaly"
+        STELLAR_EVENT = "stellar_event"
+
+    class RealTimeDiscovery:
+        def __init__(self, **kwargs):
+            self.id = kwargs.get('id', 'fallback_discovery')
+            self.title = kwargs.get('title', 'Fallback Discovery')
+            self.discovery_type = kwargs.get('discovery_type', DiscoveryType.EXOPLANET_DISCOVERY)
+            self.coordinates = kwargs.get('coordinates', None)
+            self.follow_up_actions = kwargs.get('follow_up_actions', [])
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

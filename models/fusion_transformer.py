@@ -225,7 +225,7 @@ class WorldClassFusionTransformer(pl.LightningModule if PYTORCH_LIGHTNING_AVAILA
 
     def __init__(
         self,
-        schema: Dict[str, Any],
+        schema: Optional[Dict[str, Any]] = None,
         latent_dim: int = 256,
         n_heads: int = 8,
         n_layers: int = 6,
@@ -240,7 +240,11 @@ class WorldClassFusionTransformer(pl.LightningModule if PYTORCH_LIGHTNING_AVAILA
 
         self.save_hyperparameters()
 
-        self.schema = schema
+        self.schema = schema if schema is not None else {
+            'climate': {'type': 'numerical', 'dim': 100},
+            'spectral': {'type': 'numerical', 'dim': 200},
+            'molecular': {'type': 'categorical', 'categories': 50}
+        }
         self.latent_dim = latent_dim
         self.n_heads = n_heads
         self.n_layers = n_layers
@@ -250,7 +254,7 @@ class WorldClassFusionTransformer(pl.LightningModule if PYTORCH_LIGHTNING_AVAILA
         self.use_uncertainty_quantification = use_uncertainty_quantification
 
         # Build modality encoders
-        self.encoders = build_encoders(schema)
+        self.encoders = build_encoders(self.schema)
 
         # Feature projection to common dimension
         self.feature_projection = nn.Linear(16, latent_dim)

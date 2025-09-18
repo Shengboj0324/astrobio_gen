@@ -555,8 +555,8 @@ class AdaptedMemoryModel(nn.Module):
 class MetaLearningOrchestrator:
     """Orchestrator for different meta-learning algorithms"""
 
-    def __init__(self, config: MetaLearningConfig):
-        self.config = config
+    def __init__(self, config: Optional[MetaLearningConfig] = None):
+        self.config = config if config is not None else MetaLearningConfig()
         self.algorithms = {}
         self.active_algorithm = None
 

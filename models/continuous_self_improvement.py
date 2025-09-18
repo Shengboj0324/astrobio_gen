@@ -1043,24 +1043,28 @@ class ContinualSelfImprovementSystem:
     Main system for continuous self-improvement without catastrophic forgetting
     """
 
-    def __init__(self, base_model: nn.Module, config: ContinualLearningConfig):
-        self.config = config
-        self.base_model = base_model
+    def __init__(self, base_model: Optional[nn.Module] = None, config: Optional[ContinualLearningConfig] = None):
+        self.config = config if config is not None else ContinualLearningConfig()
+        self.base_model = base_model if base_model is not None else nn.Linear(128, 64)  # Default model
 
         # Core continual learning components
-        self.ewc = ElasticWeightConsolidation(base_model, config)
-        self.replay_buffer = ExperienceReplayBuffer(config)
-        self.performance_monitor = ContinualPerformanceMonitor(config)
+        self.ewc = ElasticWeightConsolidation(self.base_model, self.config)
+        self.replay_buffer = ExperienceReplayBuffer(self.config)
+        self.performance_monitor = ContinualPerformanceMonitor(self.config)
 
         # Advanced components
-        if config.primary_strategy == LearningStrategy.PROGRESSIVE_NETWORKS:
-            self.progressive_network = ProgressiveNeuralNetwork(base_model, config)
-            self.current_model = self.progressive_network
-        elif config.primary_strategy == LearningStrategy.META_LEARNING:
-            self.meta_learner = MetaLearningSystem(base_model, config)
-            self.current_model = self.meta_learner
-        else:
-            self.current_model = base_model
+        try:
+            if self.config.primary_strategy == LearningStrategy.PROGRESSIVE_NETWORKS:
+                self.progressive_network = ProgressiveNeuralNetwork(self.base_model, self.config)
+                self.current_model = self.progressive_network
+            elif self.config.primary_strategy == LearningStrategy.META_LEARNING:
+                self.meta_learner = MetaLearningSystem(self.base_model, self.config)
+                self.current_model = self.meta_learner
+            else:
+                self.current_model = self.base_model
+        except Exception as e:
+            logger.warning(f"Could not initialize advanced components: {e}")
+            self.current_model = self.base_model
 
         # Task management
         self.active_tasks = {}

@@ -45,6 +45,10 @@ import torch.nn.functional as F
 
 warnings.filterwarnings("ignore")
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Import all project components
 try:
     # Galactic Research Network

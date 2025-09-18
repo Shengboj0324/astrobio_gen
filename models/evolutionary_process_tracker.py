@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import networkx as nx
 import numpy as np
 import pandas as pd
-import pytorch_lightning as pl
+# import pytorch_lightning as pl  # Temporarily disabled due to compatibility issues
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

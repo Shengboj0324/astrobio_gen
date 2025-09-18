@@ -164,7 +164,7 @@ class Tier5AutonomousDiscoveryOrchestrator:
 
         # Workflow management
         self.active_workflows = {}
-        self.workflow_queue = asyncio.Queue()
+        self.workflow_queue = None  # Will be initialized when needed
         self.completed_workflows = []
 
         # System metrics and performance
@@ -186,8 +186,8 @@ class Tier5AutonomousDiscoveryOrchestrator:
             "adaptive_parameters": {},
         }
 
-        # Initialize system components
-        asyncio.create_task(self._initialize_system_components())
+        # Initialize system components (will be done lazily)
+        self._components_initialized = False
 
         logger.info("Tier 5 Autonomous Discovery Orchestrator initializing...")
 
