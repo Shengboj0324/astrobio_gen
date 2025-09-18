@@ -184,6 +184,7 @@ venv/
 env/
 ENV/
 astrobio_venv/
+astrobio_venv_new/
 astrobio_env/
 .conda/
 
