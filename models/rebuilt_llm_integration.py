@@ -33,15 +33,26 @@ import torch.nn.functional as F
 import math
 import numpy as np
 # import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
-# Temporarily disabled due to protobuf conflict
-# from transformers import (
-#     AutoTokenizer, AutoModelForCausalLM, AutoConfig,
-#     BitsAndBytesConfig, TrainingArguments
-# )
-# from peft import (
-#     LoraConfig, get_peft_model, TaskType, PeftModel,
-#     prepare_model_for_kbit_training
-# )
+# Conditional imports for transformers with fallback
+try:
+    from transformers import (
+        AutoTokenizer, AutoModelForCausalLM, AutoConfig,
+        BitsAndBytesConfig, TrainingArguments
+    )
+    TRANSFORMERS_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: transformers not available ({e}), using fallback implementations")
+    TRANSFORMERS_AVAILABLE = False
+
+try:
+    from peft import (
+        LoraConfig, get_peft_model, TaskType, PeftModel,
+        prepare_model_for_kbit_training
+    )
+    PEFT_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: peft not available ({e}), using fallback implementations")
+    PEFT_AVAILABLE = False
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings("ignore", category=UserWarning)

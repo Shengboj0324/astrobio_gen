@@ -32,9 +32,196 @@ import numpy as np
 from scipy.sparse.linalg import eigsh
 from scipy.sparse import csr_matrix
 # import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
-from torch_geometric.nn import GCNConv, GATConv, global_mean_pool, global_max_pool, MessagePassing
-from torch_geometric.data import Data, Batch
-from torch_geometric.utils import to_dense_adj, degree, add_self_loops
+# Conditional imports for torch_geometric with fallback
+try:
+    from torch_geometric.nn import GCNConv, GATConv, global_mean_pool, global_max_pool, MessagePassing
+    from torch_geometric.data import Data, Batch
+    from torch_geometric.utils import to_dense_adj, degree, add_self_loops
+    TORCH_GEOMETRIC_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: torch_geometric not available ({e}), using fallback implementations")
+    TORCH_GEOMETRIC_AVAILABLE = False
+
+    # Fallback Data class
+    class Data:
+        def __init__(self, x=None, edge_index=None, batch=None, **kwargs):
+            self.x = x
+            self.edge_index = edge_index
+            self.batch = batch
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    class Batch(Data):
+        pass
+
+    # Fallback functions
+    def to_dense_adj(edge_index, batch=None, edge_attr=None, max_num_nodes=None):
+        """Fallback implementation of to_dense_adj"""
+        if batch is None:
+            batch_size = 1
+            num_nodes = edge_index.max().item() + 1
+        else:
+            batch_size = batch.max().item() + 1
+            num_nodes = max_num_nodes or (edge_index.max().item() + 1)
+
+        adj = torch.zeros(batch_size, num_nodes, num_nodes, device=edge_index.device)
+
+        if batch is None:
+            adj[0, edge_index[0], edge_index[1]] = 1.0
+        else:
+            for b in range(batch_size):
+                mask = batch[edge_index[0]] == b
+                if mask.any():
+                    src = edge_index[0][mask] - (batch == b).nonzero()[0].item()
+                    dst = edge_index[1][mask] - (batch == b).nonzero()[0].item()
+                    adj[b, src, dst] = 1.0
+
+        return adj
+
+    def degree(edge_index, num_nodes=None, dtype=None):
+        """Fallback implementation of degree calculation"""
+        if num_nodes is None:
+            num_nodes = edge_index.max().item() + 1
+
+        deg = torch.zeros(num_nodes, dtype=dtype or torch.float, device=edge_index.device)
+        deg.scatter_add_(0, edge_index[0], torch.ones_like(edge_index[0], dtype=deg.dtype))
+        return deg
+
+    def add_self_loops(edge_index, edge_attr=None, fill_value=1.0, num_nodes=None):
+        """Fallback implementation of add_self_loops"""
+        if num_nodes is None:
+            num_nodes = edge_index.max().item() + 1
+
+        device = edge_index.device
+        self_loops = torch.arange(num_nodes, device=device).repeat(2, 1)
+        edge_index = torch.cat([edge_index, self_loops], dim=1)
+
+        if edge_attr is not None:
+            self_loop_attr = torch.full((num_nodes,), fill_value, device=device, dtype=edge_attr.dtype)
+            edge_attr = torch.cat([edge_attr, self_loop_attr], dim=0)
+            return edge_index, edge_attr
+
+        return edge_index
+
+    def global_mean_pool(x, batch, size=None):
+        """Fallback implementation of global_mean_pool"""
+        if batch is None:
+            return x.mean(dim=0, keepdim=True)
+
+        batch_size = batch.max().item() + 1
+        out = torch.zeros(batch_size, x.size(-1), device=x.device, dtype=x.dtype)
+
+        for i in range(batch_size):
+            mask = batch == i
+            if mask.any():
+                out[i] = x[mask].mean(dim=0)
+
+        return out
+
+    def global_max_pool(x, batch, size=None):
+        """Fallback implementation of global_max_pool"""
+        if batch is None:
+            return x.max(dim=0, keepdim=True)[0]
+
+        batch_size = batch.max().item() + 1
+        out = torch.zeros(batch_size, x.size(-1), device=x.device, dtype=x.dtype)
+
+        for i in range(batch_size):
+            mask = batch == i
+            if mask.any():
+                out[i] = x[mask].max(dim=0)[0]
+
+        return out
+
+    # Fallback MessagePassing base class
+    class MessagePassing(nn.Module):
+        def __init__(self, aggr='add', flow='source_to_target', node_dim=-2):
+            super().__init__()
+            self.aggr = aggr
+            self.flow = flow
+            self.node_dim = node_dim
+
+        def forward(self, x, edge_index):
+            return self.propagate(edge_index, x=x)
+
+        def propagate(self, edge_index, x):
+            # Simple fallback implementation
+            row, col = edge_index
+            out = torch.zeros_like(x)
+            for i in range(edge_index.size(1)):
+                out[col[i]] += x[row[i]]
+            return out
+
+    # Fallback GCN and GAT layers
+    class GCNConv(MessagePassing):
+        def __init__(self, in_channels, out_channels, bias=True):
+            super().__init__()
+            self.in_channels = in_channels
+            self.out_channels = out_channels
+            self.lin = nn.Linear(in_channels, out_channels, bias=bias)
+
+        def forward(self, x, edge_index):
+            # Simple GCN implementation
+            x = self.lin(x)
+            row, col = edge_index
+            deg = degree(edge_index[0], x.size(0), dtype=x.dtype)
+            deg_inv_sqrt = deg.pow(-0.5)
+            deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
+
+            out = torch.zeros_like(x)
+            for i in range(edge_index.size(1)):
+                out[col[i]] += deg_inv_sqrt[row[i]] * x[row[i]] * deg_inv_sqrt[col[i]]
+
+            return out
+
+    class GATConv(MessagePassing):
+        def __init__(self, in_channels, out_channels, heads=1, concat=True, dropout=0.0, bias=True):
+            super().__init__()
+            self.in_channels = in_channels
+            self.out_channels = out_channels
+            self.heads = heads
+            self.concat = concat
+            self.dropout = dropout
+
+            self.lin = nn.Linear(in_channels, heads * out_channels, bias=False)
+            self.att = nn.Parameter(torch.Tensor(1, heads, 2 * out_channels))
+
+            if bias and concat:
+                self.bias = nn.Parameter(torch.Tensor(heads * out_channels))
+            elif bias and not concat:
+                self.bias = nn.Parameter(torch.Tensor(out_channels))
+            else:
+                self.register_parameter('bias', None)
+
+            self.reset_parameters()
+
+        def reset_parameters(self):
+            nn.init.xavier_uniform_(self.lin.weight)
+            nn.init.xavier_uniform_(self.att)
+            if self.bias is not None:
+                nn.init.zeros_(self.bias)
+
+        def forward(self, x, edge_index):
+            # Simple GAT implementation
+            x = self.lin(x).view(-1, self.heads, self.out_channels)
+
+            # Simple attention mechanism (fallback)
+            row, col = edge_index
+            alpha = torch.ones(edge_index.size(1), self.heads, device=x.device) / edge_index.size(1)
+
+            out = torch.zeros(x.size(0), self.heads, self.out_channels, device=x.device)
+            for i in range(edge_index.size(1)):
+                out[col[i]] += alpha[i].unsqueeze(-1) * x[row[i]]
+
+            if self.concat:
+                out = out.view(-1, self.heads * self.out_channels)
+            else:
+                out = out.mean(dim=1)
+
+            if self.bias is not None:
+                out += self.bias
+
+            return out
 from torch.distributions import Normal, kl_divergence
 
 

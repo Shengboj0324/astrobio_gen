@@ -38,23 +38,44 @@ try:
 except ImportError as e:
     warnings.warn(f"Rebuilt Datacube CNN not available: {e}")
 
-try:
-    from .rebuilt_graph_vae import RebuiltGraphVAE
-    __all__.append("RebuiltGraphVAE")
-except ImportError as e:
-    warnings.warn(f"Rebuilt Graph VAE not available: {e}")
+# Rebuilt models with proper error handling
+def _safe_import_rebuilt_models():
+    """Safely import rebuilt models with fallbacks"""
+    models = {}
 
-try:
-    from .rebuilt_llm_integration import RebuiltLLMIntegration
-    __all__.append("RebuiltLLMIntegration")
-except ImportError as e:
-    warnings.warn(f"Rebuilt LLM Integration not available: {e}")
+    # Graph VAE
+    try:
+        from .rebuilt_graph_vae import RebuiltGraphVAE
+        models['RebuiltGraphVAE'] = RebuiltGraphVAE
+        globals()['RebuiltGraphVAE'] = RebuiltGraphVAE
+        __all__.append("RebuiltGraphVAE")
+    except Exception as e:
+        warnings.warn(f"Rebuilt Graph VAE not available: {e}")
 
-try:
-    from .rebuilt_multimodal_integration import RebuiltMultiModalIntegration
-    __all__.append("RebuiltMultiModalIntegration")
-except ImportError as e:
-    warnings.warn(f"Rebuilt Multi-Modal Integration not available: {e}")
+    # LLM Integration
+    try:
+        from .rebuilt_llm_integration import RebuiltLLMIntegration
+        models['RebuiltLLMIntegration'] = RebuiltLLMIntegration
+        globals()['RebuiltLLMIntegration'] = RebuiltLLMIntegration
+        __all__.append("RebuiltLLMIntegration")
+    except Exception as e:
+        warnings.warn(f"Rebuilt LLM Integration not available: {e}")
+
+    # Multimodal Integration
+    try:
+        from .rebuilt_multimodal_integration import RebuiltMultimodalIntegration, RebuiltMultiModalIntegration
+        models['RebuiltMultimodalIntegration'] = RebuiltMultimodalIntegration
+        models['RebuiltMultiModalIntegration'] = RebuiltMultiModalIntegration
+        globals()['RebuiltMultimodalIntegration'] = RebuiltMultimodalIntegration
+        globals()['RebuiltMultiModalIntegration'] = RebuiltMultiModalIntegration
+        __all__.extend(["RebuiltMultimodalIntegration", "RebuiltMultiModalIntegration"])
+    except Exception as e:
+        warnings.warn(f"Rebuilt Multi-Modal Integration not available: {e}")
+
+    return models
+
+# Import rebuilt models
+_rebuilt_models = _safe_import_rebuilt_models()
 
 # Legacy world-class models (maintained for compatibility)
 try:
@@ -62,6 +83,8 @@ try:
     __all__.append("GVAE")
 except ImportError as e:
     warnings.warn(f"Legacy Graph VAE not available: {e}")
+except OSError as e:
+    warnings.warn(f"Legacy Graph VAE not available (DLL error): {e}")
 
 try:
     from .spectrum_model import WorldClassSpectralAutoencoder, get_autoencoder
@@ -75,11 +98,13 @@ try:
 except ImportError as e:
     warnings.warn(f"Enhanced Datacube U-Net not available: {e}")
 
-try:
-    from .metabolism_model import WorldClassMetabolismGenerator, MetabolismGenerator
-    __all__.extend(["WorldClassMetabolismGenerator", "MetabolismGenerator"])
-except ImportError as e:
-    warnings.warn(f"Metabolism models not available: {e}")
+# Temporarily disable torch_geometric dependent models due to Windows DLL issues
+# try:
+#     from .metabolism_model import WorldClassMetabolismGenerator, MetabolismGenerator
+#     __all__.extend(["WorldClassMetabolismGenerator", "MetabolismGenerator"])
+# except ImportError as e:
+#     warnings.warn(f"Metabolism models not available: {e}")
+warnings.warn("Metabolism models temporarily disabled due to torch_geometric Windows compatibility issues")
 
 # Import new advanced components if available
 try:
@@ -130,12 +155,13 @@ try:
 except ImportError as e:
     warnings.warn(f"Enhanced multimodal integration not available: {e}")
 
-# World-class model registry
-try:
-    from .world_class_integration_summary import WorldClassModelRegistry, verify_world_class_status
-    __all__.extend(["WorldClassModelRegistry", "verify_world_class_status"])
-except ImportError as e:
-    warnings.warn(f"World-class model registry not available: {e}")
+# World-class model registry - temporarily disabled due to torch_geometric dependencies
+# try:
+#     from .world_class_integration_summary import WorldClassModelRegistry, verify_world_class_status
+#     __all__.extend(["WorldClassModelRegistry", "verify_world_class_status"])
+# except ImportError as e:
+#     warnings.warn(f"World-class model registry not available: {e}")
+warnings.warn("World-class model registry temporarily disabled due to torch_geometric Windows compatibility issues")
 
 # Advanced graph components
 try:

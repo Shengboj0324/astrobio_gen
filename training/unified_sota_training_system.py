@@ -257,8 +257,16 @@ class UnifiedSOTATrainer:
             
             # Compile model for 2x speedup (PyTorch 2.0+)
             if self.config.use_compile and hasattr(torch, 'compile'):
-                model = torch.compile(model)
-                logger.info("⚡ Model compiled for optimization")
+                try:
+                    # Disable torch.compile on Windows due to compatibility issues
+                    import platform
+                    if platform.system() != "Windows":
+                        model = torch.compile(model)
+                        logger.info("⚡ Model compiled for optimization")
+                    else:
+                        logger.info("⚠️  torch.compile disabled on Windows for compatibility")
+                except Exception as e:
+                    logger.warning(f"torch.compile failed: {e}, continuing without compilation")
             
             # Wrap with DDP for multi-GPU training
             if self.config.use_distributed and torch.cuda.device_count() > 1 and torch.distributed.is_initialized():
