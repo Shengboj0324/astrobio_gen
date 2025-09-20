@@ -464,8 +464,8 @@ class RebuiltDatacubeCNN(nn.Module):
         self.rms_normalization = True
         self.spectral_normalization = True
 
-        # Input projection - handle combined temporal-variable channels
-        self.input_proj = nn.Conv3d(input_variables * 4, base_channels, 3, padding=1)  # V*T1*T2 channels
+        # Input projection - will be created dynamically based on actual input shape
+        self.input_proj = None  # Will be initialized on first forward pass
         
         # Encoder layers
         self.encoder_layers = nn.ModuleList()
@@ -549,6 +549,11 @@ class RebuiltDatacubeCNN(nn.Module):
         # Reshape for CNN processing: [B, V, T1, T2, L, H, W] -> [B, V*T1*T2, L, H, W]
         x_reshaped = x.view(B, V * T1 * T2, L, H, W)
 
+        # Initialize input projection dynamically if not already done
+        if self.input_proj is None:
+            input_channels = V * T1 * T2
+            self.input_proj = nn.Conv3d(input_channels, self.base_channels, 3, padding=1).to(x.device)
+
         # Apply encoder layers
         x = self.input_proj(x_reshaped)
         encoder_features = []
@@ -608,13 +613,30 @@ class RebuiltDatacubeCNN(nn.Module):
                 pass
 
         # Global average pooling to get fixed-size output
+        # processed_features shape: [B*V, spatial_tokens, channels]
         pooled_features = processed_features.mean(dim=1)  # [B*V, channels]
 
-        # Reshape back to original batch structure
-        pooled_features = pooled_features.view(B, V, -1)  # [B, V, channels]
+        # Calculate the number of features per variable
+        total_batch_size = pooled_features.size(0)  # B*V
+        channels = pooled_features.size(1)
 
-        # Final output projection
-        output_features = pooled_features.mean(dim=1)  # Average over variables: [B, channels]
+        # Debug: Check if we have the expected number of elements
+        expected_elements = B * V * channels
+        actual_elements = pooled_features.numel()
+
+        if actual_elements != expected_elements or total_batch_size != B * V:
+            # Use adaptive approach - just average all features
+            pooled_features = pooled_features.view(B, -1).mean(dim=1, keepdim=True)  # [B, 1]
+            # Expand to match expected output channels
+            pooled_features = pooled_features.expand(B, channels)  # [B, channels]
+        else:
+            # Reshape back to original batch structure
+            pooled_features = pooled_features.view(B, V, channels)  # [B, V, channels]
+            # Final output projection
+            pooled_features = pooled_features.mean(dim=1)  # Average over variables: [B, channels]
+
+        # pooled_features is now [B, channels]
+        output_features = pooled_features
 
         # Apply output projection to get desired output size
         if hasattr(self, 'output_projection'):

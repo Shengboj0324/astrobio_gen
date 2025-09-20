@@ -553,7 +553,7 @@ class RebuiltMultimodalIntegration(nn.Module):
 def create_rebuilt_multimodal_integration(
     modality_configs: Dict[str, Dict[str, int]] = None,
     **kwargs
-) -> RebuiltMultimodalIntegrationgration:
+) -> RebuiltMultimodalIntegration:
     """Factory function for creating rebuilt multimodal integration"""
     return RebuiltMultimodalIntegration(
         modality_configs=modality_configs,

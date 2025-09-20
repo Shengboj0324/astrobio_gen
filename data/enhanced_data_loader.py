@@ -549,3 +549,26 @@ def create_unified_data_loaders(
     
     logger.info(f"✅ Created unified data loaders with batch_size={batch_size}")
     return data_loaders
+
+
+class EnhancedDataLoader:
+    """Enhanced data loader wrapper for compatibility"""
+
+    def __init__(self, data_sources: Dict[str, DataSourceConfig] = None, **kwargs):
+        self.data_sources = data_sources or {}
+        self.dataset = MultiModalDataset(self.data_sources)
+        self.dataloader = DataLoader(self.dataset, **kwargs)
+
+    def __iter__(self):
+        return iter(self.dataloader)
+
+    def __len__(self):
+        return len(self.dataloader)
+
+
+# Export all classes for compatibility
+__all__ = [
+    'DataModality', 'DataQualityMetrics', 'DataSourceConfig', 'BatchConfig',
+    'PhysicsValidator', 'QualityController', 'MultiModalDataset', 'EnhancedDataLoader',
+    'create_unified_data_loaders'
+]
