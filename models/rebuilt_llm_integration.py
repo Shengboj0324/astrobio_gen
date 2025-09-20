@@ -149,12 +149,22 @@ class GroupedQueryAttention(nn.Module):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_heads = num_heads
-        self.num_kv_heads = num_kv_heads or num_heads // 4  # Default to 4x reduction
+        # Ensure num_kv_heads is a divisor of num_heads
+        if num_kv_heads is None:
+            # Find the largest divisor of num_heads that's <= num_heads // 2
+            for candidate in [num_heads // 4, num_heads // 2, num_heads]:
+                if candidate > 0 and num_heads % candidate == 0:
+                    self.num_kv_heads = candidate
+                    break
+            else:
+                self.num_kv_heads = num_heads  # Fallback to full attention
+        else:
+            self.num_kv_heads = num_kv_heads
         self.head_dim = hidden_size // num_heads
         self.use_rope = use_rope
 
         assert hidden_size % num_heads == 0, "hidden_size must be divisible by num_heads"
-        assert num_heads % self.num_kv_heads == 0, "num_heads must be divisible by num_kv_heads"
+        assert num_heads % self.num_kv_heads == 0, f"num_heads ({num_heads}) must be divisible by num_kv_heads ({self.num_kv_heads})"
 
         self.num_queries_per_kv = num_heads // self.num_kv_heads
 
@@ -544,7 +554,7 @@ class RebuiltLLMIntegration(nn.Module):
         # ITERATION 7: PRECISE 13.14B PARAMETER TARGET ACHIEVEMENT (CORRECTED)
         hidden_size: int = 4352,  # ITERATION 7: Optimized for 13.01B (divisible by 64)
         num_attention_heads: int = 64,  # ITERATION 6: Massive increase (maintained)
-        num_kv_heads: int = 16,  # For Grouped Query Attention
+        num_kv_heads: int = None,  # For Grouped Query Attention (auto-calculated)
         use_rope: bool = True,
         use_gqa: bool = True,
         use_rms_norm: bool = True,
@@ -566,7 +576,17 @@ class RebuiltLLMIntegration(nn.Module):
         # SOTA attention parameters
         self.hidden_size = hidden_size
         self.num_attention_heads = num_attention_heads
-        self.num_kv_heads = num_kv_heads
+        # Auto-calculate num_kv_heads if not provided
+        if num_kv_heads is None:
+            # Find the largest divisor of num_attention_heads that's <= num_attention_heads // 2
+            for candidate in [num_attention_heads // 4, num_attention_heads // 2, num_attention_heads]:
+                if candidate > 0 and num_attention_heads % candidate == 0:
+                    self.num_kv_heads = candidate
+                    break
+            else:
+                self.num_kv_heads = num_attention_heads  # Fallback to full attention
+        else:
+            self.num_kv_heads = num_kv_heads
         self.use_rope = use_rope
         self.use_gqa = use_gqa
         self.use_rms_norm = use_rms_norm
