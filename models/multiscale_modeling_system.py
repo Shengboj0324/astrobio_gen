@@ -1525,6 +1525,7 @@ class MultiScaleModelingSystem:
 
         if config_path and Path(config_path).exists():
             with open(config_path, "r") as f:
+                import yaml
                 user_config = yaml.safe_load(f)
                 default_config.update(user_config)
 

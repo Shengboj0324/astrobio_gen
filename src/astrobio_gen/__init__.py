@@ -30,22 +30,47 @@ __author__ = "Astrobio Research Team"
 __email__ = "research@astrobio-gen.org"
 __license__ = "Apache 2.0"
 
-# Core imports
-from . import api, data, models, training, utils
+# Core imports (skip models since it's in root directory)
+from . import api, data, training, utils
 
 # Configuration
 from .config import AstroBioConfig, get_default_config, load_config
 
-# Main classes and functions
-from .models import (
-    CausalInferenceEngine,
-    ContinualSelfImprovementSystem,
-    EmbodiedIntelligenceSystem,
-    HierarchicalAttentionSystem,
-    MetaCognitiveController,
-    WorldClassMultiModalIntegration,
-)
-from .utils import get_enhanced_surrogate_manager, get_integrated_url_system, ssl_manager
+# Main classes and functions - import from root models directory
+try:
+    import sys
+    from pathlib import Path
+    # Add root directory to path to access models
+    root_dir = Path(__file__).parent.parent.parent
+    sys.path.insert(0, str(root_dir))
+    
+    from models.causal_world_models import CausalInferenceEngine
+    from models.continuous_self_improvement import ContinualSelfImprovementSystem
+    from models.embodied_intelligence import EmbodiedIntelligenceSystem
+    from models.hierarchical_attention import HierarchicalAttentionSystem
+    from models.meta_cognitive_control import MetaCognitiveController
+    from models.world_class_multimodal_integration import WorldClassMultiModalIntegration
+except ImportError as e:
+    # Fallback imports
+    CausalInferenceEngine = None
+    ContinualSelfImprovementSystem = None
+    EmbodiedIntelligenceSystem = None
+    HierarchicalAttentionSystem = None
+    MetaCognitiveController = None
+    WorldClassMultiModalIntegration = None
+# Import utils from root directory
+try:
+    from utils.enhanced_ssl_certificate_manager import ssl_manager
+    from utils.integrated_url_system import get_integrated_url_system
+    # get_enhanced_surrogate_manager might be in surrogate module
+    try:
+        from surrogate import get_enhanced_surrogate_manager
+    except ImportError:
+        get_enhanced_surrogate_manager = None
+except ImportError as e:
+    ssl_manager = None
+    get_integrated_url_system = None
+    get_enhanced_surrogate_manager = None
 
 __all__ = [
     # Version info
@@ -54,7 +79,6 @@ __all__ = [
     "__email__",
     "__license__",
     # Core modules
-    "models",
     "utils",
     "training",
     "data",
@@ -118,15 +142,22 @@ def verify_installation():
     """Verify that all core components are properly installed"""
     try:
         # Test core imports
-        from . import api, data, models, training, utils
-        from .models.causal_world_models import CausalInferenceEngine
-        from .models.continuous_self_improvement import ContinualSelfImprovementSystem
-        from .models.embodied_intelligence import EmbodiedIntelligenceSystem
-        from .models.hierarchical_attention import HierarchicalAttentionSystem
-        from .models.meta_cognitive_control import MetaCognitiveController
+        from . import api, data, training, utils
+        
+        # Test models from root directory
+        import sys
+        from pathlib import Path
+        root_dir = Path(__file__).parent.parent.parent
+        sys.path.insert(0, str(root_dir))
+        
+        from models.causal_world_models import CausalInferenceEngine
+        from models.continuous_self_improvement import ContinualSelfImprovementSystem
+        from models.embodied_intelligence import EmbodiedIntelligenceSystem
+        from models.hierarchical_attention import HierarchicalAttentionSystem
+        from models.meta_cognitive_control import MetaCognitiveController
 
         # Test key components
-        from .models.world_class_multimodal_integration import WorldClassMultiModalIntegration
+        from models.world_class_multimodal_integration import WorldClassMultiModalIntegration
 
         return {
             "status": "success",

@@ -18,11 +18,17 @@ import pandas as pd
 # Import existing platform components
 try:
     from data_build.comprehensive_data_expansion import ComprehensiveDataExpansion
-    from data_build.enhanced_cnn_datacube import EnhancedCNNDatacube
-    from data_build.surrogate_transformer import SurrogateTransformer
+    from models.enhanced_datacube_unet import EnhancedCubeUNet as EnhancedCNNDatacube  # Use the correct model
+    from models.surrogate_transformer import SurrogateTransformer  # Import from models
     from models.peft_llm_integration import AstrobiologyPEFTLLM, KnowledgeRetriever
 except ImportError as e:
     logging.warning(f"Some platform components not available: {e}")
+    # Set fallbacks
+    ComprehensiveDataExpansion = None
+    EnhancedCNNDatacube = None
+    SurrogateTransformer = None
+    AstrobiologyPEFTLLM = None
+    KnowledgeRetriever = None
 
 logger = logging.getLogger(__name__)
 

@@ -644,8 +644,10 @@ class QuantumMolecularSimulator:
             hamiltonian = PauliSumOp.from_list(pauli_list)
 
         else:
-            # Mock Hamiltonian matrix
-            hamiltonian = np.random.hermitian(2**num_qubits)
+            # Mock Hamiltonian matrix (create a Hermitian matrix)
+            size = 2**num_qubits
+            A = np.random.randn(size, size) + 1j * np.random.randn(size, size)
+            hamiltonian = (A + A.conj().T) / 2  # Make it Hermitian
 
         return hamiltonian
 

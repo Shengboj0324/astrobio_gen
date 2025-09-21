@@ -72,20 +72,51 @@ logger = logging.getLogger(__name__)
 TENSORBOARD_AVAILABLE = False
 
 # PyTorch Lightning components - Temporarily disabled due to protobuf conflict
-# from pytorch_lightning.callbacks import (
-#     BatchSizeFinder,
-#     DeviceStatsMonitor,
-#     EarlyStopping,
-#     GradientAccumulationScheduler,
-#     LearningRateMonitor,
-#     ModelCheckpoint,
-#     ModelSummary,
-#     StochasticWeightAveraging,
-# )
-# from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
-# from pytorch_lightning.plugins import MixedPrecisionPlugin
-# from pytorch_lightning.profilers import AdvancedProfiler, PyTorchProfiler
-# from pytorch_lightning.strategies import DDPStrategy, DeepSpeedStrategy
+# PyTorch Lightning imports with fallback handling
+try:
+    from pytorch_lightning import Trainer
+    from pytorch_lightning.callbacks import (
+        BatchSizeFinder,
+        DeviceStatsMonitor,
+        EarlyStopping,
+        GradientAccumulationScheduler,
+        LearningRateMonitor,
+        ModelCheckpoint,
+        ModelSummary,
+        StochasticWeightAveraging,
+    )
+    from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
+    from pytorch_lightning.plugins import MixedPrecisionPlugin
+    from pytorch_lightning.profilers import AdvancedProfiler, PyTorchProfiler
+    from pytorch_lightning.strategies import DDPStrategy, DeepSpeedStrategy
+    
+    PYTORCH_LIGHTNING_AVAILABLE = True
+except ImportError:
+    PYTORCH_LIGHTNING_AVAILABLE = False
+    # Create dummy classes for fallback
+    class ModelCheckpoint:
+        def __init__(self, *args, **kwargs): pass
+    class EarlyStopping:
+        def __init__(self, *args, **kwargs): pass
+    class LearningRateMonitor:
+        def __init__(self, *args, **kwargs): pass
+    class ModelSummary:
+        def __init__(self, *args, **kwargs): pass
+    class DeviceStatsMonitor:
+        def __init__(self, *args, **kwargs): pass
+    class StochasticWeightAveraging:
+        def __init__(self, *args, **kwargs): pass
+    class TensorBoardLogger:
+        def __init__(self, *args, **kwargs): pass
+    class WandbLogger:
+        def __init__(self, *args, **kwargs): pass
+    class PyTorchProfiler:
+        def __init__(self, *args, **kwargs): pass
+    class DDPStrategy:
+        def __init__(self, *args, **kwargs): pass
+    class Trainer:
+        def __init__(self, *args, **kwargs): pass
+        def fit(self, *args, **kwargs): pass
 
 # Optional imports with fallbacks
 try:
@@ -137,7 +168,7 @@ try:
     from models.evolutionary_process_tracker import EvolutionaryProcessTracker
     from models.meta_learning_system import MetaLearningSystem
     from models.neural_architecture_search import NeuralArchitectureSearch
-    from models.peft_llm_integration import PEFTLLMIntegration
+    from models.peft_llm_integration import AstrobiologyPEFTLLM
     from models.uncertainty_emergence_system import UncertaintyEmergenceSystem
 
     ENHANCED_MODELS_AVAILABLE = True
@@ -767,7 +798,7 @@ class EnhancedTrainingOrchestrator:
                     logger.info(f"✅ Initialized Meta Learning System")
 
                 elif model_name == "peft_llm" and ENHANCED_MODELS_AVAILABLE:
-                    models[model_name] = PEFTLLMIntegration(**model_config).to(self.device)
+                    models[model_name] = AstrobiologyPEFTLLM(**model_config).to(self.device)
                     logger.info(f"✅ Initialized PEFT LLM Integration (Legacy)")
 
                 elif model_name == "advanced_gnn" and ENHANCED_MODELS_AVAILABLE:

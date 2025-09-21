@@ -697,7 +697,7 @@ class DynamicKernelConv3D(nn.Module):
 
         # Multiple convolutions with different kernel sizes
         self.convs = nn.ModuleList([
-            SeparableConv3d(in_channels, out_channels, k, padding=k//2)
+            SeparableConv3D(in_channels, out_channels, k, padding=k//2)
             for k in kernel_sizes
         ])
 
