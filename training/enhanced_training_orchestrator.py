@@ -701,7 +701,10 @@ class EnhancedTrainingOrchestrator:
 
     def __init__(self, config: Optional[EnhancedTrainingConfig] = None):
         self.config = config or EnhancedTrainingConfig()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # PRODUCTION: GPU-ONLY training - NO CPU FALLBACK
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA is required for training. CPU training is not supported in production.")
+        self.device = torch.device("cuda")
         self.results = {}
         self.training_history = []
 
@@ -1489,50 +1492,6 @@ def _original_initialize_enhanced_data_treatment(self):
 
         except Exception as e:
             logger.error(f"❌ Enhanced data treatment initialization failed: {e}")
-
-    def apply_enhanced_data_treatment(self, data_config: Dict[str, Any]) -> Dict[str, Any]:
-        """Apply enhanced data treatment to training configuration"""
-        try:
-            # Apply data treatment pipeline if specified
-            if 'data_treatment' in data_config and data_config['data_treatment']:
-                logger.info("🔧 Applying enhanced data treatment pipeline")
-
-                # Apply physics validation
-                if data_config['data_treatment'].get('physics_validation'):
-                    data_config['physics_constraints'] = True
-                    data_config['conservation_laws'] = True
-
-                # Apply quality enhancement
-                if data_config['data_treatment'].get('quality_enhancement'):
-                    data_config['quality_threshold'] = data_config.get('quality_threshold', 0.95)
-                    data_config['noise_reduction'] = True
-                    data_config['outlier_detection'] = True
-
-                # Apply memory optimization
-                if data_config['data_treatment'].get('memory_optimization'):
-                    data_config['streaming_processing'] = True
-                    data_config['memory_mapping'] = True
-                    data_config['compression'] = True
-
-            # Apply augmentation engine if specified
-            if 'augmentation' in data_config and data_config['augmentation']:
-                logger.info("🎨 Applying enhanced augmentation engine")
-                data_config['real_time_augmentation'] = True
-                data_config['physics_preserving_augmentation'] = True
-                data_config['quality_aware_augmentation'] = True
-
-            # Apply memory optimizer if specified
-            if 'memory_optimization' in data_config and data_config['memory_optimization']:
-                logger.info("💾 Applying memory optimization")
-                data_config['adaptive_batch_sizing'] = True
-                data_config['memory_efficient_processing'] = True
-                data_config['cache_optimization'] = True
-
-            return data_config
-
-        except Exception as e:
-            logger.error(f"❌ Enhanced data treatment application failed: {e}")
-            return data_config
 
 
 if __name__ == "__main__":

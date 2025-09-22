@@ -207,8 +207,8 @@ class UnifiedSOTATrainer:
             logger.info(f"   GPUs available: {num_gpus}")
             logger.info(f"   Distributed training: {self.config.use_distributed}")
         else:
-            device = torch.device("cpu")
-            logger.warning("⚠️  CUDA not available, using CPU")
+            # PRODUCTION: GPU-ONLY training - NO CPU FALLBACK
+            raise RuntimeError("CUDA is required for training. CPU training is not supported in production.")
         
         return device
     

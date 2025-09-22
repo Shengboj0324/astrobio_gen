@@ -32,251 +32,50 @@ import numpy as np
 from scipy.sparse.linalg import eigsh
 from scipy.sparse import csr_matrix
 # import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
-# Always use fallback implementations for Windows compatibility
-TORCH_GEOMETRIC_AVAILABLE = False
-print("Using fallback implementations for torch_geometric compatibility")
+# Production PyTorch Geometric - AUTHENTIC DLL VERSION
+from torch_geometric.data import Data, Batch
+from torch_geometric.nn import (
+    GCNConv, GATConv, MessagePassing, global_mean_pool, 
+    global_max_pool, global_add_pool, BatchNorm, LayerNorm
+)
+from torch_geometric.utils import (
+    to_dense_adj, dense_to_sparse, add_self_loops, 
+    remove_self_loops, degree, scatter
+)
+from torch_geometric.loader import DataLoader as GeometricDataLoader
 
-# Fallback Data class
-class Data:
-    def __init__(self, x=None, edge_index=None, batch=None, **kwargs):
-        self.x = x
-        self.edge_index = edge_index
-        self.batch = batch
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+TORCH_GEOMETRIC_AVAILABLE = True
 
-# Fallback Batch class
-class Batch(Data):
-    def __init__(self, batch=None, **kwargs):
-        super().__init__(**kwargs)
-        self.batch = batch
 
-    @staticmethod
-    def from_data_list(data_list):
-        batch = Batch()
-        batch.x = torch.cat([data.x for data in data_list], dim=0)
-        batch.edge_index = torch.cat([data.edge_index for data in data_list], dim=1)
-        batch.batch = torch.cat([torch.full((data.x.size(0),), i) for i, data in enumerate(data_list)])
-        return batch
+# Configure logging
+logger = logging.getLogger(__name__)
 
-# Fallback MessagePassing base class
-class MessagePassing(nn.Module):
-    def __init__(self, aggr='add', **kwargs):
+
+@dataclass
+class GraphVAEConfig:
+    """Configuration for Graph VAE"""
+    node_features: int = 16
+    hidden_dim: int = 512
+    latent_dim: int = 256
+    max_nodes: int = 50
+    num_layers: int = 12
+    heads: int = 16
+    use_biochemical_constraints: bool = True
+    dropout: float = 0.1
+    learning_rate: float = 1e-4
+
+
+# Note: Clean RebuiltGraphVAE class is defined later in the file
+
+
+class GraphEncoder(nn.Module):
+    """Graph encoder with attention mechanism"""
+    
+    def __init__(self, node_features: int, hidden_dim: int, latent_dim: int, num_layers: int = 4, heads: int = 8):
         super().__init__()
-        self.aggr = aggr
-
-    def forward(self, x, edge_index):
-        return x  # Simple passthrough for fallback
-
-# Fallback GCN Convolution
-class GCNConv(MessagePassing):
-    def __init__(self, in_channels, out_channels, **kwargs):
-        super().__init__()
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.linear = nn.Linear(in_channels, out_channels)
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        self.linear.reset_parameters()
-
-    def forward(self, x, edge_index):
-        # Simple linear transformation as fallback
-        return self.linear(x)
-
-# Fallback GAT Convolution
-class GATConv(MessagePassing):
-    def __init__(self, in_channels, out_channels, heads=1, **kwargs):
-        super().__init__()
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.heads = heads
-        self.linear = nn.Linear(in_channels, out_channels * heads)
-        self.attention = nn.MultiheadAttention(out_channels * heads, heads, batch_first=True)
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        self.linear.reset_parameters()
-
-    def forward(self, x, edge_index):
-        # Simple attention-based transformation as fallback
-        x = self.linear(x)
-        x = x.unsqueeze(0)  # Add batch dimension for attention
-        x, _ = self.attention(x, x, x)
-        return x.squeeze(0)  # Remove batch dimension
-
-# Fallback pooling functions
-def global_mean_pool(x, batch):
-    """Global mean pooling fallback"""
-    if batch is None:
-        return x.mean(dim=0, keepdim=True)
-
-    batch_size = batch.max().item() + 1
-    out = torch.zeros(batch_size, x.size(1), device=x.device, dtype=x.dtype)
-
-    for i in range(batch_size):
-        mask = batch == i
-        if mask.any():
-            out[i] = x[mask].mean(dim=0)
-
-    return out
-
-def global_max_pool(x, batch):
-    """Global max pooling fallback"""
-    if batch is None:
-        return x.max(dim=0, keepdim=True)[0]
-
-    batch_size = batch.max().item() + 1
-    out = torch.zeros(batch_size, x.size(1), device=x.device, dtype=x.dtype)
-
-    for i in range(batch_size):
-        mask = batch == i
-        if mask.any():
-            out[i] = x[mask].max(dim=0)[0]
-
-    return out
-
-# Fallback utility functions
-def to_dense_adj(edge_index, batch=None, edge_attr=None, max_num_nodes=None):
-    """Convert edge_index to dense adjacency matrix"""
-    if batch is None:
-        num_nodes = edge_index.max().item() + 1
-        adj = torch.zeros(num_nodes, num_nodes, device=edge_index.device)
-        adj[edge_index[0], edge_index[1]] = 1.0
-        return adj.unsqueeze(0)
-    else:
-        batch_size = batch.max().item() + 1
-        if max_num_nodes is None:
-            max_num_nodes = 100  # Default fallback
-        adj = torch.zeros(batch_size, max_num_nodes, max_num_nodes, device=edge_index.device)
-        return adj
-
-def degree(edge_index, num_nodes=None, dtype=None):
-    """Compute node degrees"""
-    if num_nodes is None:
-        num_nodes = edge_index.max().item() + 1
-
-    if dtype is None:
-        dtype = torch.float
-
-    deg = torch.zeros(num_nodes, device=edge_index.device, dtype=dtype)
-    deg.scatter_add_(0, edge_index[1], torch.ones_like(edge_index[1], dtype=dtype))
-    return deg
-
-def add_self_loops(edge_index, num_nodes=None):
-    """Add self loops to edge_index"""
-    if num_nodes is None:
-        num_nodes = edge_index.max().item() + 1
-
-    self_loops = torch.arange(num_nodes, device=edge_index.device).repeat(2, 1)
-    edge_index = torch.cat([edge_index, self_loops], dim=1)
-    return edge_index, None
-
-    # Fallback functions
-    def to_dense_adj(edge_index, batch=None, edge_attr=None, max_num_nodes=None):
-        """Fallback implementation of to_dense_adj"""
-        if batch is None:
-            batch_size = 1
-            num_nodes = edge_index.max().item() + 1
-        else:
-            batch_size = batch.max().item() + 1
-            num_nodes = max_num_nodes or (edge_index.max().item() + 1)
-
-        adj = torch.zeros(batch_size, num_nodes, num_nodes, device=edge_index.device)
-
-        if batch is None:
-            adj[0, edge_index[0], edge_index[1]] = 1.0
-        else:
-            for b in range(batch_size):
-                mask = batch[edge_index[0]] == b
-                if mask.any():
-                    src = edge_index[0][mask] - (batch == b).nonzero()[0].item()
-                    dst = edge_index[1][mask] - (batch == b).nonzero()[0].item()
-                    adj[b, src, dst] = 1.0
-
-        return adj
-
-    def degree(edge_index, num_nodes=None, dtype=None):
-        """Fallback implementation of degree calculation"""
-        if num_nodes is None:
-            num_nodes = edge_index.max().item() + 1
-
-        deg = torch.zeros(num_nodes, dtype=dtype or torch.float, device=edge_index.device)
-        deg.scatter_add_(0, edge_index[0], torch.ones_like(edge_index[0], dtype=deg.dtype))
-        return deg
-
-    def add_self_loops(edge_index, edge_attr=None, fill_value=1.0, num_nodes=None):
-        """Fallback implementation of add_self_loops"""
-        if num_nodes is None:
-            num_nodes = edge_index.max().item() + 1
-
-        device = edge_index.device
-        self_loops = torch.arange(num_nodes, device=device).repeat(2, 1)
-        edge_index = torch.cat([edge_index, self_loops], dim=1)
-
-        if edge_attr is not None:
-            self_loop_attr = torch.full((num_nodes,), fill_value, device=device, dtype=edge_attr.dtype)
-            edge_attr = torch.cat([edge_attr, self_loop_attr], dim=0)
-            return edge_index, edge_attr
-
-        return edge_index
-
-    def global_mean_pool(x, batch, size=None):
-        """Fallback implementation of global_mean_pool"""
-        if batch is None:
-            return x.mean(dim=0, keepdim=True)
-
-        batch_size = batch.max().item() + 1
-        out = torch.zeros(batch_size, x.size(-1), device=x.device, dtype=x.dtype)
-
-        for i in range(batch_size):
-            mask = batch == i
-            if mask.any():
-                out[i] = x[mask].mean(dim=0)
-
-        return out
-
-    def global_max_pool(x, batch, size=None):
-        """Fallback implementation of global_max_pool"""
-        if batch is None:
-            return x.max(dim=0, keepdim=True)[0]
-
-        batch_size = batch.max().item() + 1
-        out = torch.zeros(batch_size, x.size(-1), device=x.device, dtype=x.dtype)
-
-        for i in range(batch_size):
-            mask = batch == i
-            if mask.any():
-                out[i] = x[mask].max(dim=0)[0]
-
-        return out
-
-    # Fallback MessagePassing base class
-    class MessagePassing(nn.Module):
-        def __init__(self, aggr='add', flow='source_to_target', node_dim=-2):
-            super().__init__()
-            self.aggr = aggr
-            self.flow = flow
-            self.node_dim = node_dim
-
-        def forward(self, x, edge_index):
-            return self.propagate(edge_index, x=x)
-
-        def propagate(self, edge_index, x):
-            # Simple fallback implementation
-            row, col = edge_index
-            out = torch.zeros_like(x)
-            for i in range(edge_index.size(1)):
-                out[col[i]] += x[row[i]]
-            return out
-
-    # Fallback GCN and GAT layers
-    class GCNConv(MessagePassing):
-        def __init__(self, in_channels, out_channels, bias=True):
-            super().__init__()
-            self.in_channels = in_channels
-            self.out_channels = out_channels
-            self.lin = nn.Linear(in_channels, out_channels, bias=bias)
+        self.node_features = node_features
+        self.hidden_dim = hidden_dim
+        self.latent_dim = latent_dim
 
         def forward(self, x, edge_index):
             # Simple GCN implementation

@@ -33,26 +33,21 @@ import torch.nn.functional as F
 import math
 import numpy as np
 # import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
-# Conditional imports for transformers with fallback
-try:
-    from transformers import (
-        AutoTokenizer, AutoModelForCausalLM, AutoConfig,
-        BitsAndBytesConfig, TrainingArguments
-    )
-    TRANSFORMERS_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: transformers not available ({e}), using fallback implementations")
-    TRANSFORMERS_AVAILABLE = False
+# Production PEFT/Transformers imports - NO FALLBACKS
+from transformers import (
+    AutoTokenizer, AutoModelForCausalLM, AutoConfig,
+    BitsAndBytesConfig, TrainingArguments, pipeline,
+    PreTrainedModel, PreTrainedTokenizer
+)
+from peft import (
+    LoraConfig, get_peft_model, TaskType, PeftModel,
+    prepare_model_for_kbit_training, PeftConfig,
+    AdaLoraConfig, IA3Config, PromptTuningConfig
+)
 
-try:
-    from peft import (
-        LoraConfig, get_peft_model, TaskType, PeftModel,
-        prepare_model_for_kbit_training
-    )
-    PEFT_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: peft not available ({e}), using fallback implementations")
-    PEFT_AVAILABLE = False
+# Always available in production
+TRANSFORMERS_AVAILABLE = True
+PEFT_AVAILABLE = True
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -638,7 +633,7 @@ class RebuiltLLMIntegration(nn.Module):
         # Update hidden_size to match SOTA parameters
         self.hidden_size = hidden_size
 
-        # Create fallback transformer architecture
+        # Create production transformer architecture
         self.embedding = nn.Embedding(self.vocab_size, self.hidden_size)
         self.transformer_layers = nn.ModuleList([
             nn.TransformerEncoderLayer(self.hidden_size, nhead=num_attention_heads, batch_first=True)

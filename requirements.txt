@@ -25,7 +25,7 @@ torchaudio==2.4.0         # Audio processing (for biosignatures)
 pytorch-lightning==2.4.0  # High-level PyTorch training framework
 
 # ---- Enhanced ML for Tier 1 ----
-transformers>=4.35.0      # Enhanced Foundation LLM
+transformers>=4.35.0,<4.37.0  # Enhanced Foundation LLM (compatible version)
 peft>=0.7.0              # Parameter-Efficient Fine-tuning
 accelerate>=0.25.0       # Model acceleration
 bitsandbytes>=0.41.0     # Quantization for efficiency
@@ -177,8 +177,9 @@ pre-commit>=3.7           # Pre-commit hooks
 #########################################################
 # ======  INSTALLATION NOTES  ========================= #
 #########################################################
-# For GPU support, install PyTorch with CUDA:
+# PRODUCTION: GPU support is MANDATORY - install PyTorch with CUDA:
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# CUDA 11.8 or higher required for production training
 #
 # For graph neural networks after PyTorch:
 # pip install torch_geometric torch_sparse

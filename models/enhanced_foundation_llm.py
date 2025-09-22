@@ -35,110 +35,26 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# Handle PEFT imports with fallback
-PEFT_AVAILABLE = False
-try:
-    from peft import LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model
-    PEFT_AVAILABLE = True
-except ImportError as e:
-    logging.warning(f"PEFT not available: {e}")
-    # Create fallback classes
-    class LoraConfig:
-        def __init__(self, *args, **kwargs):
-            pass
+# Production PEFT imports - NO FALLBACKS
+from peft import (
+    LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model,
+    prepare_model_for_kbit_training, AdaLoraConfig, IA3Config
+)
 
-    class PeftConfig:
-        def __init__(self, *args, **kwargs):
-            pass
+# Production transformers imports - NO FALLBACKS  
+from transformers import (
+    AutoTokenizer, AutoModelForCausalLM, AutoConfig,
+    BitsAndBytesConfig, TrainingArguments, pipeline
+)
+from sentence_transformers import SentenceTransformer
 
-    class PeftModel:
-        def __init__(self, *args, **kwargs):
-            pass
+# Always available in production
+PEFT_AVAILABLE = True
+TRANSFORMERS_AVAILABLE = True
 
-    class TaskType:
-        CAUSAL_LM = "CAUSAL_LM"
-
-    def get_peft_model(model, config):
-        return model
-
-# Handle transformers imports with fallback
-TRANSFORMERS_AVAILABLE = False
-try:
-    from sentence_transformers import SentenceTransformer
-    from transformers import (
-        AutoConfig,
-        AutoModelForCausalLM,
-        AutoTokenizer,
-        BitsAndBytesConfig,
-        PretrainedConfig,
-        PreTrainedModel,
-    )
-    TRANSFORMERS_AVAILABLE = True
-except ImportError as e:
-    logging.warning(f"Transformers not available: {e}")
-    # Create fallback classes
-    class SentenceTransformer:
-        def __init__(self, *args, **kwargs):
-            pass
-        def encode(self, texts):
-            return np.random.randn(len(texts), 384)
-
-    class AutoConfig:
-        @staticmethod
-        def from_pretrained(*args, **kwargs):
-            return None
-
-    class AutoModelForCausalLM:
-        @staticmethod
-        def from_pretrained(*args, **kwargs):
-            return nn.Linear(1, 1)
-
-    class AutoTokenizer:
-        @staticmethod
-        def from_pretrained(*args, **kwargs):
-            return None
-
-    class BitsAndBytesConfig:
-        def __init__(self, *args, **kwargs):
-            pass
-
-    class PretrainedConfig:
-        def __init__(self, *args, **kwargs):
-            pass
-
-    class PreTrainedModel(nn.Module):
-        def __init__(self, *args, **kwargs):
-            super().__init__()
-
-# Import existing components with fallback
-PEFT_LLM_AVAILABLE = False
-try:
-    from .peft_llm_integration import KnowledgeRetriever, LLMConfig, SurrogateOutputs
-    PEFT_LLM_AVAILABLE = True
-except ImportError:
-    try:
-        from peft_llm_integration import KnowledgeRetriever, LLMConfig, SurrogateOutputs
-        PEFT_LLM_AVAILABLE = True
-    except ImportError as e:
-        logging.warning(f"PEFT LLM Integration not available: {e}")
-        # Create fallback classes
-        from dataclasses import dataclass
-
-        @dataclass
-        class LLMConfig:
-            model_name: str = "fallback"
-            max_length: int = 512
-            temperature: float = 0.7
-
-        class KnowledgeRetriever:
-            def __init__(self, *args, **kwargs):
-                pass
-            def retrieve(self, query):
-                return []
-
-        class SurrogateOutputs:
-            def __init__(self, *args, **kwargs):
-                pass
+# Import existing components - PRODUCTION ONLY
+from .peft_llm_integration import KnowledgeRetriever, LLMConfig, SurrogateOutputs
+PEFT_LLM_AVAILABLE = True
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

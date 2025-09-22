@@ -31,21 +31,29 @@ import pytorch_lightning as pl
 import torchmetrics
 import torchmetrics
 
-# Modern transformers and PEFT imports
+# Production PEFT/Transformers - Latest versions with full compatibility
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
+    AutoConfig,
     BitsAndBytesConfig,
     GenerationConfig,
     TrainingArguments,
-    DataCollatorForLanguageModeling
+    DataCollatorForLanguageModeling,
+    pipeline,
+    PreTrainedModel,
+    PreTrainedTokenizer
 )
 from peft import (
     LoraConfig,
     TaskType,
     get_peft_model,
     prepare_model_for_kbit_training,
-    PeftModel
+    PeftModel,
+    PeftConfig,
+    AdaLoraConfig,
+    IA3Config,
+    PromptTuningConfig
 )
 
 # Configure logging

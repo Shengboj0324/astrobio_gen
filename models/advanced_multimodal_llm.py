@@ -38,24 +38,26 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
 
-# Transformers library for advanced language models
-try:
-    from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
-    from transformers import (
-        AutoModel,
-        AutoModelForCausalLM,
-        AutoTokenizer,
-        BitsAndBytesConfig,
-        LlamaConfig,
-        LlamaForCausalLM,
-        LlamaTokenizer,
-        pipeline,
-    )
+# Production transformers library - NO FALLBACKS
+from peft import (
+    LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training,
+    PeftModel, PeftConfig, AdaLoraConfig, IA3Config
+)
+from transformers import (
+    AutoModel,
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    AutoConfig,
+    BitsAndBytesConfig,
+    LlamaConfig,
+    LlamaForCausalLM,
+    LlamaTokenizer,
+    pipeline,
+    PreTrainedModel,
+    PreTrainedTokenizer
+)
 
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
-    warnings.warn("Transformers library not available. Install with: pip install transformers")
+TRANSFORMERS_AVAILABLE = True
 
 # Vision processing libraries
 try:

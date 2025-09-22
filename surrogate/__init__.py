@@ -291,7 +291,8 @@ class EnhancedModelLoader:
             if torch.cuda.is_available():
                 return torch.device("cuda")
             else:
-                return torch.device("cpu")
+                # PRODUCTION: GPU-ONLY training - NO CPU FALLBACK
+                raise RuntimeError("CUDA is required for training. CPU training is not supported in production.")
         else:
             return torch.device(device)
 
