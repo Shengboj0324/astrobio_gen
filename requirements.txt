@@ -19,7 +19,7 @@ sympy>=1.12             # quick analytic checks / ODE prototypes
 # =====  DEEP-LEARNING & CLASSICAL ML  ================ #
 #########################################################
 # ---- PyTorch ecosystem ----
-torch==2.4.0              # Core PyTorch
+torch==2.8.0              # Core PyTorch
 torchvision==0.19.0       # Computer vision utilities (compatible with PyTorch 2.4)
 torchaudio==2.4.0         # Audio processing (for biosignatures)
 pytorch-lightning==2.4.0  # High-level PyTorch training framework
