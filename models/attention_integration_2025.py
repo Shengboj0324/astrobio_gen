@@ -23,21 +23,36 @@ import torch.nn as nn
 
 # Import existing attention mechanisms
 try:
-    from .sota_features import FlashAttention
-    from .rebuilt_llm_integration import GroupedQueryAttention, MemoryOptimizedMultiHeadAttention
-    from .hierarchical_attention import HierarchicalAttentionSystem
-    from .performance_optimization_engine import MemoryEfficientAttention
+    try:
+        from .sota_features import FlashAttention
+        from .rebuilt_llm_integration import GroupedQueryAttention, MemoryOptimizedMultiHeadAttention
+        from .hierarchical_attention import HierarchicalAttentionSystem
+        from .performance_optimization_engine import MemoryEfficientAttention
+    except ImportError:
+        # Fallback for direct execution
+        from sota_features import FlashAttention
+        from rebuilt_llm_integration import GroupedQueryAttention, MemoryOptimizedMultiHeadAttention
+        from hierarchical_attention import HierarchicalAttentionSystem
+        from performance_optimization_engine import MemoryEfficientAttention
     EXISTING_ATTENTION_AVAILABLE = True
 except ImportError as e:
     EXISTING_ATTENTION_AVAILABLE = False
     warnings.warn(f"Some existing attention mechanisms not available: {e}")
 
 # Import SOTA Attention 2025
-from .sota_attention_2025 import (
-    SOTAAttention2025, SOTAAttentionConfig, create_sota_attention,
-    AttentionType, FlashAttention3, RingAttention, SlidingWindowAttention,
-    LinearAttention, MambaBlock, MultiQueryAttention
-)
+try:
+    from .sota_attention_2025 import (
+        SOTAAttention2025, SOTAAttentionConfig, create_sota_attention,
+        AttentionType, FlashAttention3, RingAttention, SlidingWindowAttention,
+        LinearAttention, MambaBlock, MultiQueryAttention
+    )
+except ImportError:
+    # Fallback for direct execution
+    from sota_attention_2025 import (
+        SOTAAttention2025, SOTAAttentionConfig, create_sota_attention,
+        AttentionType, FlashAttention3, RingAttention, SlidingWindowAttention,
+        LinearAttention, MambaBlock, MultiQueryAttention
+    )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

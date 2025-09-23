@@ -40,6 +40,7 @@ USAGE:
 
 import math
 import warnings
+import logging
 from typing import Optional, Tuple, Union, Callable, Dict, Any
 from functools import partial
 
@@ -47,6 +48,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
+
+# Configure logging
+logger = logging.getLogger(__name__)
 from torch.utils.checkpoint import checkpoint
 
 # Try to import Flash Attention 2.0
@@ -101,10 +105,15 @@ class FlashAttention(nn.Module):
 
         # Import SOTA Attention 2025 components
         try:
-            from .sota_attention_2025 import create_sota_attention, SOTAAttentionConfig
+            # Try relative import first
+            try:
+                from .sota_attention_2025 import create_sota_attention, SOTAAttentionConfig
+            except ImportError:
+                # Try absolute import as fallback
+                from sota_attention_2025 import create_sota_attention, SOTAAttentionConfig
 
-            # Create SOTA 2025 configuration
-            config = SOTAAttentionConfig(
+            # Create SOTA attention module with proper configuration
+            self.sota_attention = create_sota_attention(
                 hidden_size=dim,
                 num_attention_heads=heads,
                 head_dim=dim_head,
@@ -118,17 +127,10 @@ class FlashAttention(nn.Module):
                 **kwargs
             )
 
-            # Create SOTA attention module
-            self.sota_attention = create_sota_attention(
-                hidden_size=dim,
-                num_attention_heads=heads,
-                **kwargs
-            )
-
             self.use_sota_2025 = True
             logger.info("✅ FlashAttention upgraded to SOTA 2025 with production-grade optimizations")
 
-        except ImportError:
+        except ImportError as e:
             # Fallback to original Flash Attention 2.0
             inner_dim = dim_head * heads
             self.heads = heads
@@ -143,7 +145,7 @@ class FlashAttention(nn.Module):
             )
 
             self.use_sota_2025 = False
-            warnings.warn("SOTA Attention 2025 not available, using Flash Attention 2.0 fallback")
+            logger.warning(f"SOTA Attention 2025 not available, using Flash Attention 2.0 fallback: {e}")
     
     def forward(
         self,
