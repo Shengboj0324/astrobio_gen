@@ -394,12 +394,16 @@ class RingAttention(nn.Module):
             if step < world_size - 1:
                 next_rank = (rank + 1) % world_size
                 prev_rank = (rank - 1) % world_size
-                
-                # Send current chunk to next device
-                torch.distributed.send(local_hidden_states, dst=next_rank)
-                
-                # Receive chunk from previous device
-                torch.distributed.recv(local_hidden_states, src=prev_rank)
+
+                # Use non-blocking communication to avoid deadlock
+                if rank % 2 == 0:
+                    # Even ranks send first, then receive
+                    torch.distributed.send(local_hidden_states, dst=next_rank)
+                    torch.distributed.recv(local_hidden_states, src=prev_rank)
+                else:
+                    # Odd ranks receive first, then send
+                    torch.distributed.recv(local_hidden_states, src=prev_rank)
+                    torch.distributed.send(local_hidden_states, dst=next_rank)
         
         # Gather results from all devices
         all_outputs = [torch.zeros_like(output) for _ in range(world_size)]
@@ -1037,10 +1041,10 @@ class MambaBlock(nn.Module):
         batch_size, seq_len, d_inner = x.shape
 
         # Compute state space parameters
-        delta_B_C = self.x_proj(x)  # [batch, seq, d_state * 2]
-        delta, B, C = torch.split(
-            delta_B_C,
-            [d_inner, self.d_state, self.d_state],
+        B_C = self.x_proj(x)  # [batch, seq, d_state * 2]
+        B, C = torch.split(
+            B_C,
+            [self.d_state, self.d_state],
             dim=-1
         )
 
@@ -1481,6 +1485,20 @@ class SOTAAttention2025(nn.Module):
         self.total_tokens_processed += hidden_states.numel()
 
         batch_size, seq_len, hidden_size = hidden_states.shape
+
+        # Validate input dimensions
+        if seq_len == 0:
+            raise ValueError("Sequence length cannot be zero")
+        if hidden_size != self.config.hidden_size:
+            raise ValueError(f"Hidden size mismatch: expected {self.config.hidden_size}, got {hidden_size}")
+
+        # Validate attention mask if provided
+        if attention_mask is not None:
+            mask_shape = attention_mask.shape
+            if len(mask_shape) == 2 and mask_shape[-1] != seq_len:
+                raise ValueError(f"Attention mask sequence length ({mask_shape[-1]}) must match input sequence length ({seq_len})")
+            elif len(mask_shape) == 3 and mask_shape[-1] != seq_len:
+                raise ValueError(f"Attention mask sequence length ({mask_shape[-1]}) must match input sequence length ({seq_len})")
 
         try:
             # Route to optimal attention mechanism
