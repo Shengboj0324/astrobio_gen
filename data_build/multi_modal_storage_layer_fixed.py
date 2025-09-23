@@ -35,6 +35,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 # Core dependencies
 try:
     import h5py

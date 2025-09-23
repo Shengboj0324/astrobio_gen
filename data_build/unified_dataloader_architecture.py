@@ -47,6 +47,12 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset, IterableDataset
 
+# Configure logging first
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 # PyTorch Geometric for graph data
 try:
     import torch_geometric
@@ -60,13 +66,7 @@ except ImportError:
 
 # Local imports
 from .multi_modal_storage_layer_simple import MultiModalStorage, StorageConfig, get_storage_manager
-from .planet_run_primary_key_system import get_planet_run_manager
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
+from .planet_run_primary_key_system import get_planet_run_primary_key_manager
 
 
 class BatchingStrategy(Enum):
