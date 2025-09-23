@@ -309,12 +309,16 @@ class MultiModalDataset(Dataset):
     
     def __init__(
         self,
-        data_sources: Dict[str, DataSourceConfig],
+        data_sources: Union[List[DataSourceConfig], Dict[str, DataSourceConfig]],
         batch_config: BatchConfig = None,
         quality_controller: QualityController = None,
         cache_dir: str = "data/cache"
     ):
-        self.data_sources = data_sources
+        # Convert list to dict if needed
+        if isinstance(data_sources, list):
+            self.data_sources = {config.name: config for config in data_sources}
+        else:
+            self.data_sources = data_sources
         self.batch_config = batch_config or BatchConfig()
         self.quality_controller = quality_controller or QualityController()
         self.cache_dir = Path(cache_dir)

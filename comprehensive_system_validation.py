@@ -467,7 +467,7 @@ class ComprehensiveSystemValidator:
 
             # 1. Data loading
             from data.enhanced_data_loader import MultiModalDataset, DataSourceConfig, DataModality
-            config = DataSourceConfig(name="test", modality=DataModality.SPECTRAL)
+            config = DataSourceConfig(name="test", modality=DataModality.SPECTRAL, path="dummy_test.csv")
             dataset = MultiModalDataset([config])
             result["integration_tests"].append("data_loading")
 

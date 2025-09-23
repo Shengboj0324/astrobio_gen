@@ -60,16 +60,16 @@ except ImportError:
     XFORMERS_AVAILABLE = False
     logger.warning("⚠️ xFormers not available. Install with: pip install xformers")
 
+# Configure logging FIRST before using logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Check for PyTorch 2.0+ scaled_dot_product_attention
 PYTORCH_SDPA_AVAILABLE = hasattr(F, 'scaled_dot_product_attention')
 if PYTORCH_SDPA_AVAILABLE:
     logger.info("✅ PyTorch 2.0+ scaled_dot_product_attention available")
 else:
     logger.warning("⚠️ PyTorch 2.0+ scaled_dot_product_attention not available")
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class AttentionType(Enum):
