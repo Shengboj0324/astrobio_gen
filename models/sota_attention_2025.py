@@ -30,6 +30,10 @@ import torch.nn.functional as F
 from torch import Tensor
 from torch.utils.checkpoint import checkpoint
 
+# Configure logging FIRST before using logger anywhere
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Advanced attention imports with comprehensive fallbacks
 try:
     from flash_attn import flash_attn_func, flash_attn_varlen_func
@@ -59,10 +63,6 @@ try:
 except ImportError:
     XFORMERS_AVAILABLE = False
     logger.warning("⚠️ xFormers not available. Install with: pip install xformers")
-
-# Configure logging FIRST before using logger
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Check for PyTorch 2.0+ scaled_dot_product_attention
 PYTORCH_SDPA_AVAILABLE = hasattr(F, 'scaled_dot_product_attention')
