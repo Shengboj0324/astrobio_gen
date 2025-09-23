@@ -33,21 +33,32 @@ import torch.nn.functional as F
 import math
 import numpy as np
 # import pytorch_lightning as pl  # Temporarily disabled due to protobuf conflict
-# Production PEFT/Transformers imports - NO FALLBACKS
-from transformers import (
-    AutoTokenizer, AutoModelForCausalLM, AutoConfig,
-    BitsAndBytesConfig, TrainingArguments, pipeline,
-    PreTrainedModel, PreTrainedTokenizer
-)
-from peft import (
-    LoraConfig, get_peft_model, TaskType, PeftModel,
-    prepare_model_for_kbit_training, PeftConfig,
-    AdaLoraConfig, IA3Config, PromptTuningConfig
-)
+# Production PEFT/Transformers imports with version compatibility
+try:
+    from transformers import (
+        AutoTokenizer, AutoModelForCausalLM, AutoConfig,
+        BitsAndBytesConfig, TrainingArguments, pipeline,
+        PreTrainedModel, PreTrainedTokenizer
+    )
+    TRANSFORMERS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Transformers import failed: {e}")
+    TRANSFORMERS_AVAILABLE = False
 
-# Always available in production
-TRANSFORMERS_AVAILABLE = True
-PEFT_AVAILABLE = True
+try:
+    from peft import (
+        LoraConfig, get_peft_model, TaskType, PeftModel,
+        prepare_model_for_kbit_training, PeftConfig,
+        AdaLoraConfig, IA3Config, PromptTuningConfig
+    )
+    PEFT_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ PEFT import failed (version compatibility issue): {e}")
+    print("   This is likely due to PEFT/transformers version mismatch")
+    print("   System will use fallback implementations")
+    PEFT_AVAILABLE = False
+
+# Availability determined by imports above
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings("ignore", category=UserWarning)

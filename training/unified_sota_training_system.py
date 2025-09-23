@@ -207,8 +207,10 @@ class UnifiedSOTATrainer:
             logger.info(f"   GPUs available: {num_gpus}")
             logger.info(f"   Distributed training: {self.config.use_distributed}")
         else:
-            # PRODUCTION: GPU-ONLY training - NO CPU FALLBACK
-            raise RuntimeError("CUDA is required for training. CPU training is not supported in production.")
+            # DEVELOPMENT: Allow CPU for testing, warn for production
+            device = torch.device("cpu")
+            logger.warning("⚠️ CUDA not available - using CPU for development/testing")
+            logger.warning("   For production training, GPU is strongly recommended")
         
         return device
     
@@ -228,21 +230,37 @@ class UnifiedSOTATrainer:
         
         try:
             if model_name == "rebuilt_llm_integration":
-                from models.rebuilt_llm_integration import RebuiltLLMIntegration
-                model = RebuiltLLMIntegration(**self.config.model_config)
-                
+                try:
+                    from models.rebuilt_llm_integration import RebuiltLLMIntegration
+                    model = RebuiltLLMIntegration(**self.config.model_config)
+                except ImportError as e:
+                    logger.warning(f"⚠️ RebuiltLLMIntegration not available: {e}")
+                    raise ValueError(f"Model {model_name} not available due to import error")
+
             elif model_name == "rebuilt_graph_vae":
-                from models.rebuilt_graph_vae import RebuiltGraphVAE
-                model = RebuiltGraphVAE(**self.config.model_config)
-                
+                try:
+                    from models.rebuilt_graph_vae import RebuiltGraphVAE
+                    model = RebuiltGraphVAE(**self.config.model_config)
+                except ImportError as e:
+                    logger.warning(f"⚠️ RebuiltGraphVAE not available (torch_geometric DLL issue): {e}")
+                    raise ValueError(f"Model {model_name} not available due to torch_geometric compatibility")
+
             elif model_name == "rebuilt_datacube_cnn":
-                from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
-                model = RebuiltDatacubeCNN(**self.config.model_config)
-                
+                try:
+                    from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
+                    model = RebuiltDatacubeCNN(**self.config.model_config)
+                except ImportError as e:
+                    logger.warning(f"⚠️ RebuiltDatacubeCNN not available: {e}")
+                    raise ValueError(f"Model {model_name} not available due to import error")
+
             elif model_name == "rebuilt_multimodal_integration":
-                from models.rebuilt_multimodal_integration import RebuiltMultimodalIntegration
-                model = RebuiltMultimodalIntegration(**self.config.model_config)
-                
+                try:
+                    from models.rebuilt_multimodal_integration import RebuiltMultimodalIntegration
+                    model = RebuiltMultimodalIntegration(**self.config.model_config)
+                except ImportError as e:
+                    logger.warning(f"⚠️ RebuiltMultimodalIntegration not available: {e}")
+                    raise ValueError(f"Model {model_name} not available due to import error")
+
             else:
                 raise ValueError(f"Unknown model: {model_name}")
             

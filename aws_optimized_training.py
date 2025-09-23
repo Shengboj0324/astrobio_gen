@@ -33,17 +33,52 @@ logger = logging.getLogger(__name__)
 s3_client = boto3.client('s3')
 cloudwatch = boto3.client('cloudwatch')
 
-# Import SOTA models
+# Import SOTA models with individual fallback handling
+MODELS_AVAILABLE = {}
+
+# Test each model individually
+try:
+    from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
+    MODELS_AVAILABLE['datacube_cnn'] = True
+    logger.info("✅ RebuiltDatacubeCNN available")
+except ImportError as e:
+    MODELS_AVAILABLE['datacube_cnn'] = False
+    logger.warning(f"⚠️ RebuiltDatacubeCNN not available: {e}")
+
+try:
+    from models.rebuilt_llm_integration import RebuiltLLMIntegration
+    MODELS_AVAILABLE['llm_integration'] = True
+    logger.info("✅ RebuiltLLMIntegration available")
+except ImportError as e:
+    MODELS_AVAILABLE['llm_integration'] = False
+    logger.warning(f"⚠️ RebuiltLLMIntegration not available: {e}")
+
 try:
     from models.rebuilt_graph_vae import RebuiltGraphVAE
-    from models.rebuilt_datacube_cnn import RebuiltDatacubeCNN
-    from models.rebuilt_llm_integration import RebuiltLLMIntegration
-    from models.simple_diffusion_model import SimpleAstrobiologyDiffusion
-    from training.sota_training_strategies import SOTATrainingOrchestrator, SOTATrainingConfig
-    MODELS_AVAILABLE = True
+    MODELS_AVAILABLE['graph_vae'] = True
+    logger.info("✅ RebuiltGraphVAE available")
 except ImportError as e:
-    logger.error(f"❌ Models not available: {e}")
-    MODELS_AVAILABLE = False
+    MODELS_AVAILABLE['graph_vae'] = False
+    logger.warning(f"⚠️ RebuiltGraphVAE not available (torch_geometric DLL issue): {e}")
+
+try:
+    from models.simple_diffusion_model import SimpleAstrobiologyDiffusion
+    MODELS_AVAILABLE['diffusion'] = True
+    logger.info("✅ SimpleAstrobiologyDiffusion available")
+except ImportError as e:
+    MODELS_AVAILABLE['diffusion'] = False
+    logger.warning(f"⚠️ SimpleAstrobiologyDiffusion not available: {e}")
+
+try:
+    from training.sota_training_strategies import SOTATrainingOrchestrator, SOTATrainingConfig
+    MODELS_AVAILABLE['sota_training'] = True
+    logger.info("✅ SOTA Training strategies available")
+except ImportError as e:
+    MODELS_AVAILABLE['sota_training'] = False
+    logger.warning(f"⚠️ SOTA Training strategies not available: {e}")
+
+# Overall availability
+MODELS_AVAILABLE['any'] = any(MODELS_AVAILABLE.values())
 
 
 class AWSOptimizedTrainer:
@@ -98,65 +133,85 @@ class AWSOptimizedTrainer:
     
     def initialize_models_with_transfer_learning(self) -> Dict[str, nn.Module]:
         """Initialize models with transfer learning for faster training"""
-        if not MODELS_AVAILABLE:
-            logger.error("❌ Models not available")
+        if not MODELS_AVAILABLE['any']:
+            logger.error("❌ No models available")
             return {}
         
         models = {}
         
         # High Priority Models (with transfer learning)
         if self.use_transfer_learning:
-            logger.info("🎯 Initializing models with transfer learning...")
-            
-            # Advanced LLM with pre-trained weights
-            models['llm'] = RebuiltLLMIntegration(
-                model_name="microsoft/DialoGPT-medium",  # Pre-trained base
-                use_4bit_quantization=False,
-                use_lora=True,  # LoRA for efficient fine-tuning
-                lora_r=16,
-                lora_alpha=32,
-                hidden_size=512,
-                num_attention_heads=8,
-                use_rope=True,
-                use_gqa=True,
-                use_rms_norm=True,
-                use_swiglu=True
-            )
-            
-            # CNN-ViT with pre-trained components
-            models['cnn_vit'] = RebuiltDatacubeCNN(
-                input_variables=5,
-                output_variables=5,
-                base_channels=32,  # Reduced for faster training
-                depth=2,  # Reduced depth
-                use_attention=True,
-                use_physics_constraints=True,
-                embed_dim=128,  # Reduced embedding dimension
-                num_heads=4,  # Reduced heads
-                num_transformer_layers=2,  # Reduced layers
-                use_vit_features=True
-            )
+            logger.info("🎯 Initializing available models with transfer learning...")
+
+            # Advanced LLM with pre-trained weights (if available)
+            if MODELS_AVAILABLE['llm_integration']:
+                models['llm'] = RebuiltLLMIntegration(
+                    model_name="microsoft/DialoGPT-medium",  # Pre-trained base
+                    use_4bit_quantization=False,
+                    use_lora=True,  # LoRA for efficient fine-tuning
+                    lora_r=16,
+                    lora_alpha=32,
+                    hidden_size=512,
+                    num_attention_heads=8,
+                    use_rope=True,
+                    use_gqa=True,
+                    use_rms_norm=True,
+                    use_swiglu=True
+                )
+                logger.info("✅ LLM model initialized with transfer learning")
+            else:
+                logger.warning("⚠️ LLM model not available - skipping")
+
+            # CNN-ViT with pre-trained components (if available)
+            if MODELS_AVAILABLE['datacube_cnn']:
+                models['cnn_vit'] = RebuiltDatacubeCNN(
+                    input_variables=5,
+                    output_variables=5,
+                    base_channels=32,  # Reduced for faster training
+                    depth=2,  # Reduced depth
+                    use_attention=True,
+                    use_physics_constraints=True,
+                    embed_dim=128,  # Reduced embedding dimension
+                    num_heads=4,  # Reduced heads
+                    num_transformer_layers=2,  # Reduced layers
+                    use_vit_features=True
+                )
+                logger.info("✅ CNN-ViT model initialized with transfer learning")
+            else:
+                logger.warning("⚠️ CNN-ViT model not available - skipping")
         else:
-            # Standard initialization
-            models['llm'] = RebuiltLLMIntegration()
-            models['cnn_vit'] = RebuiltDatacubeCNN()
+            # Standard initialization (only for available models)
+            if MODELS_AVAILABLE['llm_integration']:
+                models['llm'] = RebuiltLLMIntegration()
+                logger.info("✅ LLM model initialized (standard)")
+            if MODELS_AVAILABLE['datacube_cnn']:
+                models['cnn_vit'] = RebuiltDatacubeCNN()
+                logger.info("✅ CNN-ViT model initialized (standard)")
         
-        # Medium Priority Models
-        models['diffusion'] = SimpleAstrobiologyDiffusion(
-            in_channels=3,
-            num_timesteps=500,  # Reduced for faster training
-            model_channels=64,
-            num_classes=10
-        )
-        
-        models['graph_vae'] = RebuiltGraphVAE(
-            node_features=16,
-            hidden_dim=144,
-            latent_dim=64,
-            num_layers=3,  # Reduced layers
-            heads=12,
-            use_biochemical_constraints=True
-        )
+        # Medium Priority Models (only if available)
+        if MODELS_AVAILABLE['diffusion']:
+            models['diffusion'] = SimpleAstrobiologyDiffusion(
+                in_channels=3,
+                num_timesteps=500,  # Reduced for faster training
+                model_channels=64,
+                num_classes=10
+            )
+            logger.info("✅ Diffusion model initialized")
+        else:
+            logger.warning("⚠️ Diffusion model not available - skipping")
+
+        if MODELS_AVAILABLE['graph_vae']:
+            models['graph_vae'] = RebuiltGraphVAE(
+                node_features=16,
+                hidden_dim=144,
+                latent_dim=64,
+                num_layers=3,  # Reduced layers
+                heads=12,
+                use_biochemical_constraints=True
+            )
+            logger.info("✅ Graph VAE model initialized")
+        else:
+            logger.warning("⚠️ Graph VAE model not available (torch_geometric DLL issue) - skipping")
         
         # Move models to device and setup DDP
         for name, model in models.items():
