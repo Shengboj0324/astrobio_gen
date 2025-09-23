@@ -464,8 +464,11 @@ class RebuiltDatacubeCNN(nn.Module):
         self.rms_normalization = True
         self.spectral_normalization = True
 
-        # Input projection - will be created dynamically based on actual input shape
-        self.input_proj = None  # Will be initialized on first forward pass
+        # Input projection - properly initialized for expected input shape
+        # Expected input: [B, V, T1, T2, L, H, W] -> reshaped to [B, V*T1*T2, L, H, W]
+        # For standard climate data: V=5, T1=2, T2=2 -> input_channels = 5*2*2 = 20
+        expected_input_channels = input_variables * 4  # Assuming T1*T2 = 4 for standard case
+        self.input_proj = nn.Conv3d(expected_input_channels, base_channels, 3, padding=1)
         
         # Encoder layers
         self.encoder_layers = nn.ModuleList()
@@ -549,10 +552,10 @@ class RebuiltDatacubeCNN(nn.Module):
         # Reshape for CNN processing: [B, V, T1, T2, L, H, W] -> [B, V*T1*T2, L, H, W]
         x_reshaped = x.view(B, V * T1 * T2, L, H, W)
 
-        # Initialize input projection dynamically if not already done
-        if self.input_proj is None:
-            input_channels = V * T1 * T2
-            self.input_proj = nn.Conv3d(input_channels, self.base_channels, 3, padding=1).to(x.device)
+        # Input projection should be initialized in __init__, not forward
+        # This is a critical bug - dynamic module creation in forward pass
+        if not hasattr(self, 'input_proj') or self.input_proj is None:
+            raise RuntimeError(f"input_proj not properly initialized. Expected {V * T1 * T2} input channels.")
 
         # Apply encoder layers
         x = self.input_proj(x_reshaped)

@@ -56,7 +56,7 @@ try:
     from models.collaborative_research_network import AdvancedCollaborativeResearchNetwork
 
     # CNNs and U-Net
-    from models.datacube_unet import CubeUNet
+    from models.enhanced_datacube_unet import EnhancedCubeUNet as CubeUNet
     from models.enhanced_datacube_unet import EnhancedCubeUNet
     from models.enhanced_foundation_llm import EnhancedFoundationLLM, EnhancedLLMConfig
     from models.enhanced_surrogate_integration import EnhancedSurrogateIntegration, MultiModalConfig
