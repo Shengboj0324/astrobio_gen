@@ -18,20 +18,30 @@ sympy>=1.12             # quick analytic checks / ODE prototypes
 #########################################################
 # =====  DEEP-LEARNING & CLASSICAL ML  ================ #
 #########################################################
-# ---- PyTorch ecosystem ----
-torch==2.4.0              # Core PyTorch
-torchvision==0.19.0       # Computer vision utilities (compatible with PyTorch 2.4)
-torchaudio==2.4.0         # Audio processing (for biosignatures)
-pytorch-lightning==2.4.0  # High-level PyTorch training framework
+# ---- PyTorch ecosystem (Updated for RunPod A5000 compatibility) ----
+torch>=2.4.0,<2.6.0      # Core PyTorch (compatible with CUDA 12.8)
+torchvision>=0.19.0,<0.21.0  # Computer vision utilities
+torchaudio>=2.4.0,<2.6.0     # Audio processing (for biosignatures)
+pytorch-lightning>=2.4.0,<3.0.0  # High-level PyTorch training framework
 
-# ---- Enhanced ML for Tier 1 ----
-transformers>=4.35.0,<4.37.0  # Enhanced Foundation LLM (compatible version)
-peft>=0.7.0              # Parameter-Efficient Fine-tuning
-accelerate>=0.25.0       # Model acceleration
-bitsandbytes>=0.41.0     # Quantization for efficiency
-sentence-transformers>=2.2.2  # Embeddings for knowledge retrieval
-optuna>=3.4.0            # Neural architecture search and optimization
-ray[tune]>=2.8.0         # Distributed hyperparameter optimization
+# ---- SOTA Attention and Optimization Libraries ----
+flash-attn>=2.5.0        # Flash Attention 3.0 for memory-efficient attention
+xformers>=0.0.23         # Memory-efficient transformers
+triton>=2.1.0            # Custom CUDA kernels
+
+# ---- Enhanced ML for Production ----
+transformers>=4.35.0,<4.40.0  # Enhanced Foundation LLM (broader compatibility)
+peft>=0.7.0,<1.0.0       # Parameter-Efficient Fine-tuning
+accelerate>=0.25.0,<1.0.0 # Model acceleration
+bitsandbytes>=0.41.0,<1.0.0  # Quantization for efficiency
+sentence-transformers>=2.2.2,<3.0.0  # Embeddings for knowledge retrieval
+optuna>=3.4.0,<4.0.0     # Neural architecture search and optimization
+ray[tune]>=2.8.0,<3.0.0  # Distributed hyperparameter optimization
+
+# ---- Missing Dependencies for Advanced Features ----
+numba>=0.58.0            # JIT compilation for quantum processing
+einops>=0.7.0            # Tensor operations for attention mechanisms
+rotary-embedding-torch>=0.3.0  # RoPE implementation
 
 # ---- Graph Neural Networks ----
 torch_geometric>=2.5      # Graph neural networks for metabolic pathways

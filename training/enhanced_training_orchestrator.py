@@ -701,12 +701,116 @@ class EnhancedTrainingOrchestrator:
 
     def __init__(self, config: Optional[EnhancedTrainingConfig] = None):
         self.config = config or EnhancedTrainingConfig()
-        # PRODUCTION: GPU-ONLY training - NO CPU FALLBACK
-        if not torch.cuda.is_available():
-            raise RuntimeError("CUDA is required for training. CPU training is not supported in production.")
-        self.device = torch.device("cuda")
+
+        # Enhanced device selection with comprehensive GPU validation
+        self.device, self.device_info = self._initialize_compute_device()
         self.results = {}
         self.training_history = []
+
+        # Validate GPU memory for large models
+        if self.device.type == 'cuda':
+            self._validate_gpu_memory()
+
+        logger.info(f"🚀 Training device initialized: {self.device}")
+        logger.info(f"   Device info: {self.device_info}")
+
+    def _initialize_compute_device(self) -> Tuple[torch.device, Dict[str, Any]]:
+        """Initialize compute device with comprehensive validation"""
+
+        device_info = {
+            "type": "unknown",
+            "name": "unknown",
+            "memory_gb": 0,
+            "compute_capability": None,
+            "multi_gpu": False,
+            "fallback_reason": None
+        }
+
+        # Check for CUDA availability and validate
+        if torch.cuda.is_available():
+            try:
+                # Test CUDA functionality
+                test_tensor = torch.randn(100, 100, device='cuda')
+                _ = torch.matmul(test_tensor, test_tensor)
+
+                device = torch.device("cuda")
+                device_info.update({
+                    "type": "cuda",
+                    "name": torch.cuda.get_device_name(0),
+                    "memory_gb": torch.cuda.get_device_properties(0).total_memory / (1024**3),
+                    "compute_capability": torch.cuda.get_device_capability(0),
+                    "multi_gpu": torch.cuda.device_count() > 1,
+                    "device_count": torch.cuda.device_count()
+                })
+
+                logger.info(f"✅ CUDA device validated: {device_info['name']}")
+                logger.info(f"   Memory: {device_info['memory_gb']:.1f} GB")
+                logger.info(f"   Compute capability: {device_info['compute_capability']}")
+
+                return device, device_info
+
+            except Exception as e:
+                logger.error(f"❌ CUDA validation failed: {e}")
+                device_info["fallback_reason"] = f"CUDA validation failed: {e}"
+        else:
+            device_info["fallback_reason"] = "CUDA not available"
+
+        # Check for MPS (Apple Silicon) support
+        if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            try:
+                test_tensor = torch.randn(100, 100, device='mps')
+                _ = torch.matmul(test_tensor, test_tensor)
+
+                device = torch.device("mps")
+                device_info.update({
+                    "type": "mps",
+                    "name": "Apple Silicon GPU",
+                    "memory_gb": 16,  # Estimate for Apple Silicon
+                })
+
+                logger.info("✅ MPS device validated: Apple Silicon GPU")
+                return device, device_info
+
+            except Exception as e:
+                logger.warning(f"MPS validation failed: {e}")
+                device_info["fallback_reason"] = f"MPS validation failed: {e}"
+
+        # CPU fallback with performance warning
+        device = torch.device("cpu")
+        device_info.update({
+            "type": "cpu",
+            "name": "CPU",
+            "memory_gb": psutil.virtual_memory().total / (1024**3) if 'psutil' in globals() else 8,
+        })
+
+        logger.warning("⚠️ Using CPU for training - performance will be significantly reduced")
+        logger.warning("   For production training, GPU acceleration is strongly recommended")
+
+        return device, device_info
+
+    def _validate_gpu_memory(self):
+        """Validate GPU memory for large model training"""
+        if self.device.type != 'cuda':
+            return
+
+        available_memory = self.device_info["memory_gb"]
+
+        # Estimate memory requirements based on model size
+        estimated_memory_needed = 8  # Base requirement in GB
+
+        if hasattr(self.config, 'model_size'):
+            if 'large' in str(self.config.model_size).lower():
+                estimated_memory_needed = 24
+            elif 'medium' in str(self.config.model_size).lower():
+                estimated_memory_needed = 16
+
+        if available_memory < estimated_memory_needed:
+            logger.warning(f"⚠️ GPU memory may be insufficient:")
+            logger.warning(f"   Available: {available_memory:.1f} GB")
+            logger.warning(f"   Estimated needed: {estimated_memory_needed} GB")
+            logger.warning("   Consider using gradient checkpointing or model sharding")
+        else:
+            logger.info(f"✅ GPU memory sufficient: {available_memory:.1f} GB available")
 
         # SOTA Training Components
         self.sota_orchestrator = None

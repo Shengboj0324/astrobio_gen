@@ -35,17 +35,37 @@ try:
     from flash_attn import flash_attn_func, flash_attn_varlen_func
     from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input
     FLASH_ATTENTION_AVAILABLE = True
+    logger.info("✅ Flash Attention 3.0 library available")
 except ImportError:
     FLASH_ATTENTION_AVAILABLE = False
-    warnings.warn("Flash Attention not available. Install with: pip install flash-attn --no-build-isolation")
+    logger.warning("⚠️ Flash Attention not available. Install with: pip install flash-attn --no-build-isolation")
+    logger.warning("   Falling back to optimized PyTorch attention implementations")
 
 try:
     import triton
     import triton.language as tl
     TRITON_AVAILABLE = True
+    logger.info("✅ Triton available for custom kernels")
 except ImportError:
     TRITON_AVAILABLE = False
-    warnings.warn("Triton not available for custom kernels")
+    logger.warning("⚠️ Triton not available for custom kernels")
+
+# Try to import xformers for additional optimizations
+try:
+    import xformers
+    import xformers.ops as xops
+    XFORMERS_AVAILABLE = True
+    logger.info("✅ xFormers available for memory-efficient attention")
+except ImportError:
+    XFORMERS_AVAILABLE = False
+    logger.warning("⚠️ xFormers not available. Install with: pip install xformers")
+
+# Check for PyTorch 2.0+ scaled_dot_product_attention
+PYTORCH_SDPA_AVAILABLE = hasattr(F, 'scaled_dot_product_attention')
+if PYTORCH_SDPA_AVAILABLE:
+    logger.info("✅ PyTorch 2.0+ scaled_dot_product_attention available")
+else:
+    logger.warning("⚠️ PyTorch 2.0+ scaled_dot_product_attention not available")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -241,16 +261,16 @@ class FlashAttention3(nn.Module):
         query_length: int,
         key_length: int,
     ) -> torch.Tensor:
-        """Flash Attention 3.0 optimized forward pass"""
-        
+        """Flash Attention 3.0 optimized forward pass with multiple fallback strategies"""
+
         # Reshape for Flash Attention: (batch_size, seq_len, num_heads, head_dim)
         query_states = query_states.transpose(1, 2)
         key_states = key_states.transpose(1, 2)
         value_states = value_states.transpose(1, 2)
-        
+
         # Determine dropout rate
         dropout_rate = self.config.flash_attention_dropout if self.training else 0.0
-        
+
         # Handle attention mask for Flash Attention
         if attention_mask is not None:
             # Flash Attention expects causal mask or None
@@ -259,30 +279,112 @@ class FlashAttention3(nn.Module):
             causal = True  # Assume causal for language modeling
         else:
             causal = True
-        
-        try:
-            # Flash Attention 3.0 call with enhanced performance
-            attn_output = flash_attn_func(
-                query_states,
-                key_states,
-                value_states,
-                dropout_p=dropout_rate,
-                softmax_scale=self.config.flash_attention_softmax_scale or self.scaling,
-                causal=causal,
-                window_size=(-1, -1),  # No sliding window here
-                alibi_slopes=None,
-                deterministic=False,  # Allow non-deterministic for better performance
-            )
-            
-            return attn_output
-            
-        except Exception as e:
-            logger.warning(f"Flash Attention 3.0 failed, falling back to standard: {e}")
-            return self._standard_attention_forward(
-                query_states.transpose(1, 2), key_states.transpose(1, 2), 
-                value_states.transpose(1, 2), attention_mask
-            )
+
+        # Strategy 1: Try Flash Attention 3.0 (highest performance)
+        if FLASH_ATTENTION_AVAILABLE:
+            try:
+                attn_output = flash_attn_func(
+                    query_states,
+                    key_states,
+                    value_states,
+                    dropout_p=dropout_rate,
+                    softmax_scale=self.config.flash_attention_softmax_scale or self.scaling,
+                    causal=causal,
+                    window_size=(-1, -1),  # No sliding window here
+                    alibi_slopes=None,
+                    deterministic=False,  # Allow non-deterministic for better performance
+                )
+                return attn_output
+            except Exception as e:
+                logger.warning(f"Flash Attention 3.0 failed: {e}")
+
+        # Strategy 2: Try xFormers memory-efficient attention
+        if XFORMERS_AVAILABLE:
+            try:
+                attn_output = self._xformers_attention_forward(
+                    query_states, key_states, value_states, attention_mask, dropout_rate
+                )
+                return attn_output
+            except Exception as e:
+                logger.warning(f"xFormers attention failed: {e}")
+
+        # Strategy 3: Try PyTorch 2.0+ scaled_dot_product_attention
+        if PYTORCH_SDPA_AVAILABLE:
+            try:
+                attn_output = self._pytorch_sdpa_forward(
+                    query_states, key_states, value_states, attention_mask, dropout_rate
+                )
+                return attn_output
+            except Exception as e:
+                logger.warning(f"PyTorch SDPA failed: {e}")
+
+        # Strategy 4: Fallback to optimized standard attention
+        logger.info("Using optimized standard attention fallback")
+        return self._standard_attention_forward(
+            query_states.transpose(1, 2), key_states.transpose(1, 2),
+            value_states.transpose(1, 2), attention_mask
+        )
     
+    def _xformers_attention_forward(
+        self,
+        query_states: torch.Tensor,
+        key_states: torch.Tensor,
+        value_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor],
+        dropout_rate: float,
+    ) -> torch.Tensor:
+        """xFormers memory-efficient attention"""
+
+        # xFormers expects (batch, seq_len, num_heads, head_dim)
+        attn_bias = None
+        if attention_mask is not None:
+            # Convert attention mask to xFormers format
+            attn_bias = xops.LowerTriangularMask()
+
+        attn_output = xops.memory_efficient_attention(
+            query_states,
+            key_states,
+            value_states,
+            attn_bias=attn_bias,
+            p=dropout_rate,
+            scale=self.scaling,
+        )
+
+        return attn_output
+
+    def _pytorch_sdpa_forward(
+        self,
+        query_states: torch.Tensor,
+        key_states: torch.Tensor,
+        value_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor],
+        dropout_rate: float,
+    ) -> torch.Tensor:
+        """PyTorch 2.0+ scaled_dot_product_attention"""
+
+        # Convert to PyTorch SDPA format: (batch, num_heads, seq_len, head_dim)
+        query_states = query_states.transpose(1, 2)
+        key_states = key_states.transpose(1, 2)
+        value_states = value_states.transpose(1, 2)
+
+        # Convert attention mask
+        attn_mask = None
+        if attention_mask is not None:
+            # Convert to boolean mask for SDPA
+            attn_mask = attention_mask.bool()
+
+        attn_output = F.scaled_dot_product_attention(
+            query_states,
+            key_states,
+            value_states,
+            attn_mask=attn_mask,
+            dropout_p=dropout_rate if self.training else 0.0,
+            is_causal=True,  # Assume causal for language modeling
+        )
+
+        # Convert back to (batch, seq_len, num_heads, head_dim)
+        return attn_output.transpose(1, 2)
+
     def _standard_attention_forward(
         self,
         query_states: torch.Tensor,
@@ -290,25 +392,25 @@ class FlashAttention3(nn.Module):
         value_states: torch.Tensor,
         attention_mask: Optional[torch.Tensor],
     ) -> torch.Tensor:
-        """Optimized standard attention as fallback"""
-        
-        # Compute attention scores
+        """Optimized standard attention as final fallback"""
+
+        # Compute attention scores with improved numerical stability
         attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) * self.scaling
-        
+
         # Apply attention mask
         if attention_mask is not None:
             attn_weights = attn_weights + attention_mask
-        
-        # Apply softmax
+
+        # Apply softmax with improved numerical stability
         attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
-        
+
         # Apply dropout
-        if self.training and self.config.attention_dropout > 0:
+        if self.training and hasattr(self.config, 'attention_dropout') and self.config.attention_dropout > 0:
             attn_weights = nn.functional.dropout(attn_weights, p=self.config.attention_dropout)
-        
+
         # Apply attention to values
         attn_output = torch.matmul(attn_weights, value_states)
-        
+
         return attn_output
 
 

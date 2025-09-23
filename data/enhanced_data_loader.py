@@ -417,10 +417,211 @@ class MultiModalDataset(Dataset):
             return self._create_dummy_data(config)
     
     def _load_from_url(self, config: DataSourceConfig) -> Optional[torch.Tensor]:
-        """Load data from URL (placeholder)"""
-        logger.info(f"URL loading not implemented for {config.name}, creating dummy data")
-        return self._create_dummy_data(config)
-    
+        """Load data from URL with comprehensive error handling"""
+
+        try:
+            import requests
+            import io
+            from urllib.parse import urlparse
+
+            logger.info(f"Loading data from URL for {config.name}: {config.url}")
+
+            # Validate URL
+            parsed_url = urlparse(config.url)
+            if not parsed_url.scheme or not parsed_url.netloc:
+                logger.error(f"Invalid URL format: {config.url}")
+                return self._create_dummy_data(config)
+
+            # Set up session with proper headers and timeout
+            session = requests.Session()
+            session.headers.update({
+                'User-Agent': 'AstrobiologyAI/1.0 (Scientific Research)',
+                'Accept': 'application/json, text/csv, application/octet-stream, */*'
+            })
+
+            # Handle authentication if provided
+            if hasattr(config, 'auth_token') and config.auth_token:
+                session.headers['Authorization'] = f'Bearer {config.auth_token}'
+            elif hasattr(config, 'api_key') and config.api_key:
+                session.headers['X-API-Key'] = config.api_key
+
+            # Make request with timeout and retries
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    response = session.get(config.url, timeout=30, stream=True)
+                    response.raise_for_status()
+                    break
+                except requests.exceptions.RequestException as e:
+                    if attempt == max_retries - 1:
+                        logger.error(f"Failed to fetch data after {max_retries} attempts: {e}")
+                        return self._create_dummy_data(config)
+                    logger.warning(f"Attempt {attempt + 1} failed, retrying: {e}")
+                    time.sleep(2 ** attempt)  # Exponential backoff
+
+            # Process response based on content type
+            content_type = response.headers.get('content-type', '').lower()
+
+            if 'json' in content_type:
+                return self._process_json_data(response.json(), config)
+            elif 'csv' in content_type or config.url.endswith('.csv'):
+                return self._process_csv_data(response.text, config)
+            elif 'netcdf' in content_type or config.url.endswith('.nc'):
+                return self._process_netcdf_data(response.content, config)
+            elif 'hdf' in content_type or config.url.endswith(('.h5', '.hdf5')):
+                return self._process_hdf5_data(response.content, config)
+            else:
+                # Try to process as binary data
+                return self._process_binary_data(response.content, config)
+
+        except ImportError:
+            logger.error("requests library not available for URL loading")
+            return self._create_dummy_data(config)
+        except Exception as e:
+            logger.error(f"Unexpected error loading from URL {config.url}: {e}")
+            return self._create_dummy_data(config)
+
+    def _process_json_data(self, json_data: dict, config: DataSourceConfig) -> torch.Tensor:
+        """Process JSON data into tensor format"""
+        try:
+            import numpy as np
+
+            # Handle different JSON structures
+            if isinstance(json_data, list):
+                # List of records
+                data_array = np.array(json_data)
+            elif isinstance(json_data, dict):
+                # Extract data field or convert dict values
+                if 'data' in json_data:
+                    data_array = np.array(json_data['data'])
+                elif 'values' in json_data:
+                    data_array = np.array(json_data['values'])
+                else:
+                    # Convert dict values to array
+                    data_array = np.array(list(json_data.values()))
+            else:
+                logger.warning(f"Unexpected JSON structure for {config.name}")
+                return self._create_dummy_data(config)
+
+            # Convert to tensor
+            if data_array.dtype == object:
+                # Handle mixed types by converting to float where possible
+                try:
+                    data_array = data_array.astype(float)
+                except (ValueError, TypeError):
+                    logger.warning(f"Could not convert JSON data to numeric for {config.name}")
+                    return self._create_dummy_data(config)
+
+            return torch.from_numpy(data_array).float()
+
+        except Exception as e:
+            logger.error(f"Error processing JSON data for {config.name}: {e}")
+            return self._create_dummy_data(config)
+
+    def _process_csv_data(self, csv_text: str, config: DataSourceConfig) -> torch.Tensor:
+        """Process CSV data into tensor format"""
+        try:
+            import pandas as pd
+            import io
+
+            # Read CSV data
+            df = pd.read_csv(io.StringIO(csv_text))
+
+            # Convert to numeric where possible
+            numeric_df = df.select_dtypes(include=[np.number])
+            if numeric_df.empty:
+                # Try to convert string columns to numeric
+                for col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+                numeric_df = df.select_dtypes(include=[np.number])
+
+            if numeric_df.empty:
+                logger.warning(f"No numeric data found in CSV for {config.name}")
+                return self._create_dummy_data(config)
+
+            # Convert to tensor
+            data_array = numeric_df.values
+            return torch.from_numpy(data_array).float()
+
+        except Exception as e:
+            logger.error(f"Error processing CSV data for {config.name}: {e}")
+            return self._create_dummy_data(config)
+
+    def _process_netcdf_data(self, content: bytes, config: DataSourceConfig) -> torch.Tensor:
+        """Process NetCDF data into tensor format"""
+        try:
+            import xarray as xr
+            import io
+
+            # Load NetCDF from bytes
+            with io.BytesIO(content) as buffer:
+                ds = xr.open_dataset(buffer)
+
+                # Extract first data variable
+                data_vars = list(ds.data_vars.keys())
+                if not data_vars:
+                    logger.warning(f"No data variables found in NetCDF for {config.name}")
+                    return self._create_dummy_data(config)
+
+                # Get the first data variable
+                data_array = ds[data_vars[0]].values
+                return torch.from_numpy(data_array).float()
+
+        except Exception as e:
+            logger.error(f"Error processing NetCDF data for {config.name}: {e}")
+            return self._create_dummy_data(config)
+
+    def _process_hdf5_data(self, content: bytes, config: DataSourceConfig) -> torch.Tensor:
+        """Process HDF5 data into tensor format"""
+        try:
+            import h5py
+            import io
+
+            # Load HDF5 from bytes
+            with io.BytesIO(content) as buffer:
+                with h5py.File(buffer, 'r') as f:
+                    # Find first dataset
+                    dataset_names = []
+                    f.visititems(lambda name, obj: dataset_names.append(name)
+                               if isinstance(obj, h5py.Dataset) else None)
+
+                    if not dataset_names:
+                        logger.warning(f"No datasets found in HDF5 for {config.name}")
+                        return self._create_dummy_data(config)
+
+                    # Load first dataset
+                    data_array = f[dataset_names[0]][:]
+                    return torch.from_numpy(data_array).float()
+
+        except Exception as e:
+            logger.error(f"Error processing HDF5 data for {config.name}: {e}")
+            return self._create_dummy_data(config)
+
+    def _process_binary_data(self, content: bytes, config: DataSourceConfig) -> torch.Tensor:
+        """Process binary data into tensor format"""
+        try:
+            import numpy as np
+
+            # Try to interpret as numpy array
+            try:
+                data_array = np.frombuffer(content, dtype=np.float32)
+                return torch.from_numpy(data_array)
+            except:
+                # Try as different dtypes
+                for dtype in [np.float64, np.int32, np.int64, np.uint8]:
+                    try:
+                        data_array = np.frombuffer(content, dtype=dtype)
+                        return torch.from_numpy(data_array.astype(np.float32))
+                    except:
+                        continue
+
+                logger.warning(f"Could not interpret binary data for {config.name}")
+                return self._create_dummy_data(config)
+
+        except Exception as e:
+            logger.error(f"Error processing binary data for {config.name}: {e}")
+            return self._create_dummy_data(config)
+
     def _create_dummy_data(self, config: DataSourceConfig) -> torch.Tensor:
         """Create dummy data for testing"""
         if config.modality == DataModality.CLIMATE:
