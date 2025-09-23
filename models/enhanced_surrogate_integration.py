@@ -30,10 +30,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
 
-from .datacube_unet import CubeUNet
-
-# Import enhanced components
-from .enhanced_datacube_unet import EnhancedCubeUNet, EnhancedPhysicsConstraints
+# Import enhanced components - datacube_unet.py was removed, use enhanced version
+from .enhanced_datacube_unet import EnhancedCubeUNet as CubeUNet, EnhancedPhysicsConstraints
 from .surrogate_transformer import SurrogateTransformer
 
 # Configure logging

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class ResBlock(nn.Module):
@@ -45,11 +46,10 @@ class SpectralSurrogate(nn.Module):
         x = x.flatten(1)  # Shape: (batch_size, 32*100) = (batch_size, 3200)
 
         # CRITICAL FIX: Ensure correct input dimension for final layer
-        if x.size(1) != 32 * self.bins // 4:
-            # Add adaptive layer to match expected dimensions
-            if not hasattr(self, 'adaptive_layer'):
-                self.adaptive_layer = nn.Linear(x.size(1), 32 * self.bins // 4).to(x.device)
-            x = self.adaptive_layer(x)
+        expected_dim = 32 * self.bins // 4
+        if x.size(1) != expected_dim:
+            # FIXED: No dynamic layer creation - use interpolation instead
+            x = F.adaptive_avg_pool1d(x.unsqueeze(1), expected_dim).squeeze(1)
 
         output = torch.sigmoid(self.fc_out(x))
 

@@ -29,7 +29,6 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 import pytorch_lightning as pl
 import torchmetrics
-import torchmetrics
 
 # Production PEFT/Transformers - Latest versions with full compatibility
 from transformers import (

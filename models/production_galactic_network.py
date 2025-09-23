@@ -32,7 +32,6 @@ import pytorch_lightning as pl
 import torchmetrics
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
-import torchmetrics
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
