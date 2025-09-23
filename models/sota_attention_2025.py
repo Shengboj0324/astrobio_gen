@@ -1675,7 +1675,7 @@ class SOTAAttention2025(nn.Module):
 
 # Factory function for easy instantiation
 def create_sota_attention(
-    hidden_size: int = 768,
+    config_or_hidden_size: Union[SOTAAttentionConfig, int] = None,
     num_attention_heads: int = 12,
     max_position_embeddings: int = 8192,
     **kwargs
@@ -1684,20 +1684,26 @@ def create_sota_attention(
     Factory function to create SOTA Attention with sensible defaults
 
     Args:
-        hidden_size: Model hidden dimension
-        num_attention_heads: Number of attention heads
-        max_position_embeddings: Maximum sequence length
-        **kwargs: Additional configuration options
+        config_or_hidden_size: Either a SOTAAttentionConfig object or hidden_size integer
+        num_attention_heads: Number of attention heads (if config not provided)
+        max_position_embeddings: Maximum sequence length (if config not provided)
+        **kwargs: Additional configuration options (if config not provided)
 
     Returns:
         Configured SOTAAttention2025 instance
     """
-    config = SOTAAttentionConfig(
-        hidden_size=hidden_size,
-        num_attention_heads=num_attention_heads,
-        max_position_embeddings=max_position_embeddings,
-        **kwargs
-    )
+    if isinstance(config_or_hidden_size, SOTAAttentionConfig):
+        # Config object provided
+        config = config_or_hidden_size
+    else:
+        # Individual parameters provided
+        hidden_size = config_or_hidden_size or 768
+        config = SOTAAttentionConfig(
+            hidden_size=hidden_size,
+            num_attention_heads=num_attention_heads,
+            max_position_embeddings=max_position_embeddings,
+            **kwargs
+        )
 
     return SOTAAttention2025(config)
 

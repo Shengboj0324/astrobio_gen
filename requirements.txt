@@ -30,8 +30,8 @@ xformers>=0.0.23         # Memory-efficient transformers
 triton>=2.1.0            # Custom CUDA kernels
 
 # ---- Enhanced ML for Production ----
-transformers>=4.35.0,<4.42.0  # Enhanced Foundation LLM (broader compatibility)
-peft>=0.7.0,<0.13.0      # Parameter-Efficient Fine-tuning (compatible with transformers 4.41)
+transformers>=4.35.0,<4.41.0  # Enhanced Foundation LLM (compatible with PEFT)
+peft>=0.7.0,<0.11.0      # Parameter-Efficient Fine-tuning (compatible with transformers 4.40)
 accelerate>=0.25.0,<1.0.0 # Model acceleration
 bitsandbytes>=0.41.0,<1.0.0  # Quantization for efficiency
 sentence-transformers>=2.2.2,<3.0.0  # Embeddings for knowledge retrieval
