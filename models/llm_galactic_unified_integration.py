@@ -133,7 +133,7 @@ def get_cnn_models():
     """Dynamically import CNN models"""
     models = {}
     try:
-        from models.datacube_unet import CubeUNet
+        from models.enhanced_datacube_unet import EnhancedCubeUNet as CubeUNet
 
         models["datacube_unet"] = CubeUNet
     except ImportError:

@@ -32,10 +32,10 @@ from scipy.integrate import odeint
 
 # Import existing components with fallback handling
 try:
-    from .datacube_unet import CubeUNet, PhysicsConstraints
+    from .enhanced_datacube_unet import EnhancedCubeUNet as CubeUNet, PhysicsConstraints
     DATACUBE_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"DataCube UNet not available: {e}")
+    logger.warning(f"Enhanced DataCube UNet not available: {e}")
     DATACUBE_AVAILABLE = False
     # Create fallback classes
     class CubeUNet(nn.Module):
