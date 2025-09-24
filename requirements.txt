@@ -18,35 +18,36 @@ sympy>=1.12             # quick analytic checks / ODE prototypes
 #########################################################
 # =====  DEEP-LEARNING & CLASSICAL ML  ================ #
 #########################################################
-# ---- PyTorch ecosystem (Updated for RunPod A5000 compatibility) ----
-torch>=2.4.0,<2.6.0      # Core PyTorch (compatible with CUDA 12.8)
-torchvision>=0.19.0,<0.21.0  # Computer vision utilities
-torchaudio>=2.4.0,<2.6.0     # Audio processing (for biosignatures)
+# ---- PyTorch ecosystem (FIXED for actual installed versions) ----
+torch>=2.8.0             # Core PyTorch (actual installed version)
+torchvision>=0.19.0      # Computer vision utilities
+torchaudio>=2.4.0        # Audio processing (for biosignatures)
 pytorch-lightning>=2.4.0,<3.0.0  # High-level PyTorch training framework
 
-# ---- SOTA Attention and Optimization Libraries ----
-flash-attn>=2.5.0        # Flash Attention 3.0 for memory-efficient attention
+# ---- SOTA Attention and Optimization Libraries (OPTIONAL - Linux only) ----
+# flash-attn>=2.5.0      # Flash Attention 3.0 (Linux only - will be installed on RunPod)
 xformers>=0.0.23         # Memory-efficient transformers
-triton>=2.1.0            # Custom CUDA kernels
+# triton>=2.1.0          # Custom CUDA kernels (Linux only - will be installed on RunPod)
 
-# ---- Enhanced ML for Production ----
-transformers>=4.35.0,<4.41.0  # Enhanced Foundation LLM (compatible with PEFT)
-peft>=0.7.0,<0.11.0      # Parameter-Efficient Fine-tuning (compatible with transformers 4.40)
+# ---- Enhanced ML for Production (FIXED versions) ----
+transformers>=4.35.0     # Enhanced Foundation LLM (removed upper bound for compatibility)
+peft>=0.7.0,<0.11.0      # Parameter-Efficient Fine-tuning (compatible with transformers)
 accelerate>=0.25.0,<1.0.0 # Model acceleration
 bitsandbytes>=0.41.0,<1.0.0  # Quantization for efficiency
 sentence-transformers>=2.2.2,<3.0.0  # Embeddings for knowledge retrieval
 optuna>=3.4.0,<4.0.0     # Neural architecture search and optimization
 ray[tune]>=2.8.0,<3.0.0  # Distributed hyperparameter optimization
 
-# ---- Missing Dependencies for Advanced Features ----
+# ---- CRITICAL Missing Dependencies (MUST INSTALL) ----
+sentence-transformers>=2.2.2,<3.0.0  # CRITICAL: Required by multiple models
 numba>=0.58.0            # JIT compilation for quantum processing
 einops>=0.7.0            # Tensor operations for attention mechanisms
-rotary-embedding-torch>=0.3.0  # RoPE implementation
+# rotary-embedding-torch>=0.3.0  # RoPE implementation (will be installed on RunPod)
 
-# ---- Graph Neural Networks ----
-torch_geometric>=2.5      # Graph neural networks for metabolic pathways
-torch_sparse>=0.6.18      # Sparse tensor operations (compatible with torch 2.2.0)
-torch_scatter>=2.1        # Scatter operations for torch_sparse (install from PyG wheels)
+# ---- Graph Neural Networks (Linux only - will be installed on RunPod) ----
+# torch_geometric>=2.5    # Graph neural networks (DLL issues on Windows)
+# torch_sparse>=0.6.18    # Sparse tensor operations (Linux only)
+# torch_scatter>=2.1      # Scatter operations (Linux only)
 
 # ---- Classical ML ----
 scikit-learn>=1.4         # Classical machine learning
