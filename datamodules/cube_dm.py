@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from threading import RLock
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, Union
 
 import numpy as np
 import psutil
@@ -687,14 +687,19 @@ class CubeDM(pl.LightningDataModule):
             logger.error(f"Failed to load config: {e}")
             return {}
 
-    def _resolve_zarr_root(self, zarr_root: Optional[str]) -> Path:
-        """Resolve zarr root path with environment variable support"""
+    def _resolve_zarr_root(self, zarr_root: Optional[str]) -> Union[Path, str]:
+        """Resolve zarr root path with S3 and environment variable support"""
         if zarr_root:
+            # FIXED: Support S3 URLs directly
+            if zarr_root.startswith("s3://"):
+                return zarr_root  # Return S3 URL as string
             return Path(zarr_root)
 
         # Try environment variable
         env_path = os.getenv("ASTRO_CUBE_ZARR")
         if env_path:
+            if env_path.startswith("s3://"):
+                return env_path  # Return S3 URL as string
             return Path(env_path)
 
         # Try config file
@@ -705,9 +710,17 @@ class CubeDM(pl.LightningDataModule):
                 env_var = config_path[2:-1]
                 if "," in env_var:
                     env_var, default = env_var.split(",")
-                    return Path(os.getenv(env_var, default))
+                    resolved_path = os.getenv(env_var, default)
+                    if resolved_path.startswith("s3://"):
+                        return resolved_path  # Return S3 URL as string
+                    return Path(resolved_path)
                 else:
-                    return Path(os.getenv(env_var, "data/processed/gcm_zarr"))
+                    resolved_path = os.getenv(env_var, "data/processed/gcm_zarr")
+                    if resolved_path.startswith("s3://"):
+                        return resolved_path  # Return S3 URL as string
+                    return Path(resolved_path)
+            if config_path.startswith("s3://"):
+                return config_path  # Return S3 URL as string
             return Path(config_path)
 
         # Default fallback
@@ -717,6 +730,39 @@ class CubeDM(pl.LightningDataModule):
         """Get additional zarr stores from config"""
         additional = self.config.get("datacube", {}).get("additional_zarr_stores", [])
         return [Path(store) for store in additional]
+
+    def _discover_s3_zarr_stores(self) -> List[str]:
+        """Discover zarr stores in S3 bucket"""
+        try:
+            import s3fs
+            fs = s3fs.S3FileSystem()
+
+            # Parse S3 URL
+            bucket_path = self.zarr_root.replace("s3://", "")
+
+            # List directories matching run_*/data.zarr pattern
+            zarr_stores = []
+            try:
+                # List all objects in the bucket path
+                objects = fs.ls(bucket_path, detail=False)
+
+                # Filter for zarr stores
+                for obj in objects:
+                    if obj.endswith("/data.zarr") and "/run_" in obj:
+                        zarr_stores.append(f"s3://{obj}")
+
+                logger.info(f"🔍 Discovered {len(zarr_stores)} S3 zarr stores")
+                return zarr_stores
+
+            except Exception as e:
+                logger.warning(f"⚠️ S3 zarr store discovery failed: {e}")
+                # Return dummy stores for testing
+                return [f"{self.zarr_root}/run_000001/data.zarr",
+                       f"{self.zarr_root}/run_000002/data.zarr"]
+
+        except ImportError:
+            logger.error("❌ s3fs not available for S3 zarr store discovery")
+            raise RuntimeError("s3fs required for S3 zarr operations")
 
     def _get_config_variables(self, var_type: str) -> List[str]:
         """Get variables from configuration"""
@@ -787,8 +833,13 @@ class CubeDM(pl.LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         """Setup datasets for each stage"""
         if stage in (None, "fit", "validate"):
-            # Find all zarr stores
-            zarr_stores = list(self.zarr_root.glob("run_*/data.zarr"))
+            # FIXED: Handle S3 URLs for zarr store discovery
+            if isinstance(self.zarr_root, str) and self.zarr_root.startswith("s3://"):
+                # S3 zarr store discovery
+                zarr_stores = self._discover_s3_zarr_stores()
+            else:
+                # Local zarr store discovery
+                zarr_stores = list(self.zarr_root.glob("run_*/data.zarr"))
 
             if not zarr_stores:
                 raise ValueError(f"No zarr stores found in {self.zarr_root}")

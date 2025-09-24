@@ -40,6 +40,9 @@ ray[tune]>=2.8.0,<3.0.0  # Distributed hyperparameter optimization
 
 # ---- CRITICAL Missing Dependencies (MUST INSTALL) ----
 sentence-transformers>=2.2.2,<3.0.0  # CRITICAL: Required by multiple models
+s3fs>=2023.12.0          # CRITICAL: S3 filesystem operations for data flow
+fsspec>=2023.12.0        # CRITICAL: Cloud storage abstraction
+aiobotocore>=2.7.0       # CRITICAL: Async S3 operations
 numba>=0.58.0            # JIT compilation for quantum processing
 einops>=0.7.0            # Tensor operations for attention mechanisms
 # rotary-embedding-torch>=0.3.0  # RoPE implementation (will be installed on RunPod)
