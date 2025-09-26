@@ -145,7 +145,7 @@ matplotlib==3.8.4        # Core plotting library
 seaborn==0.13.2          # Statistical data visualization
 plotly==5.19.0           # Interactive spectral plots
 ipykernel==6.29.5        # Jupyter kernel
-jupyterlab==4.1.8        # Modern Jupyter interface
+jupyterlab==4.4.8        # Modern Jupyter interface
 
 #########################################################
 # ======  DATA FORMATS & SERIALIZATION  =============== #

@@ -69,7 +69,7 @@ pathlib==1.0.1
 jupyter==1.0.0
 notebook==7.0.6
 ipywidgets==8.1.1
-jupyterlab==4.0.9
+jupyterlab==4.4.8
 
 # Optional GPU dependencies
 nvidia-ml-py3==7.352.0
