@@ -1,0 +1,101 @@
+{
+  "validation_timestamp": "2025-09-23T15:27:27.645904",
+  "total_validation_time_seconds": 4.791817903518677,
+  "overall_score": 0.25,
+  "readiness_status": "NOT_READY",
+  "test_summary": {
+    "total_tests": 8,
+    "passed": 1,
+    "warned": 2,
+    "failed": 5
+  },
+  "detailed_results": {
+    "Hardware Compatibility": {
+      "status": "FAIL",
+      "gpu_available": false,
+      "gpu_memory_gb": 0,
+      "gpu_name": "None",
+      "compute_capability": null,
+      "multi_gpu": false,
+      "recommendations": [
+        "CUDA not available - install CUDA 12.8+"
+      ]
+    },
+    "Dependency Verification": {
+      "status": "WARN",
+      "missing_dependencies": [],
+      "version_conflicts": [],
+      "optional_missing": [
+        "flash_attn",
+        "xformers",
+        "triton",
+        "peft"
+      ],
+      "recommendations": [
+        "Install optional dependencies for optimal performance"
+      ]
+    },
+    "SOTA Attention Mechanisms": {
+      "status": "FAIL",
+      "error": "unsupported operand type(s) for //: 'SOTAAttentionConfig' and 'int'",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\comprehensive_system_validation.py\", line 80, in run_full_validation\n    result = test_function()\n             ^^^^^^^^^^^^^^^\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\comprehensive_system_validation.py\", line 236, in _validate_attention_mechanisms\n    attention = create_sota_attention(config)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\models\\sota_attention_2025.py\", line 1702, in create_sota_attention\n    return SOTAAttention2025(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\models\\sota_attention_2025.py\", line 1560, in __init__\n    self.attention_router = SOTAAttentionRouter(config)\n                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\models\\sota_attention_2025.py\", line 1295, in __init__\n    self.flash_attention_3 = FlashAttention3(config) if config.use_flash_attention_3 else None\n                             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\sjham\\OneDrive\\Desktop\\astrobio_gen\\models\\sota_attention_2025.py\", line 159, in __init__\n    self.head_dim = config.head_dim or (config.hidden_size // config.num_attention_heads)\n                                        ~~~~~~~~~~~~~~~~~~~^^~~~~~~~~~~~~~~~~~~~~~~~~~~~\nTypeError: unsupported operand type(s) for //: 'SOTAAttentionConfig' and 'int'\n"
+    },
+    "Multi-Modal Models": {
+      "status": "FAIL",
+      "models_tested": [],
+      "performance_metrics": {},
+      "recommendations": [
+        "Multi-modal model test failed: cannot import name 'EncoderDecoderCache' from 'transformers' (C:\\Users\\sjham\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\transformers\\__init__.py)"
+      ]
+    },
+    "Data Pipeline Robustness": {
+      "status": "PASS",
+      "pipeline_tests": [
+        "data_loading"
+      ],
+      "data_sources_tested": 2,
+      "recommendations": []
+    },
+    "Training Orchestrator": {
+      "status": "FAIL",
+      "orchestrator_features": [],
+      "device_compatibility": {},
+      "recommendations": [
+        "Training orchestrator test failed: [WinError 127] The specified procedure could not be found"
+      ]
+    },
+    "Memory Management": {
+      "status": "WARN",
+      "memory_tests": [],
+      "peak_memory_gb": 0,
+      "memory_efficiency": 0,
+      "recommendations": [
+        "GPU not available for memory testing"
+      ]
+    },
+    "End-to-End Integration": {
+      "status": "FAIL",
+      "integration_tests": [
+        "data_loading"
+      ],
+      "total_time_ms": 0,
+      "recommendations": [
+        "End-to-end integration failed: cannot import name 'EncoderDecoderCache' from 'transformers' (C:\\Users\\sjham\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\transformers\\__init__.py)"
+      ]
+    }
+  },
+  "recommendations": [
+    "Hardware Compatibility: CUDA not available - install CUDA 12.8+",
+    "Dependency Verification: Install optional dependencies for optimal performance",
+    "Multi-Modal Models: Multi-modal model test failed: cannot import name 'EncoderDecoderCache' from 'transformers' (C:\\Users\\sjham\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\transformers\\__init__.py)",
+    "Training Orchestrator: Training orchestrator test failed: [WinError 127] The specified procedure could not be found",
+    "Memory Management: GPU not available for memory testing",
+    "End-to-End Integration: End-to-end integration failed: cannot import name 'EncoderDecoderCache' from 'transformers' (C:\\Users\\sjham\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\transformers\\__init__.py)"
+  ],
+  "next_steps": [
+    "Fix critical failures before proceeding",
+    "Install missing dependencies",
+    "Resolve hardware compatibility issues",
+    "Re-run validation after fixes"
+  ]
+}

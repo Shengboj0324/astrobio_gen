@@ -1,0 +1,154 @@
+{
+  "validation_timestamp": "2025-09-23T15:39:59.064343",
+  "total_validation_time_seconds": 32.01429200172424,
+  "overall_score": 0.5,
+  "readiness_status": "NOT_READY",
+  "test_summary": {
+    "total_tests": 8,
+    "passed": 3,
+    "warned": 2,
+    "failed": 3
+  },
+  "detailed_results": {
+    "Hardware Compatibility": {
+      "status": "FAIL",
+      "gpu_available": false,
+      "gpu_memory_gb": 0,
+      "gpu_name": "None",
+      "compute_capability": null,
+      "multi_gpu": false,
+      "recommendations": [
+        "CUDA not available - install CUDA 12.8+"
+      ]
+    },
+    "Dependency Verification": {
+      "status": "WARN",
+      "missing_dependencies": [],
+      "version_conflicts": [],
+      "optional_missing": [
+        "flash_attn",
+        "triton"
+      ],
+      "recommendations": [
+        "Install optional dependencies for optimal performance"
+      ]
+    },
+    "SOTA Attention Mechanisms": {
+      "status": "PASS",
+      "mechanisms_tested": [
+        "short",
+        "medium",
+        "long",
+        "very_long"
+      ],
+      "fallback_performance": {
+        "short": {
+          "time_ms": 3.999948501586914,
+          "memory_mb": 0,
+          "output_shape": [
+            2,
+            128,
+            768
+          ]
+        },
+        "medium": {
+          "time_ms": 13.001203536987305,
+          "memory_mb": 0,
+          "output_shape": [
+            2,
+            512,
+            768
+          ]
+        },
+        "long": {
+          "time_ms": 190.02366065979004,
+          "memory_mb": 0,
+          "output_shape": [
+            2,
+            2048,
+            768
+          ]
+        },
+        "very_long": {
+          "time_ms": 11159.968614578247,
+          "memory_mb": 0,
+          "output_shape": [
+            2,
+            8192,
+            768
+          ]
+        }
+      },
+      "memory_efficiency": {},
+      "recommendations": []
+    },
+    "Multi-Modal Models": {
+      "status": "PASS",
+      "models_tested": [
+        "AdvancedMultiModalLLM"
+      ],
+      "performance_metrics": {
+        "inference_time_ms": 1544.9278354644775,
+        "output_keys": [
+          "logits",
+          "embeddings",
+          "fused_features",
+          "enhanced_features",
+          "inference_time",
+          "modalities_processed",
+          "batch_size"
+        ]
+      },
+      "recommendations": []
+    },
+    "Data Pipeline Robustness": {
+      "status": "PASS",
+      "pipeline_tests": [
+        "data_loading"
+      ],
+      "data_sources_tested": 2,
+      "recommendations": []
+    },
+    "Training Orchestrator": {
+      "status": "FAIL",
+      "orchestrator_features": [],
+      "device_compatibility": {},
+      "recommendations": [
+        "Training orchestrator test failed: [WinError 127] The specified procedure could not be found"
+      ]
+    },
+    "Memory Management": {
+      "status": "WARN",
+      "memory_tests": [],
+      "peak_memory_gb": 0,
+      "memory_efficiency": 0,
+      "recommendations": [
+        "GPU not available for memory testing"
+      ]
+    },
+    "End-to-End Integration": {
+      "status": "FAIL",
+      "integration_tests": [
+        "data_loading",
+        "model_initialization"
+      ],
+      "total_time_ms": 0,
+      "recommendations": [
+        "End-to-end integration failed: [WinError 127] The specified procedure could not be found"
+      ]
+    }
+  },
+  "recommendations": [
+    "Hardware Compatibility: CUDA not available - install CUDA 12.8+",
+    "Dependency Verification: Install optional dependencies for optimal performance",
+    "Training Orchestrator: Training orchestrator test failed: [WinError 127] The specified procedure could not be found",
+    "Memory Management: GPU not available for memory testing",
+    "End-to-End Integration: End-to-end integration failed: [WinError 127] The specified procedure could not be found"
+  ],
+  "next_steps": [
+    "Fix critical failures before proceeding",
+    "Install missing dependencies",
+    "Resolve hardware compatibility issues",
+    "Re-run validation after fixes"
+  ]
+}
