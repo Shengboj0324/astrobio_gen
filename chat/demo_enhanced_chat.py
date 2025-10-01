@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any, Dict
 
 # Import the enhanced tools directly for demonstration
-from enhanced_tool_router import (
+from chat.enhanced_tool_router import (
     access_spectral_library,
     analyze_atmospheric_composition,
     calculate_habitability_metrics,

@@ -60,9 +60,9 @@ except ImportError:
     import sys
 
     sys.path.append(str(Path(__file__).parent))
-    from advanced_data_system import AdvancedDataManager
-    from advanced_quality_system import DataType, QualityMonitor
-    from data_versioning_system import VersionManager
+    from data_build.advanced_data_system import AdvancedDataManager
+    from data_build.advanced_quality_system import DataType, QualityMonitor
+    from data_build.data_versioning_system import VersionManager
     from metadata_db import MetadataManager
 
 # Configure logging

@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # Import our enhanced tools
-from enhanced_tool_router import (
+from chat.enhanced_tool_router import (
     access_spectral_library,
     analyze_atmospheric_composition,
     calculate_habitability_metrics,

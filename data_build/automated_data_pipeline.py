@@ -65,11 +65,11 @@ except ImportError:
     import sys
 
     sys.path.append(str(Path(__file__).parent))
-    from advanced_data_system import AdvancedDataManager
-    from advanced_quality_system import DataType, QualityMonitor
-    from data_versioning_system import VersionManager
+    from data_build.advanced_data_system import AdvancedDataManager
+    from data_build.advanced_quality_system import DataType, QualityMonitor
+    from data_build.data_versioning_system import VersionManager
     from kegg_real_data_integration import KEGGRealDataIntegration
-    from metadata_annotation_system import MetadataManager
+    from data_build.metadata_annotation_system import MetadataManager
     from ncbi_agora2_integration import NCBIAgoraIntegration
 
 # Configure logging
