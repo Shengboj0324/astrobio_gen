@@ -67,10 +67,10 @@
     "immediate_s3_upload": true,
     "cleanup_local_after_upload": true,
     "s3_buckets": {
-      "primary": "astrobio-data-primary-20250714",
-      "zarr": "astrobio-zarr-cubes-20250714",
-      "backup": "astrobio-data-backup-20250714",
-      "logs": "astrobio-logs-metadata-20250714"
+      "primary": "astrobio-data-primary-20250717",
+      "zarr": "astrobio-zarr-cubes-20250717",
+      "backup": "astrobio-data-backup-20250717",
+      "logs": "astrobio-logs-metadata-20250717"
     },
     "temp_paths": {
       "download": "temp/download",

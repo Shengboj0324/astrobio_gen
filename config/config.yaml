@@ -205,12 +205,12 @@ database:
 aws:
   region: "us-east-1"
   
-  # S3 Buckets (will be created automatically)
+  # S3 Buckets (configured and verified - July 17, 2025)
   s3_buckets:
-    primary: "astrobio-data-primary"  # Main data storage
-    backup: "astrobio-data-backup"    # Cross-region backup
-    zarr: "astrobio-zarr-cubes"       # Zarr datacubes
-    logs: "astrobio-logs-metadata"    # Logs and metadata
+    primary: "astrobio-data-primary-20250717"  # Main data storage
+    backup: "astrobio-data-backup-20250717"    # Cross-region backup
+    zarr: "astrobio-zarr-cubes-20250717"       # Zarr datacubes
+    logs: "astrobio-logs-metadata-20250717"    # Logs and metadata
   
   # Compute Configuration
   compute:

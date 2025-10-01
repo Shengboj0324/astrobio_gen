@@ -1,0 +1,33 @@
+================================================================================
+EXACT BUCKET NAMES TO CREATE IN AWS S3 CONSOLE
+================================================================================
+
+Copy-paste these exact names when creating buckets:
+
+1. astrobio-data-primary-20251001
+
+2. astrobio-zarr-cubes-20251001
+
+3. astrobio-data-backup-20251001
+
+4. astrobio-logs-metadata-20251001
+
+
+REGION FOR ALL BUCKETS:
+us-east-1
+
+
+SETTINGS FOR EACH BUCKET:
+- Block all public access: YES (keep checked)
+- Bucket Versioning: Enable for buckets 1 & 3, Disable for buckets 2 & 4
+- Encryption: SSE-S3 (default)
+- Object Ownership: ACLs disabled
+
+
+AFTER CREATING ALL 4 BUCKETS:
+Just tell me: "Done, all 4 buckets created"
+
+Then I will configure everything locally and verify the complete data flow.
+
+================================================================================
+
