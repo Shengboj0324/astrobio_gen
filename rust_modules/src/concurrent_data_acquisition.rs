@@ -216,47 +216,118 @@ impl ConcurrentDataAcquisition {
     /// Acquire data from a single source
     async fn acquire_single_source(&self, config: &DataSourceConfig) -> Result<Vec<u8>> {
         let start_time = Instant::now();
-        
-        // Simulate HTTP request (in real implementation, this would use reqwest or similar)
-        let data = self.simulate_data_acquisition(config).await?;
-        
+
+        // CRITICAL: Use real HTTP requests to acquire actual scientific data
+        // NO SIMULATION - Only real data acquisition
+        let data = self.acquire_real_data(config).await?;
+
         let elapsed = start_time.elapsed();
-        log::debug!("Acquired {} bytes from {} in {:?}", data.len(), config.name, elapsed);
-        
+        log::info!("✅ Acquired {} bytes of REAL DATA from {} in {:?}", data.len(), config.name, elapsed);
+
         Ok(data)
     }
     
-    /// Simulate data acquisition (placeholder for actual HTTP requests)
-    async fn simulate_data_acquisition(&self, config: &DataSourceConfig) -> Result<Vec<u8>> {
-        // Simulate network delay based on priority
-        let delay_ms = match config.priority {
-            9..=10 => 50,  // High priority: 50ms
-            6..=8 => 100,  // Medium priority: 100ms
-            _ => 200,      // Low priority: 200ms
-        };
-        
-        tokio::time::sleep(Duration::from_millis(delay_ms)).await;
-        
-        // Simulate different data sizes based on source type
-        let data_size = match config.data_format.as_str() {
-            "netcdf" => 1024 * 1024, // 1MB for NetCDF files
-            "json" => 64 * 1024,     // 64KB for JSON
-            "csv" => 128 * 1024,     // 128KB for CSV
-            "xml" => 32 * 1024,      // 32KB for XML
-            _ => 16 * 1024,          // 16KB default
-        };
-        
-        // Generate simulated data
-        let data = vec![0u8; data_size];
-        
-        // Simulate occasional failures (5% failure rate)
-        if fastrand::f32() < 0.05 {
-            return Err(AstrobiologyError::NetworkError {
-                message: format!("Simulated network error for {}", config.name),
-            });
+    /// Acquire real data from scientific data sources via HTTP/HTTPS
+    /// CRITICAL: This replaces simulated data acquisition with real HTTP requests
+    async fn acquire_real_data(&self, config: &DataSourceConfig) -> Result<Vec<u8>> {
+        // Build HTTP client with timeout and retry logic
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_secs(config.timeout_seconds))
+            .build()
+            .map_err(|e| AstrobiologyError::NetworkError {
+                message: format!("Failed to build HTTP client: {}", e),
+            })?;
+
+        // Prepare request with authentication
+        let mut request_builder = client.get(&config.url);
+
+        // Add authentication headers based on type
+        match config.authentication_type.as_str() {
+            "api_key" => {
+                if let Some(api_key) = &config.api_key {
+                    request_builder = request_builder.header("X-API-Key", api_key);
+                }
+            },
+            "bearer" => {
+                if let Some(api_key) = &config.api_key {
+                    request_builder = request_builder.header("Authorization", format!("Bearer {}", api_key));
+                }
+            },
+            "basic" => {
+                if let Some(api_key) = &config.api_key {
+                    request_builder = request_builder.header("Authorization", format!("Basic {}", api_key));
+                }
+            },
+            _ => {} // No authentication
         }
-        
-        Ok(data)
+
+        // Execute request with retry logic
+        let mut last_error = None;
+        for attempt in 0..config.retry_attempts {
+            match request_builder.try_clone()
+                .ok_or_else(|| AstrobiologyError::NetworkError {
+                    message: "Failed to clone request".to_string(),
+                })?
+                .send()
+                .await
+            {
+                Ok(response) => {
+                    if response.status().is_success() {
+                        // Download data
+                        let data = response.bytes().await
+                            .map_err(|e| AstrobiologyError::NetworkError {
+                                message: format!("Failed to read response: {}", e),
+                            })?
+                            .to_vec();
+
+                        log::info!(
+                            "✅ Successfully acquired {} bytes from {} (attempt {}/{})",
+                            data.len(),
+                            config.name,
+                            attempt + 1,
+                            config.retry_attempts
+                        );
+
+                        return Ok(data);
+                    } else {
+                        last_error = Some(format!("HTTP {}: {}", response.status(), response.status().canonical_reason().unwrap_or("Unknown")));
+                        log::warn!(
+                            "⚠️  HTTP error from {}: {} (attempt {}/{})",
+                            config.name,
+                            last_error.as_ref().unwrap(),
+                            attempt + 1,
+                            config.retry_attempts
+                        );
+                    }
+                },
+                Err(e) => {
+                    last_error = Some(format!("Request failed: {}", e));
+                    log::warn!(
+                        "⚠️  Request error from {}: {} (attempt {}/{})",
+                        config.name,
+                        e,
+                        attempt + 1,
+                        config.retry_attempts
+                    );
+                }
+            }
+
+            // Exponential backoff between retries
+            if attempt < config.retry_attempts - 1 {
+                let backoff_ms = 1000 * (2_u64.pow(attempt));
+                tokio::time::sleep(Duration::from_millis(backoff_ms)).await;
+            }
+        }
+
+        // All retries failed
+        Err(AstrobiologyError::NetworkError {
+            message: format!(
+                "❌ CRITICAL: Failed to acquire real data from {} after {} attempts. Last error: {}. TRAINING CANNOT PROCEED.",
+                config.name,
+                config.retry_attempts,
+                last_error.unwrap_or_else(|| "Unknown error".to_string())
+            ),
+        })
     }
     
     /// Check circuit breaker state

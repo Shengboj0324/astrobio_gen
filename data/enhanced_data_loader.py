@@ -619,30 +619,22 @@ class MultiModalDataset(Dataset):
                     except:
                         continue
 
-                logger.warning(f"Could not interpret binary data for {config.name}")
-                return self._create_dummy_data(config)
+                error_msg = f"❌ CRITICAL: Could not interpret binary data for {config.name}"
+                logger.error(error_msg)
+                raise RuntimeError(
+                    f"{error_msg}\n"
+                    "NO DUMMY DATA FALLBACK AVAILABLE.\n"
+                    "Training CANNOT proceed without valid real data."
+                )
 
         except Exception as e:
-            logger.error(f"Error processing binary data for {config.name}: {e}")
-            return self._create_dummy_data(config)
-
-    def _create_dummy_data(self, config: DataSourceConfig) -> torch.Tensor:
-        """Create dummy data for testing"""
-        if config.modality == DataModality.CLIMATE:
-            # Climate datacube: [variables, time, lat, lon, level]
-            return torch.randn(5, 12, 64, 128, 10)
-        elif config.modality == DataModality.SPECTRAL:
-            # Spectral data: [wavelengths]
-            return torch.abs(torch.randn(1000))
-        elif config.modality == DataModality.MOLECULAR:
-            # Molecular features
-            return torch.randn(64)
-        elif config.modality == DataModality.TEXTUAL:
-            # Text embeddings
-            return torch.randn(768)
-        else:
-            # Generic data
-            return torch.randn(100)
+            error_msg = f"❌ CRITICAL: Error processing binary data for {config.name}: {e}"
+            logger.error(error_msg)
+            raise RuntimeError(
+                f"{error_msg}\n"
+                "NO DUMMY DATA FALLBACK AVAILABLE.\n"
+                "Training CANNOT proceed without valid real data."
+            )
     
     def __len__(self) -> int:
         """Dataset length"""

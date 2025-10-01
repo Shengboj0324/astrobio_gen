@@ -537,13 +537,22 @@ class UnifiedSOTATrainer:
             logger.info("⚡ Mixed precision training enabled")
 
     def load_data(self) -> Dict[str, DataLoader]:
-        """Load and setup data loaders"""
-        logger.info("📊 Loading data...")
+        """
+        Load and setup data loaders.
 
-        # This would be implemented based on specific data requirements
-        # For now, create dummy data loaders for testing
+        CRITICAL: NO DUMMY DATA ALLOWED. Training will fail if real data is not available.
+        """
+        logger.info("📊 Loading data...")
+        logger.info("⚠️  ZERO TOLERANCE: Only real data accepted, no fallbacks")
 
         try:
+            # First, ensure data is ready
+            import asyncio
+            from training.automatic_data_acquisition_system import ensure_training_data_ready
+
+            logger.info("Verifying data readiness...")
+            asyncio.run(ensure_training_data_ready(min_quality_score=0.95))
+
             # Import data modules
             from data.enhanced_data_loader import create_unified_data_loaders
 
@@ -552,52 +561,44 @@ class UnifiedSOTATrainer:
                 batch_size=self.config.batch_size
             )
 
+            if not data_loaders or len(data_loaders) == 0:
+                raise RuntimeError(
+                    "❌ CRITICAL: Data loaders returned empty. "
+                    "Training CANNOT proceed without valid data loaders."
+                )
+
             self.data_loaders = data_loaders
-            logger.info(f"✅ Data loaders created: {list(data_loaders.keys())}")
+            logger.info(f"✅ Real data loaders created: {list(data_loaders.keys())}")
 
-        except ImportError:
-            logger.warning("⚠️  Data loaders not available, using dummy data")
-            # Create dummy data loaders for testing
-            self.data_loaders = self._create_dummy_data_loaders()
+            # Validate data loaders have real data
+            for split, loader in data_loaders.items():
+                if len(loader) == 0:
+                    raise RuntimeError(
+                        f"❌ CRITICAL: {split} data loader is empty. "
+                        "Training CANNOT proceed without data."
+                    )
 
-        return self.data_loaders
+            logger.info(f"✅ Data validation passed: All loaders contain real data")
+            return self.data_loaders
 
-    def _create_dummy_data_loaders(self) -> Dict[str, DataLoader]:
-        """Create dummy data loaders for testing"""
-        from torch.utils.data import TensorDataset
+        except ImportError as e:
+            error_msg = (
+                f"❌ CRITICAL: Failed to import data loaders: {e}\n"
+                "Training CANNOT proceed without real data.\n"
+                "NO DUMMY DATA FALLBACK AVAILABLE.\n"
+                "Please ensure data acquisition is complete and data loaders are properly installed."
+            )
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
 
-        # Create dummy data based on model type
-        if self.config.model_name == "rebuilt_llm_integration":
-            # Dummy text data
-            input_ids = torch.randint(0, 1000, (1000, 32))
-            attention_mask = torch.ones(1000, 32)
-            labels = torch.randint(0, 1000, (1000, 32))
-            dataset = TensorDataset(input_ids, attention_mask, labels)
-
-        elif self.config.model_name == "rebuilt_datacube_cnn":
-            # Dummy datacube data
-            data = torch.randn(1000, 5, 2, 2, 4, 8, 8)
-            labels = torch.randn(1000, 10)
-            dataset = TensorDataset(data, labels)
-
-        else:
-            # Generic dummy data
-            data = torch.randn(1000, 64)
-            labels = torch.randn(1000, 10)
-            dataset = TensorDataset(data, labels)
-
-        data_loader = DataLoader(
-            dataset,
-            batch_size=self.config.batch_size,
-            shuffle=True,
-            num_workers=0
-        )
-
-        return {
-            'train': data_loader,
-            'val': data_loader,
-            'test': data_loader
-        }
+        except Exception as e:
+            error_msg = (
+                f"❌ CRITICAL: Failed to load data: {e}\n"
+                "Training CANNOT proceed without valid real data.\n"
+                "NO DUMMY DATA FALLBACK AVAILABLE."
+            )
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
 
     def train_epoch(self, epoch: int) -> Dict[str, float]:
         """Train for one epoch with SOTA optimizations"""

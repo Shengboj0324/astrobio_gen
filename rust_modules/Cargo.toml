@@ -19,8 +19,8 @@ numpy = "0.20"
 ndarray = { version = "0.15", features = ["rayon", "serde"] }
 rayon = "1.8"
 
-# Async and networking for future phases
-reqwest = { version = "0.11", features = ["json"], optional = true }
+# Async and networking for REAL data acquisition (CRITICAL - NOT OPTIONAL)
+reqwest = { version = "0.11", features = ["json", "stream"] }
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -58,9 +58,9 @@ tokio = { version = "1.35", features = ["full"] }
 futures = "0.3"
 
 [features]
-default = ["datacube-processing"]
+default = ["datacube-processing", "concurrent-acquisition"]
 datacube-processing = []
-concurrent-acquisition = ["reqwest"]
+concurrent-acquisition = []
 full = ["datacube-processing", "concurrent-acquisition"]
 
 [profile.release]
