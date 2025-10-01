@@ -189,9 +189,16 @@ class GroupedQueryAttention(nn.Module):
 
     def forward(self, hidden_states: torch.Tensor,
                 attention_mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Grouped query attention forward pass"""
-        batch_size, seq_len, _ = hidden_states.shape
-
+        
+        # Handle attention mask dtype
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(dtype=hidden_states.dtype)
+            # Ensure proper shape: [batch, 1, seq_len, seq_len] or [batch, 1, 1, seq_len]
+            if attention_mask.dim() == 2:
+                attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+            elif attention_mask.dim() == 3:
+                attention_mask = attention_mask.unsqueeze(1)
+        
         # Project to Q, K, V
         queries = self.q_proj(hidden_states)
         keys = self.k_proj(hidden_states)

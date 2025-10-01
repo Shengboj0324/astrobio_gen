@@ -981,6 +981,8 @@ class EnhancedCubeUNet(pl.LightningModule if PYTORCH_LIGHTNING_AVAILABLE else nn
                         use_gradient_checkpointing=self.use_gradient_checkpointing,
                     )
                 )
+                # FIX: Update in_channels after first block
+                in_channels = features
             else:
                 # Downsampling blocks
                 self.downsample_blocks.append(

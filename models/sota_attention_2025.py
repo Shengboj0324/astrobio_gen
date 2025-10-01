@@ -881,6 +881,9 @@ class LinearAttention(nn.Module):
         self.v_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
         self.o_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
 
+        # Attention scaling factor
+        self.scaling = self.head_dim ** -0.5
+
         # Type-specific initialization
         if self.linear_attention_type == "performer":
             self.nb_features = config.performer_nb_features

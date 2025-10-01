@@ -230,10 +230,6 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=astrobio_gen",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
 ]
 testpaths = ["tests"]
 filterwarnings = [
