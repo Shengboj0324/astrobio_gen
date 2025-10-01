@@ -78,7 +78,7 @@ pysiaf==0.19.1          # JWST aperture data for pixel-level sims
 #########################################################
 # ======  WEB SCRAPING & HTTP REQUESTS  =============== #
 #########################################################
-requests==2.31.0         # HTTP library for REST APIs
+requests==2.32.4         # HTTP library for REST APIs
 aiohttp==3.9.5           # Async HTTP client/server framework
 beautifulsoup4==4.12.3   # HTML/XML parsing for web scraping
 lxml==4.9.4              # Fast XML/HTML parser backend
