@@ -546,56 +546,95 @@ class UnifiedSOTATrainer:
         logger.info("⚠️  ZERO TOLERANCE: Only real data accepted, no fallbacks")
 
         try:
-            # First, ensure data is ready
-            import asyncio
-            from training.automatic_data_acquisition_system import ensure_training_data_ready
+            # First, verify real data exists using RealDataStorage
+            logger.info("Verifying real data availability...")
+            from data_build.real_data_storage import RealDataStorage
 
-            logger.info("Verifying data readiness...")
-            asyncio.run(ensure_training_data_ready(min_quality_score=0.95))
+            try:
+                # This will FAIL if real data is not available
+                real_storage = RealDataStorage()
+                available_runs = real_storage.list_stored_runs()
+                logger.info(f"✅ Real data verified: {len(available_runs)} runs available")
+            except FileNotFoundError as e:
+                error_msg = (
+                    f"❌ CRITICAL: Real data not found: {e}\n"
+                    "Training CANNOT proceed without real data.\n"
+                    "Run: python training/enable_automatic_data_download.py"
+                )
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
 
-            # Import data modules
-            from data.enhanced_data_loader import create_unified_data_loaders
+            # Try to import production data loader
+            try:
+                from data_build.production_data_loader import ProductionDataLoader
+                prod_loader = ProductionDataLoader()
+                logger.info("✅ Production data loader available")
+            except ImportError as e:
+                logger.warning(f"⚠️  Production data loader not available: {e}")
 
-            data_loaders = create_unified_data_loaders(
-                config=self.config.data_config,
-                batch_size=self.config.batch_size
-            )
-
-            if not data_loaders or len(data_loaders) == 0:
-                raise RuntimeError(
-                    "❌ CRITICAL: Data loaders returned empty. "
-                    "Training CANNOT proceed without valid data loaders."
+            # Try to import unified data loaders
+            try:
+                from data_build.unified_dataloader_fixed import (
+                    create_multimodal_dataloaders,
+                    DataLoaderConfig
                 )
 
-            self.data_loaders = data_loaders
-            logger.info(f"✅ Real data loaders created: {list(data_loaders.keys())}")
+                # Create data loader configuration
+                dataloader_config = DataLoaderConfig(
+                    batch_size=self.config.batch_size,
+                    num_workers=4,
+                    pin_memory=True,
+                    include_climate=True,
+                    include_biology=True,
+                    include_spectroscopy=True,
+                    enable_caching=True,
+                    normalize_climate=True
+                )
 
-            # Validate data loaders have real data
-            for split, loader in data_loaders.items():
-                if len(loader) == 0:
-                    raise RuntimeError(
-                        f"❌ CRITICAL: {split} data loader is empty. "
-                        "Training CANNOT proceed without data."
-                    )
+                # Create data loaders with REAL data storage
+                train_loader, val_loader, test_loader = create_multimodal_dataloaders(
+                    dataloader_config,
+                    storage_manager=real_storage
+                )
 
-            logger.info(f"✅ Data validation passed: All loaders contain real data")
-            return self.data_loaders
+                self.data_loaders = {
+                    'train': train_loader,
+                    'val': val_loader,
+                    'test': test_loader
+                }
 
-        except ImportError as e:
-            error_msg = (
-                f"❌ CRITICAL: Failed to import data loaders: {e}\n"
-                "Training CANNOT proceed without real data.\n"
-                "NO DUMMY DATA FALLBACK AVAILABLE.\n"
-                "Please ensure data acquisition is complete and data loaders are properly installed."
-            )
-            logger.error(error_msg)
-            raise RuntimeError(error_msg)
+                logger.info(f"✅ Real data loaders created successfully")
+                logger.info(f"   Train batches: {len(train_loader)}")
+                logger.info(f"   Val batches: {len(val_loader)}")
+                logger.info(f"   Test batches: {len(test_loader)}")
+
+                # Validate data loaders have real data
+                for split, loader in self.data_loaders.items():
+                    if len(loader) == 0:
+                        raise RuntimeError(
+                            f"❌ CRITICAL: {split} data loader is empty. "
+                            "Training CANNOT proceed without data."
+                        )
+
+                logger.info(f"✅ Data validation passed: All loaders contain real data")
+                return self.data_loaders
+
+            except ImportError as e:
+                error_msg = (
+                    f"❌ CRITICAL: Failed to import data loaders: {e}\n"
+                    "Training CANNOT proceed without real data.\n"
+                    "NO DUMMY DATA FALLBACK AVAILABLE.\n"
+                    "Please ensure data acquisition is complete and data loaders are properly installed."
+                )
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
 
         except Exception as e:
             error_msg = (
                 f"❌ CRITICAL: Failed to load data: {e}\n"
                 "Training CANNOT proceed without valid real data.\n"
-                "NO DUMMY DATA FALLBACK AVAILABLE."
+                "NO DUMMY DATA FALLBACK AVAILABLE.\n"
+                "Run: python training/enable_automatic_data_download.py"
             )
             logger.error(error_msg)
             raise RuntimeError(error_msg)

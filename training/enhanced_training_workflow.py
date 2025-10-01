@@ -748,16 +748,22 @@ if __name__ == "__main__":
         # Create model and trainer
         model, trainer = create_trainer(encoder_config, training_config)
 
-        # Create mock data loaders
-        from data_build.unified_dataloader_fixed import MockDataStorage
+        # Create REAL data loaders (NO MOCK DATA)
+        from data_build.real_data_storage import RealDataStorage
 
-        mock_storage = MockDataStorage(n_runs=20)
+        try:
+            real_storage = RealDataStorage()
+            logger.info(f"✅ Real data storage initialized: {len(real_storage.list_stored_runs())} runs")
+        except FileNotFoundError as e:
+            logger.error(f"❌ CRITICAL: Real data not found: {e}")
+            logger.error("Run: python training/enable_automatic_data_download.py")
+            raise RuntimeError("Training CANNOT proceed without real data")
 
         dataloader_config = DataLoaderConfig(
             batch_size=training_config.batch_size, num_workers=0, pin_memory=False  # For testing
         )
 
-        train_loader, val_loader, _ = create_multimodal_dataloaders(dataloader_config, mock_storage)
+        train_loader, val_loader, _ = create_multimodal_dataloaders(dataloader_config, real_storage)
 
         logger.info("🔄 Starting training test...")
 

@@ -1053,12 +1053,21 @@ class EnhancedTrainingOrchestrator:
         # Setup trainer
         trainer = self._create_trainer()
 
-        # Use primary data module or create combined data module
+        # Use primary data module or create real data module
         primary_data_module = list(data_modules.values())[0] if data_modules else None
 
         if primary_data_module is None:
-            # Create synthetic data module for testing
-            primary_data_module = self._create_synthetic_data_module()
+            # CRITICAL: Use REAL data module, NO synthetic data
+            try:
+                primary_data_module = self._create_real_data_module()
+            except Exception as e:
+                error_msg = (
+                    f"❌ CRITICAL: Failed to create real data module: {e}\n"
+                    "Training CANNOT proceed without real data.\n"
+                    "Run: python training/enable_automatic_data_download.py"
+                )
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
 
         # Train
         start_time = time.time()
@@ -1269,35 +1278,71 @@ class EnhancedTrainingOrchestrator:
 
         return trainer
 
-    def _create_synthetic_data_module(self) -> Any:  # Changed from pl.LightningDataModule
-        """Create synthetic data module for testing"""
+    def _create_real_data_module(self) -> Any:
+        """
+        Create REAL data module using RealDataStorage.
+        NO SYNTHETIC DATA ALLOWED.
+        """
+        from data_build.real_data_storage import RealDataStorage
+        from data_build.unified_dataloader_fixed import (
+            create_multimodal_dataloaders,
+            DataLoaderConfig
+        )
 
-        class SyntheticDataModule:  # Changed from pl.LightningDataModule
-            def __init__(self, batch_size: int = 8):
-                super().__init__()
-                self.batch_size = batch_size
+        # Verify real data exists
+        try:
+            real_storage = RealDataStorage()
+            available_runs = real_storage.list_stored_runs()
+            logger.info(f"✅ Real data verified: {len(available_runs)} runs available")
+        except FileNotFoundError as e:
+            error_msg = (
+                f"❌ CRITICAL: Real data not found: {e}\n"
+                "Training CANNOT proceed without real data.\n"
+                "Run: python training/enable_automatic_data_download.py"
+            )
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+
+        # Create data loader configuration
+        dataloader_config = DataLoaderConfig(
+            batch_size=self.config.batch_size,
+            num_workers=4,
+            pin_memory=True,
+            include_climate=True,
+            include_biology=True,
+            include_spectroscopy=True,
+            enable_caching=True,
+            normalize_climate=True
+        )
+
+        # Create real data loaders
+        train_loader, val_loader, test_loader = create_multimodal_dataloaders(
+            dataloader_config,
+            storage_manager=real_storage
+        )
+
+        # Create data module wrapper
+        class RealDataModule:
+            def __init__(self, train_loader, val_loader, test_loader):
+                self.train_loader = train_loader
+                self.val_loader = val_loader
+                self.test_loader = test_loader
+                self.batch_size = dataloader_config.batch_size
 
             def setup(self, stage: Optional[str] = None):
                 pass
 
             def train_dataloader(self):
-                # Create synthetic data
-                def synthetic_data_generator():
-                    while True:
-                        batch = {
-                            "datacube": torch.randn(self.batch_size, 5, 32, 64, 64),
-                            "scalar_params": torch.randn(self.batch_size, 8),
-                            "target_temperature_field": torch.randn(self.batch_size, 1, 32, 64, 64),
-                            "target_habitability": torch.rand(self.batch_size, 1),
-                        }
-                        yield batch
-
-                return synthetic_data_generator()
+                return self.train_loader
 
             def val_dataloader(self):
-                return self.train_dataloader()
+                return self.val_loader
 
-        return SyntheticDataModule(self.config.batch_size)
+            def test_dataloader(self):
+                return self.test_loader
+
+        logger.info(f"✅ Real data module created successfully")
+        return RealDataModule(train_loader, val_loader, test_loader)
 
     def _get_model_complexity(self, model: nn.Module) -> Dict[str, Any]:
         """Get model complexity information"""
