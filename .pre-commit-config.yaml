@@ -1,0 +1,130 @@
+# Pre-commit hooks for AstroBio-Gen
+# ==================================
+#
+# Installation:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Run manually:
+#   pre-commit run --all-files
+#
+
+repos:
+  # Python formatting
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3.11
+        args: ['--line-length=100']
+        files: ^(models|training|utils|tests)/.*\.py$
+
+  # Python import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile', 'black', '--line-length', '100']
+        files: ^(models|training|utils|tests)/.*\.py$
+
+  # Python linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.0
+    hooks:
+      - id: ruff
+        args: ['--fix', '--exit-non-zero-on-fix']
+        files: ^(models|training|utils|tests)/.*\.py$
+
+  # Python type checking (optional, may be slow)
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.8.0
+  #   hooks:
+  #     - id: mypy
+  #       args: ['--ignore-missing-imports', '--strict']
+  #       files: ^utils/.*\.py$
+  #       additional_dependencies: [types-all]
+
+  # Rust formatting
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: ['--manifest-path', 'rust_modules/Cargo.toml', '--']
+      - id: clippy
+        args: ['--manifest-path', 'rust_modules/Cargo.toml', '--', '-D', 'warnings']
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(.*\.md|.*\.txt)$
+      - id: end-of-file-fixer
+        exclude: ^(.*\.txt)$
+      - id: check-yaml
+        args: ['--safe']
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=10000']  # 10MB limit
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Markdown formatting
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.17
+    hooks:
+      - id: mdformat
+        args: ['--wrap', '100']
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-black
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+        files: ^(models|training|utils)/.*\.py$
+
+  # Secrets detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package.lock.json
+
+# Configuration
+default_language_version:
+  python: python3.11
+
+# Exclude patterns
+exclude: |
+  (?x)^(
+      .*\.egg-info/.*|
+      .*/__pycache__/.*|
+      .*/\.git/.*|
+      .*/\.venv/.*|
+      .*/venv/.*|
+      .*/\.pytest_cache/.*|
+      .*/\.mypy_cache/.*|
+      .*/\.ruff_cache/.*|
+      .*/target/.*|
+      .*/node_modules/.*|
+      .*\.pyc|
+      .*\.pyo|
+      .*\.so|
+      .*\.dll|
+      .*\.dylib|
+      archive/.*|
+      experiments/.*|
+      data/.*|
+      checkpoints/.*|
+      logs/.*
+  )$
+
