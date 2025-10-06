@@ -61,21 +61,29 @@
     "backup_count": 5
   },
   "storage_config": {
+    "_comment": "MIGRATED TO R2: October 5, 2025 - Using Cloudflare R2 (S3-compatible)",
     "mode": "cloud_first",
     "local_cache_gb": 5,
     "temp_processing_gb": 2,
-    "immediate_s3_upload": true,
+    "immediate_r2_upload": true,
     "cleanup_local_after_upload": true,
-    "s3_buckets": {
-      "primary": "astrobio-data-primary-20250717",
-      "zarr": "astrobio-zarr-cubes-20250717",
-      "backup": "astrobio-data-backup-20250717",
-      "logs": "astrobio-logs-metadata-20250717"
+    "r2_buckets": {
+      "primary": "astrobio-data-primary",
+      "zarr": "astrobio-zarr-cubes",
+      "backup": "astrobio-data-backup",
+      "logs": "astrobio-logs-metadata"
     },
     "temp_paths": {
       "download": "temp/download",
       "processing": "temp/processing",
       "cache": "temp/cache"
+    },
+    "_deprecated_s3_buckets": {
+      "_comment": "DEPRECATED - Migrated to R2 on October 5, 2025",
+      "primary": "astrobio-data-primary-20250717",
+      "zarr": "astrobio-zarr-cubes-20250717",
+      "backup": "astrobio-data-backup-20250717",
+      "logs": "astrobio-logs-metadata-20250717"
     }
   }
 } 

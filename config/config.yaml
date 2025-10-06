@@ -7,7 +7,8 @@ defaults:
 # Advanced datacube configuration
 datacube:
   # Primary zarr store path (environment variable supported)
-  zarr_root: "${oc.env:ASTRO_CUBE_ZARR,s3://astrobio-zarr-cubes-20250714}"
+  # MIGRATED TO R2: October 5, 2025 - Using Cloudflare R2 (S3-compatible)
+  zarr_root: "${oc.env:ASTRO_CUBE_ZARR,r2://astrobio-zarr-cubes}"
   
   # Backup/additional zarr stores for ensemble processing
   additional_zarr_stores: []
@@ -201,34 +202,37 @@ database:
       permission_checks: true  # Enforce file permissions
       backup_encryption: false  # Encrypt backup files
 
-# AWS Configuration
-aws:
-  region: "us-east-1"
-  
-  # S3 Buckets (configured and verified - July 17, 2025)
-  s3_buckets:
-    primary: "astrobio-data-primary-20250717"  # Main data storage
-    backup: "astrobio-data-backup-20250717"    # Cross-region backup
-    zarr: "astrobio-zarr-cubes-20250717"       # Zarr datacubes
-    logs: "astrobio-logs-metadata-20250717"    # Logs and metadata
-  
-  # Compute Configuration
-  compute:
-    dev_instance_type: "t3.large"
-    training_instance_type: "g4dn.xlarge"  # GPU for ML training
-    batch_instance_type: "c5.4xlarge"      # CPU for data processing
-  
-  # Cost Management
-  cost_management:
-    daily_budget_alert: 100   # USD
-    monthly_budget_limit: 1000  # USD
-    auto_shutdown_idle: true
-    lifecycle_policies: true   # Auto-archive old data
-  
+# ============================================================================
+# CLOUDFLARE R2 CONFIGURATION (Migrated from AWS S3 - October 5, 2025)
+# ============================================================================
+# Zero egress fees, S3-compatible API
+# ============================================================================
+r2:
+  # R2 Buckets (S3-compatible naming)
+  buckets:
+    primary: "astrobio-data-primary"  # Main data storage
+    backup: "astrobio-data-backup"    # Backup storage
+    zarr: "astrobio-zarr-cubes"       # Zarr datacubes
+    logs: "astrobio-logs-metadata"    # Logs and metadata
+
   # Storage Configuration
   storage:
-    mode: "cloud_first"              # Store data directly to S3
+    mode: "cloud_first"              # Store data directly to R2
     local_cache_gb: 5                # Small local cache (5GB max)
     temp_processing_gb: 2            # Temporary space for processing
     immediate_upload: true           # Upload processed data immediately
+
+# ============================================================================
+# DEPRECATED: AWS Configuration (Migrated to R2 on October 5, 2025)
+# ============================================================================
+# REASON: High egress costs - switched to Cloudflare R2
+# These settings are no longer used and can be removed after verification
+# ============================================================================
+# aws:
+#   region: "us-east-1"
+#   s3_buckets:
+#     primary: "astrobio-data-primary-20250717"
+#     backup: "astrobio-data-backup-20250717"
+#     zarr: "astrobio-zarr-cubes-20250717"
+#     logs: "astrobio-logs-metadata-20250717"
     cleanup_local_after_upload: true # Delete local files after S3 upload

@@ -688,18 +688,18 @@ class CubeDM(pl.LightningDataModule):
             return {}
 
     def _resolve_zarr_root(self, zarr_root: Optional[str]) -> Union[Path, str]:
-        """Resolve zarr root path with S3 and environment variable support"""
+        """Resolve zarr root path with S3/R2 and environment variable support"""
         if zarr_root:
-            # FIXED: Support S3 URLs directly
-            if zarr_root.startswith("s3://"):
-                return zarr_root  # Return S3 URL as string
+            # FIXED: Support S3/R2 URLs directly (R2 uses S3-compatible API)
+            if zarr_root.startswith("s3://") or zarr_root.startswith("r2://"):
+                return zarr_root  # Return S3/R2 URL as string
             return Path(zarr_root)
 
         # Try environment variable
         env_path = os.getenv("ASTRO_CUBE_ZARR")
         if env_path:
-            if env_path.startswith("s3://"):
-                return env_path  # Return S3 URL as string
+            if env_path.startswith("s3://") or env_path.startswith("r2://"):
+                return env_path  # Return S3/R2 URL as string
             return Path(env_path)
 
         # Try config file
@@ -711,16 +711,16 @@ class CubeDM(pl.LightningDataModule):
                 if "," in env_var:
                     env_var, default = env_var.split(",")
                     resolved_path = os.getenv(env_var, default)
-                    if resolved_path.startswith("s3://"):
-                        return resolved_path  # Return S3 URL as string
+                    if resolved_path.startswith("s3://") or resolved_path.startswith("r2://"):
+                        return resolved_path  # Return S3/R2 URL as string
                     return Path(resolved_path)
                 else:
                     resolved_path = os.getenv(env_var, "data/processed/gcm_zarr")
-                    if resolved_path.startswith("s3://"):
-                        return resolved_path  # Return S3 URL as string
+                    if resolved_path.startswith("s3://") or resolved_path.startswith("r2://"):
+                        return resolved_path  # Return S3/R2 URL as string
                     return Path(resolved_path)
-            if config_path.startswith("s3://"):
-                return config_path  # Return S3 URL as string
+            if config_path.startswith("s3://") or config_path.startswith("r2://"):
+                return config_path  # Return S3/R2 URL as string
             return Path(config_path)
 
         # Default fallback
@@ -732,13 +732,28 @@ class CubeDM(pl.LightningDataModule):
         return [Path(store) for store in additional]
 
     def _discover_s3_zarr_stores(self) -> List[str]:
-        """Discover zarr stores in S3 bucket"""
+        """Discover zarr stores in S3/R2 bucket (R2 uses S3-compatible API)"""
         try:
             import s3fs
-            fs = s3fs.S3FileSystem()
+            import os
 
-            # Parse S3 URL
-            bucket_path = self.zarr_root.replace("s3://", "")
+            # Check if using R2 (Cloudflare R2 with S3-compatible API)
+            if self.zarr_root.startswith("r2://"):
+                # R2 endpoint configuration
+                r2_endpoint = os.getenv('R2_ENDPOINT_URL')
+                r2_key = os.getenv('R2_ACCESS_KEY_ID')
+                r2_secret = os.getenv('R2_SECRET_ACCESS_KEY')
+
+                fs = s3fs.S3FileSystem(
+                    key=r2_key,
+                    secret=r2_secret,
+                    client_kwargs={'endpoint_url': r2_endpoint}
+                )
+                bucket_path = self.zarr_root.replace("r2://", "")
+            else:
+                # Standard S3
+                fs = s3fs.S3FileSystem()
+                bucket_path = self.zarr_root.replace("s3://", "")
 
             # List directories matching run_*/data.zarr pattern
             zarr_stores = []
@@ -749,20 +764,22 @@ class CubeDM(pl.LightningDataModule):
                 # Filter for zarr stores
                 for obj in objects:
                     if obj.endswith("/data.zarr") and "/run_" in obj:
-                        zarr_stores.append(f"s3://{obj}")
+                        # Use appropriate prefix (s3:// or r2://)
+                        prefix = "r2://" if self.zarr_root.startswith("r2://") else "s3://"
+                        zarr_stores.append(f"{prefix}{obj}")
 
-                logger.info(f"🔍 Discovered {len(zarr_stores)} S3 zarr stores")
+                logger.info(f"🔍 Discovered {len(zarr_stores)} S3/R2 zarr stores")
                 return zarr_stores
 
             except Exception as e:
-                logger.warning(f"⚠️ S3 zarr store discovery failed: {e}")
+                logger.warning(f"⚠️ S3/R2 zarr store discovery failed: {e}")
                 # Return dummy stores for testing
                 return [f"{self.zarr_root}/run_000001/data.zarr",
                        f"{self.zarr_root}/run_000002/data.zarr"]
 
         except ImportError:
-            logger.error("❌ s3fs not available for S3 zarr store discovery")
-            raise RuntimeError("s3fs required for S3 zarr operations")
+            logger.error("❌ s3fs not available for S3/R2 zarr store discovery")
+            raise RuntimeError("s3fs required for S3/R2 zarr operations")
 
     def _get_config_variables(self, var_type: str) -> List[str]:
         """Get variables from configuration"""
@@ -833,9 +850,9 @@ class CubeDM(pl.LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         """Setup datasets for each stage"""
         if stage in (None, "fit", "validate"):
-            # FIXED: Handle S3 URLs for zarr store discovery
-            if isinstance(self.zarr_root, str) and self.zarr_root.startswith("s3://"):
-                # S3 zarr store discovery
+            # FIXED: Handle S3/R2 URLs for zarr store discovery
+            if isinstance(self.zarr_root, str) and (self.zarr_root.startswith("s3://") or self.zarr_root.startswith("r2://")):
+                # S3/R2 zarr store discovery (R2 uses S3-compatible API)
                 zarr_stores = self._discover_s3_zarr_stores()
             else:
                 # Local zarr store discovery
