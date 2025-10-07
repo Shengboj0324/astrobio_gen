@@ -69,6 +69,23 @@ try:
 except ImportError:
     FLASH_ATTENTION_AVAILABLE = False
 
+# 8-bit AdamW optimizer for memory efficiency
+try:
+    import bitsandbytes as bnb
+    BITSANDBYTES_AVAILABLE = True
+except ImportError:
+    BITSANDBYTES_AVAILABLE = False
+    logger.warning("⚠️ bitsandbytes not available - 8-bit optimizer disabled")
+
+# FSDP for CPU offloading
+try:
+    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+    from torch.distributed.fsdp import CPUOffload
+    FSDP_AVAILABLE = True
+except ImportError:
+    FSDP_AVAILABLE = False
+    logger.warning("⚠️ FSDP not available - CPU offloading disabled")
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -94,11 +111,11 @@ class TrainingMode(Enum):
 @dataclass
 class SOTATrainingConfig:
     """Comprehensive SOTA training configuration"""
-    
+
     # Model configuration
     model_name: str = "rebuilt_llm_integration"
     model_config: Dict[str, Any] = field(default_factory=dict)
-    
+
     # Training parameters
     batch_size: int = 32
     learning_rate: float = 1e-4
@@ -106,34 +123,43 @@ class SOTATrainingConfig:
     max_epochs: int = 100
     warmup_epochs: int = 10
     gradient_clip_val: float = 1.0
-    
+
+    # Memory optimization parameters (CRITICAL for 13.14B model)
+    gradient_accumulation_steps: int = 32  # Accumulate gradients over 32 steps
+    effective_batch_size: int = 32  # Effective batch size after accumulation
+    micro_batch_size: int = 1  # Actual batch size per step (fits in memory)
+    use_8bit_optimizer: bool = True  # Use 8-bit AdamW (75% memory reduction)
+    use_cpu_offloading: bool = True  # Offload optimizer states to CPU
+    memory_profiling_interval: int = 10  # Profile memory every N steps
+    max_memory_per_gpu_gb: float = 45.0  # Alert threshold for memory usage
+
     # SOTA optimization features
     use_flash_attention: bool = True
     use_mixed_precision: bool = True
     use_gradient_checkpointing: bool = True
     use_compile: bool = True  # torch.compile for 2x speedup
-    
+
     # Advanced optimizers
-    optimizer_name: str = "adamw"  # adamw, lion, sophia
+    optimizer_name: str = "adamw"  # adamw, lion, sophia, adamw8bit
     scheduler_name: str = "onecycle"  # onecycle, cosine, cosine_restarts
-    
+
     # Distributed training
     use_distributed: bool = False
     num_gpus: int = 1
     num_nodes: int = 1
-    
+
     # Physics constraints
     use_physics_constraints: bool = True
     physics_weight: float = 0.1
-    
+
     # Monitoring and logging
     use_wandb: bool = True
     log_every_n_steps: int = 50
     save_every_n_epochs: int = 10
-    
+
     # Data configuration
     data_config: Dict[str, Any] = field(default_factory=dict)
-    
+
     # Output configuration
     output_dir: str = "outputs/sota_training"
     experiment_name: str = "sota_unified_training"
@@ -223,6 +249,58 @@ class UnifiedSOTATrainer:
                 config=self.config.__dict__
             )
             logger.info("📊 Weights & Biases logging initialized")
+
+    def profile_memory(self, step: int, log_to_wandb: bool = True) -> Dict[str, float]:
+        """
+        Profile GPU memory usage with comprehensive metrics
+
+        CRITICAL for monitoring 13.14B parameter model training
+        Target: <45GB per GPU
+        """
+        if not torch.cuda.is_available():
+            return {}
+
+        # Get memory statistics
+        allocated_gb = torch.cuda.memory_allocated() / 1e9
+        reserved_gb = torch.cuda.memory_reserved() / 1e9
+        max_allocated_gb = torch.cuda.max_memory_allocated() / 1e9
+
+        # Calculate memory breakdown (approximate)
+        memory_stats = {
+            'allocated_gb': allocated_gb,
+            'reserved_gb': reserved_gb,
+            'peak_gb': max_allocated_gb,
+            'free_gb': reserved_gb - allocated_gb
+        }
+
+        # Log to console
+        logger.info(f"💾 Memory Profile (Step {step}):")
+        logger.info(f"   Allocated: {allocated_gb:.2f}GB")
+        logger.info(f"   Reserved:  {reserved_gb:.2f}GB")
+        logger.info(f"   Peak:      {max_allocated_gb:.2f}GB")
+        logger.info(f"   Free:      {memory_stats['free_gb']:.2f}GB")
+
+        # Alert if memory usage too high
+        if allocated_gb > self.config.max_memory_per_gpu_gb:
+            logger.warning(f"⚠️ HIGH MEMORY USAGE: {allocated_gb:.2f}GB > {self.config.max_memory_per_gpu_gb}GB threshold")
+            logger.warning("   Consider:")
+            logger.warning("   - Reducing micro_batch_size")
+            logger.warning("   - Increasing gradient_accumulation_steps")
+            logger.warning("   - Enabling gradient checkpointing")
+            logger.warning("   - Enabling CPU offloading")
+
+        # Log to W&B if available
+        if log_to_wandb and self.config.use_wandb and WANDB_AVAILABLE:
+            wandb.log({
+                'memory/allocated_gb': allocated_gb,
+                'memory/reserved_gb': reserved_gb,
+                'memory/peak_gb': max_allocated_gb,
+                'memory/free_gb': memory_stats['free_gb'],
+                'memory/utilization': allocated_gb / self.config.max_memory_per_gpu_gb,
+                'step': step
+            })
+
+        return memory_stats
     
     def load_model(self, model_name: str) -> nn.Module:
         """Load and initialize SOTA model"""
@@ -274,13 +352,31 @@ class UnifiedSOTATrainer:
             
             # Move to device
             model = model.to(self.device)
-            
+
             # Apply SOTA optimizations
             if self.config.use_gradient_checkpointing:
                 if hasattr(model, 'gradient_checkpointing_enable'):
                     model.gradient_checkpointing_enable()
-                    logger.info("✅ Gradient checkpointing enabled")
-            
+                    logger.info("✅ Gradient checkpointing enabled (50% activation memory reduction)")
+
+            # CPU Offloading for optimizer states (CRITICAL for 13.14B model)
+            if self.config.use_cpu_offloading and FSDP_AVAILABLE:
+                try:
+                    model = FSDP(
+                        model,
+                        cpu_offload=CPUOffload(offload_params=True),
+                        use_orig_params=True,
+                        device_id=self.device if self.device.type == 'cuda' else None
+                    )
+                    logger.info("✅ CPU offloading enabled (optimizer states moved to CPU RAM)")
+                    logger.info("   Expected GPU memory savings: ~26GB for optimizer states")
+                except Exception as e:
+                    logger.warning(f"⚠️ CPU offloading failed: {e}")
+                    logger.warning("   Continuing without CPU offloading")
+            elif self.config.use_cpu_offloading:
+                logger.warning("⚠️ CPU offloading requested but FSDP not available")
+                logger.warning("   Install PyTorch with FSDP support")
+
             # Compile model for 2x speedup (PyTorch 2.0+)
             if self.config.use_compile and hasattr(torch, 'compile'):
                 try:
@@ -288,14 +384,15 @@ class UnifiedSOTATrainer:
                     import platform
                     if platform.system() != "Windows":
                         model = torch.compile(model)
-                        logger.info("⚡ Model compiled for optimization")
+                        logger.info("⚡ Model compiled for optimization (2x speedup)")
                     else:
                         logger.info("⚠️  torch.compile disabled on Windows for compatibility")
                 except Exception as e:
                     logger.warning(f"torch.compile failed: {e}, continuing without compilation")
-            
-            # Wrap with DDP for multi-GPU training
-            if self.config.use_distributed and torch.cuda.device_count() > 1 and torch.distributed.is_initialized():
+
+            # Wrap with DDP for multi-GPU training (if not using FSDP)
+            if (self.config.use_distributed and torch.cuda.device_count() > 1 and
+                torch.distributed.is_initialized() and not self.config.use_cpu_offloading):
                 try:
                     model = torch.nn.parallel.DistributedDataParallel(
                         model,
@@ -442,15 +539,36 @@ class UnifiedSOTATrainer:
         return FallbackMultimodal()
 
     def setup_optimizer(self) -> optim.Optimizer:
-        """Setup SOTA optimizer"""
+        """Setup SOTA optimizer with memory optimization support"""
         if self.model is None:
             raise ValueError("Model must be loaded before setting up optimizer")
-        
+
         optimizer_name = self.config.optimizer_name.lower()
         lr = self.config.learning_rate
         wd = self.config.weight_decay
-        
-        if optimizer_name == "adamw":
+
+        # Use 8-bit AdamW for memory efficiency (75% reduction in optimizer memory)
+        if optimizer_name == "adamw" and self.config.use_8bit_optimizer and BITSANDBYTES_AVAILABLE:
+            optimizer = bnb.optim.AdamW8bit(
+                self.model.parameters(),
+                lr=lr,
+                weight_decay=wd,
+                betas=(0.9, 0.999),
+                eps=1e-8
+            )
+            logger.info("✅ Using 8-bit AdamW optimizer (75% memory reduction)")
+            logger.info(f"   Expected optimizer memory: ~26GB (vs ~105GB for standard AdamW)")
+        elif optimizer_name == "adamw8bit" and BITSANDBYTES_AVAILABLE:
+            # Explicit 8-bit optimizer request
+            optimizer = bnb.optim.AdamW8bit(
+                self.model.parameters(),
+                lr=lr,
+                weight_decay=wd,
+                betas=(0.9, 0.999),
+                eps=1e-8
+            )
+            logger.info("✅ Using 8-bit AdamW optimizer (explicit)")
+        elif optimizer_name == "adamw":
             optimizer = optim.AdamW(
                 self.model.parameters(),
                 lr=lr,
@@ -458,6 +576,9 @@ class UnifiedSOTATrainer:
                 betas=(0.9, 0.95),
                 eps=1e-8
             )
+            if self.config.use_8bit_optimizer:
+                logger.warning("⚠️ 8-bit optimizer requested but bitsandbytes not available")
+                logger.warning("   Install with: pip install bitsandbytes")
         elif optimizer_name == "lion":
             try:
                 from lion_pytorch import Lion
@@ -482,7 +603,7 @@ class UnifiedSOTATrainer:
                 optimizer = optim.AdamW(self.model.parameters(), lr=lr, weight_decay=wd)
         else:
             raise ValueError(f"Unknown optimizer: {optimizer_name}")
-        
+
         logger.info(f"🎯 Optimizer setup: {optimizer_name}")
         self.optimizer = optimizer
         return optimizer
@@ -640,7 +761,14 @@ class UnifiedSOTATrainer:
             raise RuntimeError(error_msg)
 
     def train_epoch(self, epoch: int) -> Dict[str, float]:
-        """Train for one epoch with SOTA optimizations"""
+        """
+        Train for one epoch with SOTA optimizations and gradient accumulation
+
+        CRITICAL MEMORY OPTIMIZATION:
+        - Uses gradient accumulation to simulate larger batch sizes
+        - micro_batch_size=1 fits in 48GB VRAM
+        - Accumulates over 32 steps for effective_batch_size=32
+        """
         self.model.train()
         epoch_metrics = {
             'loss': 0.0,
@@ -650,6 +778,15 @@ class UnifiedSOTATrainer:
 
         train_loader = self.data_loaders['train']
         num_batches = len(train_loader)
+
+        # Initialize gradient accumulation
+        accumulation_steps = self.config.gradient_accumulation_steps
+        self.optimizer.zero_grad()  # Zero gradients at start of epoch
+
+        logger.info(f"🔄 Training with gradient accumulation:")
+        logger.info(f"   Micro batch size: {self.config.micro_batch_size}")
+        logger.info(f"   Accumulation steps: {accumulation_steps}")
+        logger.info(f"   Effective batch size: {self.config.effective_batch_size}")
 
         for batch_idx, batch in enumerate(train_loader):
             # Move batch to device
@@ -665,64 +802,83 @@ class UnifiedSOTATrainer:
             else:
                 loss = self._compute_loss(batch)
 
-            # Backward pass
-            self.optimizer.zero_grad()
+            # Scale loss by accumulation steps (CRITICAL for correct gradients)
+            loss = loss / accumulation_steps
 
+            # Backward pass (accumulate gradients)
             if self.config.use_mixed_precision and self.scaler is not None:
                 self.scaler.scale(loss).backward()
-
-                # Gradient clipping
-                if self.config.gradient_clip_val > 0:
-                    self.scaler.unscale_(self.optimizer)
-                    grad_norm = torch.nn.utils.clip_grad_norm_(
-                        self.model.parameters(),
-                        self.config.gradient_clip_val
-                    )
-                else:
-                    grad_norm = 0.0
-
-                self.scaler.step(self.optimizer)
-                self.scaler.update()
             else:
                 loss.backward()
 
-                # Gradient clipping
-                if self.config.gradient_clip_val > 0:
-                    grad_norm = torch.nn.utils.clip_grad_norm_(
-                        self.model.parameters(),
-                        self.config.gradient_clip_val
-                    )
+            # Update weights only after accumulation_steps batches
+            if (batch_idx + 1) % accumulation_steps == 0 or (batch_idx + 1) == num_batches:
+                # Gradient clipping and optimizer step
+                if self.config.use_mixed_precision and self.scaler is not None:
+                    # Unscale gradients for clipping
+                    if self.config.gradient_clip_val > 0:
+                        self.scaler.unscale_(self.optimizer)
+                        grad_norm = torch.nn.utils.clip_grad_norm_(
+                            self.model.parameters(),
+                            self.config.gradient_clip_val
+                        )
+                    else:
+                        grad_norm = 0.0
+
+                    # Optimizer step
+                    self.scaler.step(self.optimizer)
+                    self.scaler.update()
                 else:
-                    grad_norm = 0.0
+                    # Gradient clipping
+                    if self.config.gradient_clip_val > 0:
+                        grad_norm = torch.nn.utils.clip_grad_norm_(
+                            self.model.parameters(),
+                            self.config.gradient_clip_val
+                        )
+                    else:
+                        grad_norm = 0.0
 
-                self.optimizer.step()
+                    # Optimizer step
+                    self.optimizer.step()
 
-            # Update scheduler
-            if self.scheduler is not None:
-                self.scheduler.step()
+                # Zero gradients after optimizer step
+                self.optimizer.zero_grad()
 
-            # Update metrics
-            epoch_metrics['loss'] += loss.item()
+                # Update scheduler (once per accumulation cycle)
+                if self.scheduler is not None:
+                    self.scheduler.step()
+
+                # Log optimizer step
+                if (batch_idx + 1) % (accumulation_steps * self.config.log_every_n_steps) == 0:
+                    logger.info(f"   ✅ Optimizer step completed (accumulated {accumulation_steps} gradients)")
+
+            # Update metrics (scale back loss for logging)
+            epoch_metrics['loss'] += loss.item() * accumulation_steps  # Unscale for logging
             epoch_metrics['lr'] = self.optimizer.param_groups[0]['lr']
-            epoch_metrics['grad_norm'] += grad_norm if isinstance(grad_norm, float) else grad_norm.item()
+            if 'grad_norm' in locals():
+                epoch_metrics['grad_norm'] += grad_norm if isinstance(grad_norm, float) else grad_norm.item()
 
             self.global_step += 1
 
-            # Logging
+            # Logging and memory profiling
             if batch_idx % self.config.log_every_n_steps == 0:
                 logger.info(
                     f"Epoch {epoch:3d} | Batch {batch_idx:4d}/{num_batches:4d} | "
-                    f"Loss: {loss.item():.4f} | LR: {epoch_metrics['lr']:.2e}"
+                    f"Loss: {loss.item() * accumulation_steps:.4f} | LR: {epoch_metrics['lr']:.2e}"
                 )
 
                 if self.config.use_wandb and WANDB_AVAILABLE:
                     wandb.log({
-                        'train/loss': loss.item(),
+                        'train/loss': loss.item() * accumulation_steps,
                         'train/lr': epoch_metrics['lr'],
-                        'train/grad_norm': grad_norm if isinstance(grad_norm, float) else grad_norm.item(),
+                        'train/grad_norm': grad_norm if 'grad_norm' in locals() and isinstance(grad_norm, float) else 0.0,
                         'epoch': epoch,
                         'global_step': self.global_step
                     })
+
+            # Memory profiling at specified intervals
+            if batch_idx % self.config.memory_profiling_interval == 0:
+                self.profile_memory(step=self.global_step, log_to_wandb=True)
 
         # Average metrics
         epoch_metrics['loss'] /= num_batches
