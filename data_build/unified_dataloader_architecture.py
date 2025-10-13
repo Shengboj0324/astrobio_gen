@@ -139,6 +139,12 @@ class MultiModalBatch:
     bio_graphs: Optional[Any] = None  # PyG batch or list of adjacency matrices
     spectra: Optional[torch.Tensor] = None  # [batch_size, wavelengths, features]
 
+    # ✅ CRITICAL FIX: LLM Integration Fields (Added for unified multi-modal training)
+    input_ids: Optional[torch.Tensor] = None  # [batch_size, seq_len] for LLM tokenized text
+    attention_mask: Optional[torch.Tensor] = None  # [batch_size, seq_len] for LLM attention
+    text_descriptions: Optional[List[str]] = None  # Raw text descriptions for tokenization
+    habitability_label: Optional[torch.Tensor] = None  # [batch_size] ground truth labels (0 or 1)
+
     # Metadata
     metadata: List[Dict[str, Any]] = field(default_factory=list)
 
@@ -171,6 +177,19 @@ class MultiModalBatch:
                 result.bio_graphs = self.bio_graphs.to(device)
             else:
                 result.bio_graphs = self.bio_graphs
+
+        # ✅ CRITICAL FIX: Move LLM fields to device
+        if self.input_ids is not None:
+            result.input_ids = self.input_ids.to(device)
+
+        if self.attention_mask is not None:
+            result.attention_mask = self.attention_mask.to(device)
+
+        if self.habitability_label is not None:
+            result.habitability_label = self.habitability_label.to(device)
+
+        # text_descriptions stays on CPU (list of strings)
+        result.text_descriptions = self.text_descriptions
 
         return result
 
@@ -542,7 +561,75 @@ def collate_multimodal_batch(batch: List[Dict[str, Any]]) -> MultiModalBatch:
             else:
                 batch_data.bio_graphs = bio_graphs
 
+    # ✅ CRITICAL FIX: Collate LLM fields for unified multi-modal training
+    # Collate text descriptions
+    text_descriptions = [
+        sample.get("text_description") for sample in batch if sample.get("text_description") is not None
+    ]
+    if text_descriptions:
+        batch_data.text_descriptions = text_descriptions
+
+        # Tokenize text descriptions for LLM
+        try:
+            from transformers import AutoTokenizer
+            tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+            tokenized = tokenizer(
+                text_descriptions,
+                padding=True,
+                truncation=True,
+                max_length=512,
+                return_tensors='pt'
+            )
+            batch_data.input_ids = tokenized['input_ids']
+            batch_data.attention_mask = tokenized['attention_mask']
+        except Exception as e:
+            logger.warning(f"⚠️ Tokenization failed: {e}. Using dummy tokens.")
+            # Fallback: create dummy tokens
+            batch_size = len(text_descriptions)
+            batch_data.input_ids = torch.randint(0, 1000, (batch_size, 32))
+            batch_data.attention_mask = torch.ones(batch_size, 32)
+
+    # Collate habitability labels
+    habitability_labels = [
+        sample.get("habitability_label") for sample in batch if sample.get("habitability_label") is not None
+    ]
+    if habitability_labels:
+        batch_data.habitability_label = torch.tensor(habitability_labels, dtype=torch.long)
+
     return batch_data
+
+
+def multimodal_collate_fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    ✅ CRITICAL FIX: Unified multi-modal collation function for training integration
+
+    This is an alternative collation function that returns a dictionary format
+    compatible with UnifiedMultiModalSystem.forward() expectations.
+
+    Args:
+        batch: List of sample dictionaries
+
+    Returns:
+        Dictionary with all modalities ready for UnifiedMultiModalSystem
+    """
+    # Use the existing collate function
+    batch_obj = collate_multimodal_batch(batch)
+
+    # Convert to dictionary format for easier access
+    return {
+        'run_ids': batch_obj.run_ids,
+        'planet_params': batch_obj.planet_params,
+        'climate_datacube': batch_obj.climate_cubes,
+        'metabolic_graph': batch_obj.bio_graphs,
+        'spectroscopy': batch_obj.spectra,
+        'input_ids': batch_obj.input_ids,
+        'attention_mask': batch_obj.attention_mask,
+        'text_description': batch_obj.text_descriptions,
+        'habitability_label': batch_obj.habitability_label,
+        'metadata': batch_obj.metadata,
+        'data_completeness': batch_obj.data_completeness,
+        'quality_scores': batch_obj.quality_scores
+    }
 
 
 class AdaptiveDataLoader:

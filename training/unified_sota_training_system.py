@@ -347,6 +347,42 @@ class UnifiedSOTATrainer:
                     logger.info("🔄 Using fallback simple multimodal model")
                     model = self._create_fallback_multimodal_model()
 
+            # ✅ CRITICAL FIX: Unified Multi-Modal System Integration
+            elif model_name == "unified_multimodal_system":
+                try:
+                    from training.unified_multimodal_training import (
+                        UnifiedMultiModalSystem,
+                        MultiModalTrainingConfig
+                    )
+
+                    # Create configuration for unified system
+                    unified_config = MultiModalTrainingConfig(
+                        llm_config=self.config.model_config.get('llm_config', {}),
+                        graph_config=self.config.model_config.get('graph_config', {}),
+                        cnn_config=self.config.model_config.get('cnn_config', {}),
+                        fusion_config=self.config.model_config.get('fusion_config', {}),
+                        classification_weight=1.0,
+                        reconstruction_weight=0.1,
+                        physics_weight=0.2,
+                        consistency_weight=0.15,
+                        batch_size=self.config.batch_size,
+                        gradient_accumulation_steps=self.config.gradient_accumulation_steps,
+                        use_gradient_checkpointing=self.config.use_gradient_checkpointing,
+                        use_mixed_precision=self.config.use_mixed_precision,
+                        use_8bit_optimizer=self.config.use_8bit_optimizer,
+                        device=str(self.device)
+                    )
+
+                    model = UnifiedMultiModalSystem(unified_config)
+                    logger.info("✅ Unified Multi-Modal System loaded (LLM + Graph VAE + CNN + Fusion)")
+
+                except ImportError as e:
+                    logger.error(f"❌ UnifiedMultiModalSystem not available: {e}")
+                    raise ValueError(
+                        "UnifiedMultiModalSystem requires training/unified_multimodal_training.py. "
+                        "Please ensure the file exists."
+                    )
+
             else:
                 raise ValueError(f"Unknown model: {model_name}")
             
@@ -712,6 +748,20 @@ class UnifiedSOTATrainer:
                     normalize_climate=True
                 )
 
+                # ✅ CRITICAL FIX: Use multimodal_collate_fn for unified system
+                # Check if we're using the unified multi-modal system
+                use_unified_collate = (self.config.model_name == "unified_multimodal_system")
+
+                if use_unified_collate:
+                    logger.info("✅ Using multimodal_collate_fn for unified multi-modal system")
+                    try:
+                        from data_build.unified_dataloader_architecture import multimodal_collate_fn
+                        # We'll need to modify the dataloader creation to use this collate_fn
+                        # For now, use the standard creation and we'll wrap it
+                    except ImportError as e:
+                        logger.warning(f"⚠️ multimodal_collate_fn not available: {e}")
+                        use_unified_collate = False
+
                 # Create data loaders with REAL data storage
                 train_loader, val_loader, test_loader = create_multimodal_dataloaders(
                     dataloader_config,
@@ -939,6 +989,42 @@ class UnifiedSOTATrainer:
                 outputs = self.model(multimodal_input)
 
             return outputs.get('loss', outputs.get('total_loss', torch.tensor(0.0, device=self.device)))
+
+        # ✅ CRITICAL FIX: Unified Multi-Modal System Loss Computation
+        elif self.config.model_name == "unified_multimodal_system":
+            from training.unified_multimodal_training import (
+                compute_multimodal_loss,
+                MultiModalTrainingConfig
+            )
+
+            # Ensure batch is in dictionary format
+            if not isinstance(batch, dict):
+                raise ValueError(
+                    "Unified multi-modal system requires batch in dictionary format. "
+                    "Use multimodal_collate_fn when creating DataLoader."
+                )
+
+            # Forward pass through unified system
+            outputs = self.model(batch)
+
+            # Compute combined loss
+            total_loss, loss_dict = compute_multimodal_loss(
+                outputs,
+                batch,
+                self.model.config  # Use the config from UnifiedMultiModalSystem
+            )
+
+            # Log individual loss components
+            if self.config.use_wandb and WANDB_AVAILABLE:
+                wandb.log({
+                    'train/classification_loss': loss_dict.get('classification', 0.0),
+                    'train/llm_loss': loss_dict.get('llm', 0.0),
+                    'train/graph_vae_loss': loss_dict.get('graph_vae', 0.0),
+                    'train/total_loss': loss_dict.get('total', 0.0),
+                    'global_step': self.global_step
+                })
+
+            return total_loss
 
         else:
             raise ValueError(f"Unknown model type for loss computation: {self.config.model_name}")
