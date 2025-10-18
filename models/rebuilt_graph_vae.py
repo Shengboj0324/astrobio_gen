@@ -22,7 +22,9 @@ SOTA Features Implemented:
 
 from __future__ import annotations
 
+import logging  # ✅ CRITICAL FIX: Added missing import
 import math
+from dataclasses import dataclass  # ✅ CRITICAL FIX: Added missing import
 from typing import Dict, List, Optional, Tuple, Union, Any
 
 import torch
@@ -35,14 +37,15 @@ from scipy.sparse import csr_matrix
 # Production PyTorch Geometric - AUTHENTIC DLL VERSION
 from torch_geometric.data import Data, Batch
 from torch_geometric.nn import (
-    GCNConv, GATConv, MessagePassing, global_mean_pool, 
+    GCNConv, GATConv, MessagePassing, global_mean_pool,
     global_max_pool, global_add_pool, BatchNorm, LayerNorm
 )
 from torch_geometric.utils import (
-    to_dense_adj, dense_to_sparse, add_self_loops, 
+    to_dense_adj, dense_to_sparse, add_self_loops,
     remove_self_loops, degree, scatter
 )
 from torch_geometric.loader import DataLoader as GeometricDataLoader
+from torch.distributions import Normal, kl_divergence  # ✅ CRITICAL FIX: Moved import to top
 
 TORCH_GEOMETRIC_AVAILABLE = True
 
@@ -66,80 +69,9 @@ class GraphVAEConfig:
 
 
 # Note: Clean RebuiltGraphVAE class is defined later in the file
-
-
-class GraphEncoder(nn.Module):
-    """Graph encoder with attention mechanism"""
-    
-    def __init__(self, node_features: int, hidden_dim: int, latent_dim: int, num_layers: int = 4, heads: int = 8):
-        super().__init__()
-        self.node_features = node_features
-        self.hidden_dim = hidden_dim
-        self.latent_dim = latent_dim
-
-        def forward(self, x, edge_index):
-            # Simple GCN implementation
-            x = self.lin(x)
-            row, col = edge_index
-            deg = degree(edge_index[0], x.size(0), dtype=x.dtype)
-            deg_inv_sqrt = deg.pow(-0.5)
-            deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
-
-            out = torch.zeros_like(x)
-            for i in range(edge_index.size(1)):
-                out[col[i]] += deg_inv_sqrt[row[i]] * x[row[i]] * deg_inv_sqrt[col[i]]
-
-            return out
-
-    class GATConv(MessagePassing):
-        def __init__(self, in_channels, out_channels, heads=1, concat=True, dropout=0.0, bias=True):
-            super().__init__()
-            self.in_channels = in_channels
-            self.out_channels = out_channels
-            self.heads = heads
-            self.concat = concat
-            self.dropout = dropout
-
-            self.lin = nn.Linear(in_channels, heads * out_channels, bias=False)
-            self.att = nn.Parameter(torch.Tensor(1, heads, 2 * out_channels))
-
-            if bias and concat:
-                self.bias = nn.Parameter(torch.Tensor(heads * out_channels))
-            elif bias and not concat:
-                self.bias = nn.Parameter(torch.Tensor(out_channels))
-            else:
-                self.register_parameter('bias', None)
-
-            self.reset_parameters()
-
-        def reset_parameters(self):
-            nn.init.xavier_uniform_(self.lin.weight)
-            nn.init.xavier_uniform_(self.att)
-            if self.bias is not None:
-                nn.init.zeros_(self.bias)
-
-        def forward(self, x, edge_index):
-            # Simple GAT implementation
-            x = self.lin(x).view(-1, self.heads, self.out_channels)
-
-            # Simple attention mechanism (fallback)
-            row, col = edge_index
-            alpha = torch.ones(edge_index.size(1), self.heads, device=x.device) / edge_index.size(1)
-
-            out = torch.zeros(x.size(0), self.heads, self.out_channels, device=x.device)
-            for i in range(edge_index.size(1)):
-                out[col[i]] += alpha[i].unsqueeze(-1) * x[row[i]]
-
-            if self.concat:
-                out = out.view(-1, self.heads * self.out_channels)
-            else:
-                out = out.mean(dim=1)
-
-            if self.bias is not None:
-                out += self.bias
-
-            return out
-from torch.distributions import Normal, kl_divergence
+# ✅ CRITICAL FIX: Removed broken GraphEncoder and GATConv classes
+# These classes had forward() method defined inside __init__ and wrong indentation
+# The proper implementations are in StructuralPositionalEncoding and GraphTransformerEncoder below
 
 
 class StructuralPositionalEncoding(nn.Module):
@@ -738,45 +670,14 @@ class RebuiltGraphVAE(nn.Module):
         self.bce_loss = nn.BCELoss()
         self.mse_loss = nn.MSELoss()
 
-        # 98%+ READINESS: Comprehensive Advanced VAE Features
-        self.advanced_regularization = nn.Dropout(0.2)
-        self.gradient_checkpointing = True
-        self.attention_pooling = nn.MultiheadAttention(latent_dim, 8, batch_first=True)
-
-        # Advanced SOTA features for 98%+ readiness
-        self.flash_attention_available = True
-        self.uncertainty_quantification = nn.Linear(latent_dim, latent_dim)
-        self.meta_learning_adapter = nn.Linear(latent_dim, latent_dim)
-        self.layer_scale = nn.Parameter(torch.ones(latent_dim) * 0.1)
-        self.adaptive_loss_scaling = True
-        self.perceptual_loss_weight = 0.1
-        self.contrastive_loss_weight = 0.05
-
-        # Advanced regularization techniques
-        self.spectral_normalization = True
-        self.gradient_penalty_weight = 10.0
-        self.consistency_regularization = 0.1
-
-        # ITERATION 4: Additional SOTA features for 98%+ readiness
-        self.rotary_embedding = True
-        self.grouped_query_attention = True
-        self.swiglu_activation = True
-        self.rms_normalization = True
-        self.variational_dropout = True
-        self.bayesian_layers = True
-        self.normalizing_flows = True
-
-        # ITERATION 5: FINAL PUSH TO 98%+ - ULTIMATE GRAPH SOTA FEATURES
-        self.graph_neural_ode = True  # Graph Neural ODEs
-        self.equivariant_networks = True  # E(n)-equivariant networks
-        self.message_passing_neural_networks = True  # Advanced MPNN
-        self.graph_wavelet_networks = True  # Graph wavelets
-        self.persistent_homology = True  # Topological data analysis
-        self.graph_contrastive_learning = True  # Graph SSL
-        self.hierarchical_graph_pooling = True  # Advanced pooling
-        self.graph_adversarial_training = True  # Graph adversarial
-        self.molecular_fingerprints = True  # Chemical fingerprints
-        self.quantum_graph_networks = True  # Quantum-inspired graphs
+        # ✅ CRITICAL FIX: Removed fake SOTA feature flags
+        # These were boolean flags for features that were never actually implemented
+        # Keeping only the actual implemented components:
+        # - Graph Transformer Encoder (implemented above)
+        # - Structural Positional Encoding (implemented above)
+        # - Multi-level Tokenization (implemented above)
+        # - Structure-Aware Attention (implemented above)
+        # - Biochemical Constraints (implemented above)
         
     def reparameterize(self, mu: torch.Tensor, logvar: torch.Tensor) -> torch.Tensor:
         """Reparameterization trick for VAE"""
@@ -847,9 +748,11 @@ class RebuiltGraphVAE(nn.Module):
                 mu = results.get('mu', torch.zeros(x.size(0), self.latent_dim, device=x.device))
                 logvar = results.get('logvar', torch.zeros(x.size(0), self.latent_dim, device=x.device))
 
-                # Simple VAE loss
+                # Simple VAE loss with numerical stability
                 recon_loss = F.mse_loss(results.get('node_reconstruction', mu), x.unsqueeze(0).expand(1, -1, -1))
-                kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()) / x.size(0)
+                # ✅ NUMERICAL STABILITY FIX: Clamp logvar before exp() in fallback code
+                logvar_clamped = torch.clamp(logvar, min=-20, max=20)
+                kl_loss = -0.5 * torch.sum(1 + logvar_clamped - mu.pow(2) - logvar_clamped.exp()) / max(x.size(0), 1)
                 total_loss = recon_loss + 0.1 * kl_loss
 
                 results.update({
@@ -1029,4 +932,15 @@ def create_rebuilt_graph_vae(
 
 
 # Export for training system
-__all__ = ['RebuiltGraphVAE', 'create_rebuilt_graph_vae', 'BiochemicalConstraintLayer', 'GraphAttentionEncoder', 'GraphDecoder']
+# ✅ CRITICAL FIX: Removed GraphAttentionEncoder from exports (doesn't exist)
+# The actual encoder is GraphTransformerEncoder
+__all__ = [
+    'RebuiltGraphVAE',
+    'create_rebuilt_graph_vae',
+    'BiochemicalConstraintLayer',
+    'GraphTransformerEncoder',  # ✅ FIXED: Export the actual encoder class
+    'GraphDecoder',
+    'StructuralPositionalEncoding',
+    'MultiLevelGraphTokenizer',
+    'StructureAwareAttention'
+]
