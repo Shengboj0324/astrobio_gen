@@ -596,15 +596,18 @@ class GraphDecoder(nn.Module):
 
         node_probs = torch.sigmoid(node_features)
         
-        # Generate edges - CRITICAL FIX: Use dynamic node count
+        # ✅ CRITICAL FIX: Generate DIRECTED edges for metabolic networks
+        # Previous implementation only generated upper triangular (undirected)
+        # Metabolic reactions are directed: substrate → product
         edge_probs = []
         for i in range(target_nodes):
-            for j in range(i + 1, target_nodes):
-                node_i = node_features[:, i]
-                node_j = node_features[:, j]
-                edge_input = torch.cat([z, node_i, node_j], dim=-1)
-                edge_prob = self.edge_decoder(edge_input)
-                edge_probs.append(edge_prob)
+            for j in range(target_nodes):
+                if i != j:  # Skip self-loops
+                    node_i = node_features[:, i]
+                    node_j = node_features[:, j]
+                    edge_input = torch.cat([z, node_i, node_j], dim=-1)
+                    edge_prob = self.edge_decoder(edge_input)
+                    edge_probs.append(edge_prob)
 
         # Handle case where no edges are generated (single node)
         if edge_probs:
@@ -612,7 +615,7 @@ class GraphDecoder(nn.Module):
         else:
             # Create dummy edge probabilities for single node case
             edge_probs = torch.zeros(batch_size, 1, device=z.device)
-        
+
         return node_probs, edge_probs
 
 
@@ -728,6 +731,7 @@ class RebuiltGraphVAE(nn.Module):
             'mu': mu,
             'logvar': logvar,
             'z': z,
+            'latent': z,  # ✅ INTEGRATION FIX: Add 'latent' key for UnifiedMultiModalSystem
             'node_reconstruction': node_recon,
             'edge_reconstruction': edge_recon,
             'reconstruction': node_recon  # Add this for compatibility
@@ -765,7 +769,7 @@ class RebuiltGraphVAE(nn.Module):
     def compute_loss(self, data: Data, outputs: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """Compute VAE loss with biochemical constraints"""
         x, edge_index, batch = data.x, data.edge_index, data.batch
-        
+
         # Reconstruction loss - CRITICAL FIX for dimension mismatch
         batch_size = outputs['node_reconstruction'].size(0)
         num_nodes = x.size(0)
@@ -793,23 +797,40 @@ class RebuiltGraphVAE(nn.Module):
             x_batched = x_batched[:, :, :min_features]
 
         node_recon_loss = self.mse_loss(node_recon, x_batched)
-        
-        # Edge reconstruction loss - CRITICAL FIX: Prevent NaN with proper sizing
+
+        # ✅ CRITICAL FIX: Edge reconstruction loss with DIRECTED graph support
+        # Previous implementation only penalized missing edges, not false positives
+        # Now properly handles directed metabolic networks (substrate → product)
         num_edges = edge_index.size(1)
         edge_recon = outputs['edge_reconstruction']
 
-        # Ensure edge reconstruction has correct dimensions
-        if edge_recon.size(1) >= num_edges and num_edges > 0:
-            edge_targets = torch.ones(1, num_edges, device=x.device)
-            edge_recon_truncated = edge_recon[:, :num_edges]
+        # Build full DIRECTED adjacency matrix target from edge_index
+        # This includes both positive edges (1) and negative edges (0)
+        adj_target = torch.zeros(num_nodes, num_nodes, device=x.device)
+        if num_edges > 0:
+            # Set positive directed edges to 1
+            adj_target[edge_index[0], edge_index[1]] = 1.0
 
-            # Clamp edge reconstruction to prevent numerical instability
-            edge_recon_clamped = torch.clamp(edge_recon_truncated, min=1e-7, max=1-1e-7)
+        # Convert edge_recon predictions to DIRECTED adjacency matrix format
+        # edge_recon is [batch_size, num_edge_predictions] from decoder
+        # Decoder now generates all i→j pairs (excluding self-loops)
+        edge_idx = 0
+        adj_pred = torch.zeros(num_nodes, num_nodes, device=x.device)
 
-            edge_recon_loss = self.bce_loss(edge_recon_clamped, edge_targets)
-        else:
-            # Fallback for edge cases
-            edge_recon_loss = torch.tensor(0.01, requires_grad=True, device=x.device)
+        for i in range(num_nodes):
+            for j in range(num_nodes):
+                if i != j:  # Skip self-loops
+                    if edge_idx < edge_recon.size(1):
+                        # Directed edge i → j
+                        adj_pred[i, j] = edge_recon[0, edge_idx]
+                        edge_idx += 1
+
+        # Clamp predictions for numerical stability
+        adj_pred_clamped = torch.clamp(adj_pred, min=1e-7, max=1-1e-7)
+
+        # Compute BCE loss on full DIRECTED adjacency matrix
+        # This penalizes both false positives and false negatives
+        edge_recon_loss = F.binary_cross_entropy(adj_pred_clamped, adj_target)
 
         # Check for NaN in edge loss
         if torch.isnan(edge_recon_loss) or torch.isinf(edge_recon_loss):
