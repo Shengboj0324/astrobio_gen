@@ -110,7 +110,7 @@ mlruns/**
 *.ggml
 **/llm_cache/**
 **/model_cache/**
-
+test_outputs/
 # Neural Architecture Search results
 nas_results/**
 nas_temp/**
