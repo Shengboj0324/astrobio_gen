@@ -1,15 +1,11 @@
 # Physics-Informed Multi-Scale Neural Networks for Exoplanet Atmospheric Characterization: A Deep Learning Framework Integrating Conservation Laws and Multi-Modal Data Fusion
 
 **Author**: Shengbo Jiang  
-**Date**: September 13, 2025  
-**Institution**: Advanced Computational Astrobiology Laboratory  
-**Version**: 2.1.3  
+**Date**: September 13, 2025
 
-[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXX-blue.svg)](https://doi.org/10.5281/zenodo.XXXXXX)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.4+-red.svg)](https://pytorch.org)
 [![License](https://img.shields.io/badge/License-Apache--2.0-green.svg)](LICENSE.md)
-[![arXiv](https://img.shields.io/badge/arXiv-2409.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2409.XXXXX)
 
 ## Abstract
 
@@ -782,11 +778,3 @@ The author declares no competing financial or non-financial interests that could
 43. Batalha, N. M., Mandell, A., Pontoppidan, K., Stevenson, K. B., Lewis, N. K., Kalirai, J., ... & Valenti, J. (2018). Strategies for constraining the atmospheres of temperate terrestrial planets with JWST. *Publications of the Astronomical Society of the Pacific*, 130(993), 114401.
 
 ---
-
-**Manuscript Information**:  
-Received: September 13, 2025  
-Accepted: [Under Review]  
-Published Online: [Pending]  
-
-**Correspondence**: Shengbo Jiang (shengbo.jiang@astrobio-research.org)  
-**Copyright**: © 2025 Advanced Computational Astrobiology Laboratory. All rights reserved.
