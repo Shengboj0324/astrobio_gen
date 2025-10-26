@@ -54,6 +54,25 @@ try:
 except ImportError:
     pass
 
+# Core rebuilt models for production
+try:
+    from .rebuilt_llm_integration import RebuiltLLMIntegration
+    __all__.append("RebuiltLLMIntegration")
+except ImportError:
+    pass
+
+try:
+    from .rebuilt_graph_vae import RebuiltGraphVAE
+    __all__.append("RebuiltGraphVAE")
+except ImportError:
+    pass
+
+try:
+    from .rebuilt_multimodal_integration import RebuiltMultimodalIntegration
+    __all__.append("RebuiltMultimodalIntegration")
+except ImportError:
+    pass
+
 # Export status
 WORLD_CLASS_READY = True
 DEEP_LEARNING_READY = True

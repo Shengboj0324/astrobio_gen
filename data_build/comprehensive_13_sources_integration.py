@@ -55,6 +55,19 @@ from utils.data_source_auth import DataSourceAuthManager
 from data_build.advanced_data_system import AdvancedDataManager
 from data_build.production_data_loader import ProductionDataLoader
 
+# Import annotation and source mapping systems (NEW: 1000+ sources support)
+try:
+    from data_build.comprehensive_data_annotation_treatment import (
+        ComprehensiveDataAnnotationSystem,
+        DataDomain,
+        TreatmentConfig
+    )
+    from data_build.source_domain_mapping import get_source_domain_mapper
+    ANNOTATION_AVAILABLE = True
+except ImportError:
+    ANNOTATION_AVAILABLE = False
+    logger.warning("⚠️ Annotation system not available - running without annotations")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

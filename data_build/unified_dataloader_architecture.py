@@ -67,6 +67,14 @@ except ImportError:
 # Local imports
 from .multi_modal_storage_layer_simple import MultiModalStorage, StorageConfig, get_storage_manager
 from .planet_run_primary_key_system import get_planet_run_primary_key_manager
+from .comprehensive_data_annotation_treatment import (
+    ComprehensiveDataAnnotationSystem,
+    DataAnnotation,
+    DataDomain,  # Now supports 14 domains for 1000+ sources
+    TreatmentConfig,
+    annotate_and_treat
+)
+from .source_domain_mapping import get_source_domain_mapper  # NEW: Source mapper for 1000+ sources
 
 
 class BatchingStrategy(Enum):
@@ -152,6 +160,9 @@ class MultiModalBatch:
     data_completeness: torch.Tensor = None  # [batch_size]
     quality_scores: torch.Tensor = None  # [batch_size]
 
+    # Data annotations (NEW - comprehensive annotation system)
+    annotations: Optional[List[DataAnnotation]] = None  # [batch_size] annotation objects
+
     def to(self, device):
         """Move batch to device"""
         result = MultiModalBatch(
@@ -229,6 +240,10 @@ class PlanetRunDataset(Dataset):
         self._cache = {} if config.enable_caching else None
         self._cache_lock = Lock()
 
+        # Initialize annotation system
+        self.annotation_system = ComprehensiveDataAnnotationSystem()
+        self.treatment_config = TreatmentConfig()
+
         logger.info(
             f"[DATA] Dataset initialized: {len(self.available_runs)} runs ({data_split.value})"
         )
@@ -301,6 +316,7 @@ class PlanetRunDataset(Dataset):
             "spectrum_data": None,
             "planet_params": None,
             "metadata": {},
+            "annotations": {},
         }
 
         try:
@@ -309,15 +325,66 @@ class PlanetRunDataset(Dataset):
                 climate_data = asyncio.run(self.storage_manager.load_climate_datacube(run_id))
                 sample["climate_data"] = climate_data
 
+                # Annotate and treat climate data
+                if climate_data and "data" in climate_data:
+                    climate_annotation = self.annotation_system.annotate_data(
+                        data=climate_data["data"],
+                        source_id=f"run_{run_id}_climate",
+                        data_domain=DataDomain.CLIMATE,
+                        metadata=climate_data.get("metadata", {})
+                    )
+                    sample["annotations"]["climate"] = climate_annotation
+
+                    # Apply treatment
+                    sample["climate_data"]["data"] = self.annotation_system.treat_data(
+                        climate_data["data"],
+                        climate_annotation,
+                        self.treatment_config
+                    )
+
             # Load biological network
             if self.config.include_biology:
                 bio_data = asyncio.run(self.storage_manager.load_biological_network(run_id))
                 sample["bio_data"] = bio_data
 
+                # Annotate and treat biological data
+                if bio_data and "graph" in bio_data:
+                    bio_annotation = self.annotation_system.annotate_data(
+                        data=bio_data["graph"],
+                        source_id=f"run_{run_id}_biology",
+                        data_domain=DataDomain.METABOLIC,
+                        metadata=bio_data.get("metadata", {})
+                    )
+                    sample["annotations"]["biology"] = bio_annotation
+
+                    # Apply treatment
+                    sample["bio_data"]["graph"] = self.annotation_system.treat_data(
+                        bio_data["graph"],
+                        bio_annotation,
+                        self.treatment_config
+                    )
+
             # Load spectrum
             if self.config.include_spectroscopy:
                 spectrum_data = asyncio.run(self.storage_manager.load_spectrum(run_id))
                 sample["spectrum_data"] = spectrum_data
+
+                # Annotate and treat spectroscopy data
+                if spectrum_data and "spectrum" in spectrum_data:
+                    spectrum_annotation = self.annotation_system.annotate_data(
+                        data=spectrum_data["spectrum"],
+                        source_id=f"run_{run_id}_spectrum",
+                        data_domain=DataDomain.SPECTROSCOPY,
+                        metadata=spectrum_data.get("metadata", {})
+                    )
+                    sample["annotations"]["spectroscopy"] = spectrum_annotation
+
+                    # Apply treatment
+                    sample["spectrum_data"]["spectrum"] = self.annotation_system.treat_data(
+                        spectrum_data["spectrum"],
+                        spectrum_annotation,
+                        self.treatment_config
+                    )
 
             # Extract planet parameters from metadata
             if sample["climate_data"] and "metadata" in sample["climate_data"]:
@@ -596,6 +663,36 @@ def collate_multimodal_batch(batch: List[Dict[str, Any]]) -> MultiModalBatch:
     if habitability_labels:
         batch_data.habitability_label = torch.tensor(habitability_labels, dtype=torch.long)
 
+    # Collate annotations (NEW - comprehensive annotation system)
+    annotations_list = []
+    for sample in batch:
+        sample_annotations = sample.get("annotations", {})
+        if sample_annotations:
+            # Combine all annotations for this sample
+            annotations_list.append(sample_annotations)
+        else:
+            annotations_list.append({})
+
+    if annotations_list:
+        batch_data.annotations = annotations_list
+
+    # Calculate quality scores and completeness from annotations
+    quality_scores = []
+    completeness_scores = []
+    for annot_dict in annotations_list:
+        if annot_dict:
+            # Average quality across all modalities
+            qualities = [ann.quality_score for ann in annot_dict.values() if hasattr(ann, 'quality_score')]
+            completenesses = [ann.completeness for ann in annot_dict.values() if hasattr(ann, 'completeness')]
+            quality_scores.append(np.mean(qualities) if qualities else 1.0)
+            completeness_scores.append(np.mean(completenesses) if completenesses else 1.0)
+        else:
+            quality_scores.append(1.0)
+            completeness_scores.append(1.0)
+
+    batch_data.quality_scores = torch.tensor(quality_scores, dtype=torch.float32)
+    batch_data.data_completeness = torch.tensor(completeness_scores, dtype=torch.float32)
+
     return batch_data
 
 
@@ -628,7 +725,8 @@ def multimodal_collate_fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
         'habitability_label': batch_obj.habitability_label,
         'metadata': batch_obj.metadata,
         'data_completeness': batch_obj.data_completeness,
-        'quality_scores': batch_obj.quality_scores
+        'quality_scores': batch_obj.quality_scores,
+        'annotations': batch_obj.annotations  # NEW - comprehensive annotations
     }
 
 
