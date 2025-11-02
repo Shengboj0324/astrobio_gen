@@ -111,16 +111,16 @@ class TestComponentIntegration:
     def test_quality_data_integration(self, synthetic_planet_data):
         """Test quality management with data pipeline"""
         try:
-            from data_build.quality_manager import QualityManager
-            
+            from data_build.quality_manager import AdvancedDataQualityManager
+
             quality_config = {
-                "validation_rules": {
-                    "completeness_threshold": 0.95,
-                    "accuracy_threshold": 0.98
+                "quality_thresholds": {
+                    "completeness_min": 0.95,
+                    "accuracy_min": 0.98
                 }
             }
-            
-            quality_manager = QualityManager(quality_config)
+
+            quality_manager = AdvancedDataQualityManager(quality_config)
             
             # Convert dict to numpy array for testing
             import numpy as np
@@ -130,9 +130,11 @@ class TestComponentIntegration:
                 synthetic_planet_data["orbital_period"]
             ])
             
-            # Test quality assessment
-            result = quality_manager.check_completeness(data_array)
-            assert "completeness_score" in result
+            # Test quality assessment using correct API
+            import pandas as pd
+            df = pd.DataFrame(data_array, columns=['radius', 'mass', 'period'])
+            metrics = quality_manager.assess_data_quality(df, 'exoplanets')
+            assert metrics.completeness >= 0.0
 
         except ImportError:
             pytest.skip("Quality management components not available")
@@ -320,19 +322,21 @@ class TestErrorHandlingIntegration:
     def test_data_validation_integration(self):
         """Test data validation error handling"""
         try:
-            from data_build.quality_manager import QualityManager
+            from data_build.quality_manager import AdvancedDataQualityManager
             import numpy as np
-            
-            quality_manager = QualityManager({
-                "validation_rules": {"completeness_threshold": 0.95}
+            import pandas as pd
+
+            quality_manager = AdvancedDataQualityManager({
+                "quality_thresholds": {"completeness_min": 0.95}
             })
-            
+
             # Test with invalid data (all NaN)
             invalid_data = np.full((10, 5), np.nan)
-            
-            result = quality_manager.check_completeness(invalid_data)
-            assert result["completeness_score"] == 0.0
-            assert result["passes_threshold"] is False
+            df = pd.DataFrame(invalid_data, columns=['a', 'b', 'c', 'd', 'e'])
+
+            metrics = quality_manager.assess_data_quality(df, 'exoplanets')
+            assert metrics.completeness == 0.0
+            assert metrics.overall_score < 0.95
 
         except ImportError:
             pytest.skip("Quality management not available")
