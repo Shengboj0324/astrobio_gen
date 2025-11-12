@@ -292,22 +292,54 @@ class UnifiedMultiModalSystem(nn.Module):
 def compute_multimodal_loss(
     outputs: Dict[str, torch.Tensor],
     batch: Dict[str, Any],
-    config: MultiModalTrainingConfig
+    config: MultiModalTrainingConfig,
+    annotations: Optional[List[Dict[str, Any]]] = None
 ) -> Tuple[torch.Tensor, Dict[str, float]]:
     """
-    Compute combined multi-modal loss
-    
+    Compute combined multi-modal loss with annotation-based quality weighting
+
     Args:
         outputs: Model outputs from UnifiedMultiModalSystem
         batch: Input batch with labels
         config: Training configuration
-    
+        annotations: Optional list of data annotations with quality scores
+
     Returns:
         (total_loss, loss_dict)
     """
     device = outputs['logits'].device
     loss_dict = {}
-    
+
+    # ========================================
+    # ANNOTATION-BASED QUALITY WEIGHTING
+    # ========================================
+    quality_weight = torch.tensor(1.0, device=device)
+    if annotations is not None and len(annotations) > 0:
+        # Extract quality scores from annotations
+        quality_scores = []
+        for ann_dict in annotations:
+            # Each annotation dict contains climate, biology, spectroscopy annotations
+            scores = []
+            if 'climate' in ann_dict and hasattr(ann_dict['climate'], 'quality_score'):
+                scores.append(ann_dict['climate'].quality_score)
+            if 'biology' in ann_dict and hasattr(ann_dict['biology'], 'quality_score'):
+                scores.append(ann_dict['biology'].quality_score)
+            if 'spectroscopy' in ann_dict and hasattr(ann_dict['spectroscopy'], 'quality_score'):
+                scores.append(ann_dict['spectroscopy'].quality_score)
+
+            if scores:
+                quality_scores.append(sum(scores) / len(scores))
+            else:
+                quality_scores.append(1.0)  # Default quality
+
+        # Average quality across batch
+        if quality_scores:
+            quality_weight = torch.tensor(
+                sum(quality_scores) / len(quality_scores),
+                device=device
+            )
+            loss_dict['quality_weight'] = quality_weight.item()
+
     # ========================================
     # 1. Classification Loss (PRIMARY)
     # ========================================
@@ -315,10 +347,10 @@ def compute_multimodal_loss(
     if 'habitability_label' in batch and batch['habitability_label'] is not None:
         labels = batch['habitability_label'].to(device)
         logits = outputs['logits']
-        
+
         classification_loss = F.cross_entropy(logits, labels)
         loss_dict['classification'] = classification_loss.item()
-    
+
     # ========================================
     # 2. LLM Loss (if available)
     # ========================================
@@ -327,7 +359,7 @@ def compute_multimodal_loss(
         if 'loss' in outputs['llm_outputs']:
             llm_loss = outputs['llm_outputs']['loss']
             loss_dict['llm'] = llm_loss.item()
-    
+
     # ========================================
     # 3. Graph VAE Loss (reconstruction + KL)
     # ========================================
@@ -336,18 +368,21 @@ def compute_multimodal_loss(
         if 'loss' in outputs['graph_vae_outputs']:
             graph_loss = outputs['graph_vae_outputs']['loss']
             loss_dict['graph_vae'] = graph_loss.item()
-    
+
     # ========================================
-    # 4. Combined Loss
+    # 4. Combined Loss with Quality Weighting
     # ========================================
     total_loss = (
         config.classification_weight * classification_loss +
         0.3 * llm_loss +
         0.2 * graph_loss
     )
-    
+
+    # Apply quality weighting to prioritize high-quality data
+    total_loss = total_loss * quality_weight
+
     loss_dict['total'] = total_loss.item()
-    
+
     return total_loss, loss_dict
 
 

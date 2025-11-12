@@ -1007,22 +1007,30 @@ class UnifiedSOTATrainer:
             # Forward pass through unified system
             outputs = self.model(batch)
 
-            # Compute combined loss
+            # Extract annotations from batch (NEW - annotation integration)
+            annotations = batch.get('annotations', None)
+
+            # Compute combined loss with annotation-based quality weighting
             total_loss, loss_dict = compute_multimodal_loss(
                 outputs,
                 batch,
-                self.model.config  # Use the config from UnifiedMultiModalSystem
+                self.model.config,  # Use the config from UnifiedMultiModalSystem
+                annotations=annotations  # NEW - pass annotations for quality weighting
             )
 
-            # Log individual loss components
+            # Log individual loss components including quality weight
             if self.config.use_wandb and WANDB_AVAILABLE:
-                wandb.log({
+                log_dict = {
                     'train/classification_loss': loss_dict.get('classification', 0.0),
                     'train/llm_loss': loss_dict.get('llm', 0.0),
                     'train/graph_vae_loss': loss_dict.get('graph_vae', 0.0),
                     'train/total_loss': loss_dict.get('total', 0.0),
                     'global_step': self.global_step
-                })
+                }
+                # Log quality weight if available
+                if 'quality_weight' in loss_dict:
+                    log_dict['train/quality_weight'] = loss_dict['quality_weight']
+                wandb.log(log_dict)
 
             return total_loss
 
