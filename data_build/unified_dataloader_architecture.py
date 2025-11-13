@@ -202,6 +202,9 @@ class MultiModalBatch:
         # text_descriptions stays on CPU (list of strings)
         result.text_descriptions = self.text_descriptions
 
+        # ✅ CRITICAL FIX: Preserve annotations field (annotations stay on CPU - they're metadata)
+        result.annotations = self.annotations
+
         return result
 
 

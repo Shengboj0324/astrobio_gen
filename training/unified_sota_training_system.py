@@ -49,18 +49,27 @@ from torch.utils.data import DataLoader
 from torch.cuda.amp import GradScaler, autocast
 import numpy as np
 
+# ✅ CRITICAL FIX: Configure logging BEFORE any logger.warning() calls
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Modern training libraries
 try:
     import wandb
     WANDB_AVAILABLE = True
 except ImportError:
     WANDB_AVAILABLE = False
+    logger.warning("⚠️ wandb not available - experiment tracking disabled")
 
 try:
     import optuna
     OPTUNA_AVAILABLE = True
 except ImportError:
     OPTUNA_AVAILABLE = False
+    logger.warning("⚠️ optuna not available - hyperparameter optimization disabled")
 
 # Flash Attention 2.0
 try:
@@ -68,6 +77,7 @@ try:
     FLASH_ATTENTION_AVAILABLE = True
 except ImportError:
     FLASH_ATTENTION_AVAILABLE = False
+    logger.warning("⚠️ flash_attn not available - using standard attention")
 
 # 8-bit AdamW optimizer for memory efficiency
 try:
@@ -85,13 +95,6 @@ try:
 except ImportError:
     FSDP_AVAILABLE = False
     logger.warning("⚠️ FSDP not available - CPU offloading disabled")
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings("ignore", category=UserWarning)
