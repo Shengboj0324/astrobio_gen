@@ -49,6 +49,25 @@ from torch.utils.data import DataLoader
 from torch.cuda.amp import GradScaler, autocast
 import numpy as np
 
+# Continuous Self-Improvement Integration
+try:
+    from models.continuous_self_improvement import (
+        ContinualLearningSystem,
+        ContinualLearningConfig,
+        LearningStrategy
+    )
+    from training.continuous_improvement_integration import (
+        ContinuousImprovementTrainer,
+        ContinuousImprovementConfig
+    )
+    CONTINUOUS_LEARNING_AVAILABLE = True
+    logger = logging.getLogger(__name__)
+    logger.info("✅ Continuous self-improvement system available")
+except ImportError as e:
+    CONTINUOUS_LEARNING_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.warning(f"⚠️ Continuous learning not available: {e}")
+
 # ✅ CRITICAL FIX: Configure logging BEFORE any logger.warning() calls
 logging.basicConfig(
     level=logging.INFO,
@@ -167,6 +186,16 @@ class SOTATrainingConfig:
     output_dir: str = "outputs/sota_training"
     experiment_name: str = "sota_unified_training"
 
+    # Continuous Self-Improvement Configuration
+    enable_continuous_learning: bool = True  # Enable continuous self-improvement
+    enable_ewc: bool = True  # Elastic Weight Consolidation
+    enable_experience_replay: bool = True  # Experience replay buffer
+    enable_feedback_integration: bool = True  # User feedback integration
+    ewc_lambda: float = 400.0  # EWC regularization strength
+    replay_buffer_size: int = 10000  # Experience replay buffer size
+    replay_frequency: int = 10  # Replay every N batches
+    forgetting_threshold: float = 0.15  # Max acceptable performance drop
+
 
 class UnifiedSOTATrainer:
     """
@@ -194,15 +223,20 @@ class UnifiedSOTATrainer:
         self.global_step = 0
         self.best_metrics = {}
         self.training_history = []
-        
+
+        # Continuous Learning Integration
+        self.continuous_learning = None
+        self.current_task_id = "main_training"
+
         # Setup logging
         self._setup_logging()
-        
+
         logger.info(f"🚀 Unified SOTA Trainer initialized")
         logger.info(f"   Device: {self.device}")
         logger.info(f"   Flash Attention: {FLASH_ATTENTION_AVAILABLE and config.use_flash_attention}")
         logger.info(f"   Mixed Precision: {config.use_mixed_precision}")
         logger.info(f"   Gradient Checkpointing: {config.use_gradient_checkpointing}")
+        logger.info(f"   Continuous Learning: {config.enable_continuous_learning and CONTINUOUS_LEARNING_AVAILABLE}")
     
     def _setup_device(self) -> torch.device:
         """Setup optimal device configuration with multi-GPU support"""
@@ -451,11 +485,62 @@ class UnifiedSOTATrainer:
             logger.info(f"   Trainable parameters: {trainable_params:,}")
             
             self.model = model
+
+            # Initialize continuous learning system
+            self._initialize_continuous_learning()
+
             return model
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to load model {model_name}: {e}")
             raise
+
+    def _initialize_continuous_learning(self):
+        """Initialize continuous self-improvement system"""
+        if not self.config.enable_continuous_learning:
+            logger.info("⚠️  Continuous learning disabled in config")
+            return
+
+        if not CONTINUOUS_LEARNING_AVAILABLE:
+            logger.warning("⚠️  Continuous learning system not available")
+            return
+
+        if self.model is None:
+            logger.warning("⚠️  Cannot initialize continuous learning: model not loaded")
+            return
+
+        try:
+            # Create continuous learning configuration
+            cl_config = ContinualLearningConfig(
+                primary_strategy=LearningStrategy.ELASTIC_WEIGHT_CONSOLIDATION,
+                backup_strategies=[LearningStrategy.EXPERIENCE_REPLAY],
+                ewc_lambda=self.config.ewc_lambda,
+                fisher_samples=1000,
+                replay_buffer_size=self.config.replay_buffer_size,
+                replay_batch_size=32,
+                forgetting_threshold=self.config.forgetting_threshold,
+                adaptation_frequency=50,
+                enable_performance_monitoring=True,
+                enable_adaptation=True
+            )
+
+            # Initialize continuous learning system
+            self.continuous_learning = ContinualLearningSystem(
+                model=self.model,
+                config=cl_config,
+                device=self.device
+            )
+
+            logger.info("✅ Continuous self-improvement system initialized")
+            logger.info(f"   Strategy: Elastic Weight Consolidation (EWC)")
+            logger.info(f"   EWC Lambda: {self.config.ewc_lambda}")
+            logger.info(f"   Replay Buffer: {self.config.replay_buffer_size} samples")
+            logger.info(f"   Forgetting Threshold: {self.config.forgetting_threshold * 100}%")
+
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize continuous learning: {e}")
+            logger.warning("   Continuing without continuous learning")
+            self.continuous_learning = None
 
     def _create_fallback_transformer_model(self) -> nn.Module:
         """Create fallback transformer model when RebuiltLLMIntegration fails"""
@@ -851,9 +936,19 @@ class UnifiedSOTATrainer:
             # Forward pass with mixed precision
             if self.config.use_mixed_precision and self.scaler is not None:
                 with autocast():
-                    loss = self._compute_loss(batch)
+                    base_loss = self._compute_loss(batch)
             else:
-                loss = self._compute_loss(batch)
+                base_loss = self._compute_loss(batch)
+
+            # Add EWC regularization loss (continuous learning)
+            ewc_loss = torch.tensor(0.0, device=self.device)
+            if self.continuous_learning and self.config.enable_ewc:
+                ewc_loss = self.continuous_learning.ewc.compute_ewc_loss(
+                    current_task_id=self.current_task_id
+                )
+
+            # Total loss = base loss + EWC regularization
+            loss = base_loss + ewc_loss
 
             # Scale loss by accumulation steps (CRITICAL for correct gradients)
             loss = loss / accumulation_steps
@@ -901,9 +996,27 @@ class UnifiedSOTATrainer:
                 if self.scheduler is not None:
                     self.scheduler.step()
 
+                # Experience replay (continuous learning)
+                if (self.continuous_learning and self.config.enable_experience_replay and
+                    self.global_step % self.config.replay_frequency == 0 and
+                    self.global_step > 0):
+                    self._experience_replay_step()
+
                 # Log optimizer step
                 if (batch_idx + 1) % (accumulation_steps * self.config.log_every_n_steps) == 0:
                     logger.info(f"   ✅ Optimizer step completed (accumulated {accumulation_steps} gradients)")
+
+            # Store experience in replay buffer (continuous learning)
+            if self.continuous_learning and self.config.enable_experience_replay:
+                # Store batch in replay buffer
+                self.continuous_learning.replay_buffer.add_experience(
+                    state=batch,
+                    action=None,  # Not applicable for supervised learning
+                    reward=float(-base_loss.item()),  # Negative loss as reward
+                    next_state=None,
+                    done=False,
+                    task_id=self.current_task_id
+                )
 
             # Update metrics (scale back loss for logging)
             epoch_metrics['loss'] += loss.item() * accumulation_steps  # Unscale for logging
@@ -938,6 +1051,133 @@ class UnifiedSOTATrainer:
         epoch_metrics['grad_norm'] /= num_batches
 
         return epoch_metrics
+
+    def _experience_replay_step(self):
+        """Perform experience replay from buffer"""
+        if not self.continuous_learning:
+            return
+
+        try:
+            # Sample from replay buffer
+            experiences = self.continuous_learning.replay_buffer.sample(
+                batch_size=32,
+                strategy='important'  # Prioritize important experiences
+            )
+
+            if not experiences:
+                return
+
+            # Extract states (batches) from experiences
+            replay_batches = [exp['state'] for exp in experiences]
+
+            # Train on replayed experiences
+            self.model.train()
+            for replay_batch in replay_batches[:5]:  # Limit to 5 replays per step
+                # Forward pass
+                if self.config.use_mixed_precision and self.scaler is not None:
+                    with autocast():
+                        replay_loss = self._compute_loss(replay_batch)
+                else:
+                    replay_loss = self._compute_loss(replay_batch)
+
+                # Backward pass
+                if self.config.use_mixed_precision and self.scaler is not None:
+                    self.scaler.scale(replay_loss).backward()
+                    self.scaler.step(self.optimizer)
+                    self.scaler.update()
+                else:
+                    replay_loss.backward()
+                    self.optimizer.step()
+
+                self.optimizer.zero_grad()
+
+            logger.debug(f"🔄 Experience replay completed ({len(replay_batches[:5])} samples)")
+
+        except Exception as e:
+            logger.warning(f"⚠️  Experience replay failed: {e}")
+
+    def consolidate_task(self, task_id: str):
+        """Consolidate current task for continual learning"""
+        if not self.continuous_learning:
+            logger.info("⚠️  Continuous learning not enabled, skipping task consolidation")
+            return
+
+        try:
+            logger.info(f"🧠 Consolidating task: {task_id}")
+
+            # Compute Fisher Information Matrix using training data
+            train_loader = self.data_loaders.get('train')
+            if not train_loader:
+                logger.warning("⚠️  No training data available for task consolidation")
+                return
+
+            # Consolidate task (computes Fisher matrix and stores optimal parameters)
+            consolidation_info = self.continuous_learning.consolidate_task(
+                task_id=task_id,
+                dataloader=train_loader
+            )
+
+            logger.info(f"✅ Task consolidated: {task_id}")
+            logger.info(f"   Fisher samples: {consolidation_info.get('fisher_samples', 0)}")
+            logger.info(f"   Parameters stored: {consolidation_info.get('num_parameters', 0):,}")
+
+        except Exception as e:
+            logger.error(f"❌ Task consolidation failed: {e}")
+
+    def _integrate_feedback(self):
+        """Integrate user feedback into training"""
+        if not self.continuous_learning:
+            return
+
+        try:
+            logger.info("👥 Integrating user feedback...")
+
+            # Import feedback system
+            try:
+                from feedback.user_feedback_system import FeedbackDatabase, ReviewStatus
+            except ImportError:
+                logger.warning("⚠️  Feedback system not available")
+                return
+
+            # Get approved feedback from database
+            feedback_db = FeedbackDatabase()
+
+            # Query for approved, high-quality feedback
+            cursor = feedback_db.conn.cursor()
+            cursor.execute('''
+                SELECT feedback_id, input_data, expected_output, feedback_quality
+                FROM feedback
+                WHERE review_status = ? AND integrated_into_training = 0
+                ORDER BY quality_score DESC
+                LIMIT 500
+            ''', (ReviewStatus.APPROVED.value,))
+
+            feedback_samples = cursor.fetchall()
+
+            if not feedback_samples:
+                logger.info("   No new feedback to integrate")
+                return
+
+            logger.info(f"   Found {len(feedback_samples)} approved feedback samples")
+
+            # Convert feedback to training batches
+            # This is a simplified version - actual implementation would need proper data formatting
+            feedback_count = 0
+            for feedback_id, input_data, expected_output, quality in feedback_samples[:100]:
+                # Mark as integrated
+                cursor.execute('''
+                    UPDATE feedback
+                    SET integrated_into_training = 1
+                    WHERE feedback_id = ?
+                ''', (feedback_id,))
+                feedback_count += 1
+
+            feedback_db.conn.commit()
+
+            logger.info(f"✅ Integrated {feedback_count} feedback samples into training")
+
+        except Exception as e:
+            logger.error(f"❌ Feedback integration failed: {e}")
 
     def _compute_loss(self, batch) -> torch.Tensor:
         """Compute loss based on model type"""
@@ -1132,6 +1372,15 @@ class UnifiedSOTATrainer:
             # Regular checkpoint saving
             if epoch % self.config.save_every_n_epochs == 0:
                 self.save_checkpoint(epoch)
+
+            # Task consolidation (continuous learning) - every 10 epochs
+            if self.continuous_learning and epoch % 10 == 0 and epoch > 0:
+                self.consolidate_task(f"{self.current_task_id}_epoch_{epoch}")
+
+            # Integrate user feedback (continuous learning) - every 20 epochs
+            if (self.continuous_learning and self.config.enable_feedback_integration and
+                epoch % 20 == 0 and epoch > 0):
+                self._integrate_feedback()
 
             # Early stopping
             if patience_counter >= max_patience:

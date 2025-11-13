@@ -258,25 +258,36 @@ async def submit_review(review: ReviewDecision, background_tasks: BackgroundTask
 
 @app.get("/api/feedback/stats")
 async def get_statistics():
-    """Get feedback collection statistics"""
-    # This would query the database for statistics
-    # Simplified implementation for now
-    
-    stats = FeedbackStatistics()
-    
-    # TODO: Implement actual statistics calculation from database
-    
-    return {
-        "total_feedback": stats.total_feedback,
-        "feedback_by_type": dict(stats.feedback_by_type),
-        "feedback_by_quality": dict(stats.feedback_by_quality),
-        "feedback_by_status": dict(stats.feedback_by_status),
-        "average_quality_score": stats.average_quality_score,
-        "average_user_rating": stats.average_user_rating,
-        "high_uncertainty_samples": stats.high_uncertainty_samples,
-        "approved_for_training": stats.approved_for_training,
-        "integrated_into_training": stats.integrated_into_training
-    }
+    """
+    Get feedback collection statistics
+
+    Returns comprehensive statistics calculated from the database including:
+    - Total feedback count
+    - Breakdown by type, quality, and status
+    - Average quality and rating scores
+    - Active learning metrics (high uncertainty samples)
+    - Training integration metrics
+    """
+    try:
+        # Get actual statistics from database
+        stats = feedback_db.get_statistics()
+
+        return {
+            "total_feedback": stats.total_feedback,
+            "feedback_by_type": dict(stats.feedback_by_type),
+            "feedback_by_quality": dict(stats.feedback_by_quality),
+            "feedback_by_status": dict(stats.feedback_by_status),
+            "average_quality_score": stats.average_quality_score,
+            "average_user_rating": stats.average_user_rating,
+            "high_uncertainty_samples": stats.high_uncertainty_samples,
+            "approved_for_training": stats.approved_for_training,
+            "integrated_into_training": stats.integrated_into_training,
+            "collection_start_time": stats.collection_start_time.isoformat(),
+            "last_update_time": stats.last_update_time.isoformat()
+        }
+    except Exception as e:
+        logger.error(f"❌ Error getting statistics: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get statistics: {str(e)}")
 
 
 # Background task functions

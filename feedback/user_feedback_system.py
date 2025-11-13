@@ -454,6 +454,99 @@ class FeedbackDatabase:
             metadata=json.loads(row[24]) if row[24] else {}
         )
     
+    def get_statistics(self) -> FeedbackStatistics:
+        """
+        Calculate comprehensive statistics from database
+
+        Returns:
+            FeedbackStatistics object with all metrics calculated from actual data
+        """
+        cursor = self.conn.cursor()
+
+        # Total feedback count
+        cursor.execute('SELECT COUNT(*) FROM feedback')
+        total_feedback = cursor.fetchone()[0]
+
+        # Feedback by type
+        cursor.execute('''
+            SELECT feedback_type, COUNT(*)
+            FROM feedback
+            GROUP BY feedback_type
+        ''')
+        feedback_by_type = defaultdict(int)
+        for feedback_type, count in cursor.fetchall():
+            feedback_by_type[feedback_type] = count
+
+        # Feedback by quality level
+        cursor.execute('''
+            SELECT feedback_quality, COUNT(*)
+            FROM feedback
+            GROUP BY feedback_quality
+        ''')
+        feedback_by_quality = defaultdict(int)
+        for quality_level, count in cursor.fetchall():
+            feedback_by_quality[quality_level] = count
+
+        # Feedback by review status
+        cursor.execute('''
+            SELECT review_status, COUNT(*)
+            FROM feedback
+            GROUP BY review_status
+        ''')
+        feedback_by_status = defaultdict(int)
+        for status, count in cursor.fetchall():
+            feedback_by_status[status] = count
+
+        # Average quality score
+        cursor.execute('SELECT AVG(quality_score) FROM feedback')
+        avg_quality = cursor.fetchone()[0] or 0.0
+
+        # Average user rating (only where rating is not NULL)
+        cursor.execute('SELECT AVG(user_rating) FROM feedback WHERE user_rating IS NOT NULL')
+        avg_rating = cursor.fetchone()[0] or 0.0
+
+        # High uncertainty samples count
+        cursor.execute('''
+            SELECT COUNT(*) FROM feedback
+            WHERE uncertainty_score >= 0.7 AND review_status = ?
+        ''', (ReviewStatus.PENDING.value,))
+        high_uncertainty = cursor.fetchone()[0]
+
+        # Approved for training count
+        cursor.execute('''
+            SELECT COUNT(*) FROM feedback
+            WHERE review_status = ? AND integrated_into_training = 0
+        ''', (ReviewStatus.APPROVED.value,))
+        approved_for_training = cursor.fetchone()[0]
+
+        # Integrated into training count
+        cursor.execute('SELECT COUNT(*) FROM feedback WHERE integrated_into_training = 1')
+        integrated = cursor.fetchone()[0]
+
+        # Get earliest timestamp for collection start time
+        cursor.execute('SELECT MIN(timestamp) FROM feedback')
+        earliest_timestamp = cursor.fetchone()[0]
+        collection_start = datetime.fromisoformat(earliest_timestamp) if earliest_timestamp else datetime.now(timezone.utc)
+
+        # Get latest timestamp for last update
+        cursor.execute('SELECT MAX(timestamp) FROM feedback')
+        latest_timestamp = cursor.fetchone()[0]
+        last_update = datetime.fromisoformat(latest_timestamp) if latest_timestamp else datetime.now(timezone.utc)
+
+        return FeedbackStatistics(
+            total_feedback=total_feedback,
+            feedback_by_type=dict(feedback_by_type),
+            feedback_by_quality=dict(feedback_by_quality),
+            feedback_by_status=dict(feedback_by_status),
+            average_quality_score=avg_quality,
+            average_user_rating=avg_rating,
+            high_uncertainty_samples=high_uncertainty,
+            approved_for_training=approved_for_training,
+            integrated_into_training=integrated,
+            collection_start_time=collection_start,
+            last_update_time=last_update
+        )
+
     def close(self):
         """Close database connection"""
         if self.conn:
