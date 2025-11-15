@@ -817,12 +817,13 @@ class UnifiedSOTATrainer:
             except ImportError as e:
                 logger.warning(f"⚠️  Production data loader not available: {e}")
 
-            # Try to import unified data loaders
+            # Import canonical unified data loaders
             try:
-                from data_build.unified_dataloader_fixed import (
-                    create_multimodal_dataloaders,
+                from data_build.unified_dataloader_architecture import (
+                    multimodal_collate_fn,
                     DataLoaderConfig
                 )
+                logger.info("✅ Using canonical unified_dataloader_architecture")
 
                 # Create data loader configuration
                 dataloader_config = DataLoaderConfig(
@@ -835,20 +836,6 @@ class UnifiedSOTATrainer:
                     enable_caching=True,
                     normalize_climate=True
                 )
-
-                # ✅ CRITICAL FIX: Use multimodal_collate_fn for unified system
-                # Check if we're using the unified multi-modal system
-                use_unified_collate = (self.config.model_name == "unified_multimodal_system")
-
-                if use_unified_collate:
-                    logger.info("✅ Using multimodal_collate_fn for unified multi-modal system")
-                    try:
-                        from data_build.unified_dataloader_architecture import multimodal_collate_fn
-                        # We'll need to modify the dataloader creation to use this collate_fn
-                        # For now, use the standard creation and we'll wrap it
-                    except ImportError as e:
-                        logger.warning(f"⚠️ multimodal_collate_fn not available: {e}")
-                        use_unified_collate = False
 
                 # Create data loaders with REAL data storage
                 train_loader, val_loader, test_loader = create_multimodal_dataloaders(

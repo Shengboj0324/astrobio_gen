@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 """
-Parameter-Efficient Fine-tuned LLM Integration for Astrobiology
+⚠️ ARCHIVED - Parameter-Efficient Fine-tuned LLM Integration (Legacy)
 ==============================================================
 
+This file has been ARCHIVED. Use rebuilt_llm_integration.py instead.
+
+ARCHIVE REASON:
+- Replaced by SOTA rebuilt_llm_integration.py (1000+ lines, 13.14B params)
+- Production system uses RebuiltLLMIntegration with Flash Attention, RoPE, GQA
+- This PEFT version kept for reference only
+
+REPLACEMENT:
+Use models.rebuilt_llm_integration.RebuiltLLMIntegration instead
+
+ARCHIVED DATE: 2025-11-15
+DO NOT USE IN PRODUCTION
+
+Original description:
 Enterprise-grade PEFT LLM system integrating with surrogate models for:
 - Plain-English rationale generation from technical outputs
 - Interactive Q&A with KEGG/GCM knowledge retrieval

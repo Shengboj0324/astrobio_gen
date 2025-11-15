@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 """
-Unified DataLoader Architecture (Standalone)
+⚠️ ARCHIVED - Unified DataLoader Architecture (Standalone Version)
 ==========================================
 
-Standalone PyTorch DataPipe system for multi-modal scientific data loading
-with intelligent batching across climate, biology, and spectroscopy domains.
+This file has been ARCHIVED. Use unified_dataloader_architecture.py instead.
 
-This creates batches that contain:
+ARCHIVE REASON:
+- Replaced by canonical unified_dataloader_architecture.py (945 lines)
+- Production system uses unified_dataloader_architecture
+- This standalone version kept for reference only
+
+REPLACEMENT:
+Use data_build.unified_dataloader_architecture instead
+
+ARCHIVED DATE: 2025-11-15
+DO NOT USE IN PRODUCTION
+
+Original description:
 {
     'climate_cube': tensor,      # 4D climate fields [batch, vars, time, lat, lon, lev]
     'bio_graph': tensor/pyg,     # Biological network data

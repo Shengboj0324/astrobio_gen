@@ -42,6 +42,7 @@ class R2DataUploader:
             endpoint_url=self.endpoint,
             aws_access_key_id=self.access_key,
             aws_secret_access_key=self.secret_key,
+            region_name='auto',
             config=Config(signature_version='s3v4', retries={'max_attempts': 3})
         )
         

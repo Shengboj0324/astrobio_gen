@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 """
-Multi-Modal Storage Layer
+⚠️ ARCHIVED - Multi-Modal Storage Layer (Original Version)
 =========================
 
+This file has been ARCHIVED. Use multi_modal_storage_layer_simple.py instead.
+
+ARCHIVE REASON:
+- Replaced by canonical multi_modal_storage_layer_simple.py (678 lines)
+- Production system uses multi_modal_storage_layer_simple
+- This original version kept for reference only
+
+REPLACEMENT:
+Use data_build.multi_modal_storage_layer_simple instead
+
+ARCHIVED DATE: 2025-11-15
+DO NOT USE IN PRODUCTION
+
+Original description:
 Optimized storage architecture for multi-disciplinary scientific data with
 intelligent format selection, caching strategies, and access patterns.
 

@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """
-Unified DataLoader Architecture (Fixed)
+⚠️ ARCHIVED - Unified DataLoader Architecture (Fixed Version)
 =======================================
 
-Fixed standalone PyTorch DataPipe system for multi-modal scientific data loading.
-This version handles all edge cases and data type issues properly.
+This file has been ARCHIVED. Use unified_dataloader_architecture.py instead.
+
+ARCHIVE REASON:
+- Replaced by canonical unified_dataloader_architecture.py (945 lines)
+- Production system uses unified_dataloader_architecture
+- This fixed version kept for reference only
+
+REPLACEMENT:
+Use data_build.unified_dataloader_architecture instead
+
+ARCHIVED DATE: 2025-11-15
+DO NOT USE IN PRODUCTION
 """
 
 import asyncio
