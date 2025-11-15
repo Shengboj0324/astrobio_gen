@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """
-Domain-Specific Encoders with Shared Latent Space (Fixed)
+⚠️ ARCHIVED - Domain-Specific Encoders (Fixed Version)
 =========================================================
 
-Fixed multi-modal encoder architecture that processes different scientific domains
-with specialized encoders and fuses them into a shared representation space.
+This file has been ARCHIVED. Use domain_specific_encoders.py instead.
+
+ARCHIVE REASON:
+- Replaced by canonical domain_specific_encoders.py
+- Production system uses DomainSpecificEncoders from domain_specific_encoders.py
+- This fixed version kept for reference only
+
+ARCHIVED DATE: 2025-11-15
+DO NOT USE IN PRODUCTION
 """
 
 import logging

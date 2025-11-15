@@ -1,12 +1,19 @@
 """
-World-Class Graph VAE for Metabolic Networks
+⚠️ ARCHIVED - LEGACY Graph VAE Implementation
 ===========================================
 
-Advanced graph neural network with:
-- Graph Transformer architecture with multi-head attention
-- Hierarchical VAE with multi-scale representations
-- Physics-informed biochemical constraints
-- Advanced regularization and uncertainty quantification
+This file has been ARCHIVED and replaced with rebuilt_graph_vae.py
+
+ARCHIVE REASON:
+- Replaced by SOTA implementation in rebuilt_graph_vae.py
+- Production system uses RebuiltGraphVAE (1033 lines, 96% accuracy target)
+- This legacy version kept for backward compatibility only
+
+REPLACEMENT:
+Use models.rebuilt_graph_vae.RebuiltGraphVAE instead
+
+ARCHIVED DATE: 2025-11-15
+DO NOT USE IN PRODUCTION
 """
 
 from __future__ import annotations
